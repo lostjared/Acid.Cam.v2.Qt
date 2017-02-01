@@ -10,8 +10,7 @@
 #include<QTextCursor>
 #include"ac.h"
 #include"fractal.h"
-
-
+#include<unordered_map>
 
 
 #endif

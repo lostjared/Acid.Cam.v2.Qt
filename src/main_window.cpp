@@ -1,14 +1,20 @@
 #include "main_window.h"
 
+std::unordered_map<std::string, int> filter_map;
+
+void generate_map() {
+    for(unsigned int i = 0; i < ac::draw_max; ++i )
+        filter_map[ac::draw_strings[i]] = i;
+}
+
 void custom_filter(cv::Mat &frame) {
     
 }
 
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
-    
+    generate_map();
     setGeometry(0, 0, 800, 600);
     setWindowTitle("Acid Cam v2 - Qt");
-    
     createControls();
     createMenu();
 }

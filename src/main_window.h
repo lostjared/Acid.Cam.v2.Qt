@@ -3,7 +3,6 @@
 
 #include "qtheaders.h"
 
-
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
 public:
@@ -28,6 +27,7 @@ private:
     
 };
 
-
+extern std::unordered_map<std::string, int> filter_map;
+void generate_map();
 
 #endif
