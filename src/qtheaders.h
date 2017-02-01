@@ -4,6 +4,8 @@
 #include<QApplication>
 #include<QMainWindow>
 #include<QDialog>
+#include"ac.h"
+#include"fractal.h"
 
 
 

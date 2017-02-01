@@ -5,9 +5,7 @@
  */
 #ifndef __AC_H__
 #define __AC_H__
-#include<opencv2/videoio.hpp>
-#include<opencv2/imgproc.hpp>
-#include<opencv2/highgui.hpp>
+#include<opencv2/opencv.hpp>
 #include<iostream>
 #include<fstream>
 #include<string>
