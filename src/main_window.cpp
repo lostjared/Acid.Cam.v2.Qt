@@ -1,10 +1,28 @@
 #include "main_window.h"
 
-std::unordered_map<std::string, int> filter_map;
+std::unordered_map<std::string, std::pair<int, int>> filter_map;
+
+const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
+    "Opposite Self AlphaBlend", "AC2 Distort", "Reverse Distort", "Opposite Distort",
+    "Full Distort", "A New One", "AC NewOne", "AC Thought Filter", "Line Draw",
+    "Gradient Square", "Color Wave", "Pixelated Gradient", "Combined Gradient",
+    "Diagonal", "Average", "Average Divide", "Cos/Sin Multiply", "Modulus Multiply",
+    "Positive/Negative", "z+1 Blend", "Diamond Pattern", "Pixelated Shift","Pixelated Mix",
+    "Color Accumulate", "Color Accumulate #2", "Color Accumulate #3", "Angle",
+    "Vertical Average", "Circular Blend", "Average Blend", "~Divide", "Mix", "Random Number",
+    "Gradient Repeat", 0 };
 
 void generate_map() {
-    for(unsigned int i = 0; i < ac::draw_max; ++i )
-        filter_map[ac::draw_strings[i]] = i;
+    for(int i = 0; i < ac::draw_max; ++i )
+        filter_map[ac::draw_strings[i]] = std::make_pair(0, i);
+    
+    int index = 0;
+    while(filter_names[index] != 0) {
+        std::string filter_n = "AF_";
+        filter_n += filter_names[index];
+        filter_map[filter_n] = std::make_pair(1, index);
+        ++index;
+    }
 }
 
 void custom_filter(cv::Mat &frame) {
@@ -18,6 +36,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Acid Cam v2 - Qt");
     createControls();
     createMenu();
+    statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
 }
 
 void AC_MainWindow::createControls() {
@@ -32,6 +51,12 @@ void AC_MainWindow::createControls() {
     
     for(int i = 0; i < ac::draw_max-4; ++i) {
         filters->addItem(ac::draw_strings[i].c_str());
+    }
+    
+    for(int i = 0; filter_names[i] != 0; ++i) {
+        std::string filter_n = "AF_";
+        filter_n += filter_names[i];
+        filters->addItem(filter_n.c_str());
     }
     
     btn_add = new QPushButton("Add", this);
@@ -65,7 +90,7 @@ void AC_MainWindow::createControls() {
     chk_negate->setCheckState(Qt::Unchecked);
     
     combo_rgb = new QComboBox(this);
-    combo_rgb->setGeometry(200,215, 180, 25);
+    combo_rgb->setGeometry(200,215, 190, 25);
     combo_rgb->addItem("RGB");
     combo_rgb->addItem("BGR");
     combo_rgb->addItem("BRG");
@@ -76,7 +101,6 @@ void AC_MainWindow::createControls() {
 }
 
 void AC_MainWindow::createMenu() {
-    
     
     file_menu = menuBar()->addMenu(tr("&File"));
     controls_menu = menuBar()->addMenu(tr("&Controls"));
@@ -98,6 +122,10 @@ void AC_MainWindow::createMenu() {
     connect(file_new_video, SIGNAL(triggered()), this, SLOT(file_NewVideo()));
     connect(file_exit, SIGNAL(triggered()), this, SLOT(file_Exit()));
     
+    controls_stop = new QAction(tr("Sto&p"), this);
+    controls_stop->setShortcut(tr("Ctrl+C"));
+    controls_menu->addAction(controls_stop);
+    
     controls_snapshot = new QAction(tr("&Snap"), this);
     controls_snapshot->setShortcut(tr("Ctrl+S"));
     controls_menu->addAction(controls_snapshot);
@@ -113,13 +141,13 @@ void AC_MainWindow::createMenu() {
     connect(controls_snapshot, SIGNAL(triggered()), this, SLOT(controls_Snap()));
     connect(controls_pause, SIGNAL(triggered()), this, SLOT(controls_Pause()));
     connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
+    connect(controls_stop, SIGNAL(triggered()), this, SLOT(controls_Stop()));
     
-    help_about = new QAction(tr("Help"), this);
+    help_about = new QAction(tr("About"), this);
     help_about->setShortcut(tr("Ctrl+A"));
     help_menu->addAction(help_about);
     
     connect(help_about, SIGNAL(triggered()), this, SLOT(help_About()));
-    
 }
 
 void AC_MainWindow::addClicked() {
@@ -149,7 +177,7 @@ void AC_MainWindow::upClicked() {
 
 void AC_MainWindow::downClicked() {
     int item = custom_filters->currentRow();
-    if(item < custom_filters->count()-1) {
+    if(item >= 0 && item < custom_filters->count()-1) {
     	QListWidgetItem *i = custom_filters->takeItem(item);
     	custom_filters->insertItem(item+1, i->text());
     	custom_filters->setCurrentRow(item+1);
@@ -166,6 +194,10 @@ void AC_MainWindow::Log(const QString &s) {
     QTextCursor tmpCursor = log_text->textCursor();
     tmpCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
     log_text->setTextCursor(tmpCursor);
+}
+
+void AC_MainWindow::controls_Stop() {
+    
 }
 
 void AC_MainWindow::file_Exit() {

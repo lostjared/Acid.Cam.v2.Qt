@@ -16,7 +16,7 @@ public:
     QComboBox *combo_rgb;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
-    QAction *controls_snapshot, *controls_pause, *controls_step;
+    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop;
     QAction *help_about;
 public slots:
     void addClicked();
@@ -26,6 +26,7 @@ public slots:
     void file_Exit();
     void file_NewVideo();
     void file_NewCamera();
+    void controls_Stop();
     void controls_Snap();
     void controls_Pause();
     void controls_Step();
@@ -38,7 +39,8 @@ private:
     
 };
 
-extern std::unordered_map<std::string, int> filter_map;
+extern const char *filer_names[];
+extern std::unordered_map<std::string, std::pair<int, int>> filter_map;
 void generate_map();
 
 #endif
