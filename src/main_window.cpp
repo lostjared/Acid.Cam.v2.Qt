@@ -59,6 +59,19 @@ void AC_MainWindow::createControls() {
     
     filters->setCurrentRow(0);
     
+    chk_negate = new QCheckBox("Negate", this);
+    chk_negate->setGeometry(120,215,100, 20);
+    chk_negate->setCheckState(Qt::Unchecked);
+    
+    combo_rgb = new QComboBox(this);
+    combo_rgb->setGeometry(200,215, 180, 25);
+    combo_rgb->addItem("RGB");
+    combo_rgb->addItem("BGR");
+    combo_rgb->addItem("BRG");
+    combo_rgb->addItem("GRB");
+    
+    setWindowIcon(QPixmap(":/images/icon.png"));
+    
 }
 
 void AC_MainWindow::createMenu() {

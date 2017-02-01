@@ -8,6 +8,8 @@
 #include<QPushButton>
 #include<QTextEdit>
 #include<QTextCursor>
+#include<QComboBox>
+#include<QCheckBox>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>
