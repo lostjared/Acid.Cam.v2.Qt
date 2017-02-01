@@ -2,6 +2,7 @@
 #define __MAIN_WINDOW_H__
 
 #include "qtheaders.h"
+#include "new_dialog.h"
 
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
@@ -36,6 +37,9 @@ public slots:
 private:
     void createControls();
     void createMenu();
+    
+    CaptureCamera *cap_camera;
+    CaptureVideo *cap_video;
     
 };
 

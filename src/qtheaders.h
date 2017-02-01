@@ -14,6 +14,7 @@
 #include<QMenuBar>
 #include<QAction>
 #include<QStatusBar>
+#include<QMessageBox>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

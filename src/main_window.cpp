@@ -36,6 +36,10 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Acid Cam v2 - Qt");
     createControls();
     createMenu();
+    
+    cap_camera = new CaptureCamera(this);
+    cap_video = new CaptureVideo(this);
+    
     statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
 }
 
@@ -205,11 +209,11 @@ void AC_MainWindow::file_Exit() {
 }
 
 void AC_MainWindow::file_NewVideo() {
-    
+    cap_video->show();
 }
 
 void AC_MainWindow::file_NewCamera() {
-    
+    cap_camera->show();
 }
 
 void AC_MainWindow::controls_Snap() {
@@ -225,6 +229,6 @@ void AC_MainWindow::controls_Step() {
 }
 
 void AC_MainWindow::help_About() {
-    
+    QMessageBox::information(this, tr("About Acid Cam"), tr("Written by <b>Jared Bruni</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a>\n"));
 }
 
