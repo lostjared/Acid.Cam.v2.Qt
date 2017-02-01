@@ -12,6 +12,7 @@ public:
     
     QListWidget *filters, *custom_filters;
     QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown;
+    QTextEdit *log_text;
     
 public slots:
     void addClicked();
@@ -19,6 +20,7 @@ public slots:
     void upClicked();
     void downClicked();
     
+    void Log(const QString &s);
     
 private:
     void createControls();

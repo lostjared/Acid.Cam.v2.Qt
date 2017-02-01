@@ -23,7 +23,7 @@ void AC_MainWindow::createControls() {
     custom_filters->setGeometry(400, 10, 390, 200);
     custom_filters->show();
     
-    for(int i = 0; i < ac::draw_max; ++i) {
+    for(int i = 0; i < ac::draw_max-4; ++i) {
         filters->addItem(ac::draw_strings[i].c_str());
     }
     
@@ -41,6 +41,15 @@ void AC_MainWindow::createControls() {
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(btn_movedown, SIGNAL(clicked()), this, SLOT(downClicked()));
+    
+    log_text = new QTextEdit(this);
+    log_text->setGeometry(10, 250, 780,310);
+    log_text->setReadOnly(true);
+    
+    QString text = "Acid Cam v";
+    text += ac::version.c_str();
+    text += " loaded.\n";
+    log_text->setText(text);
     
 }
 
@@ -64,6 +73,16 @@ void AC_MainWindow::downClicked() {
     
 }
 
+void AC_MainWindow::Log(const QString &s) {
+    QString text;
+    text = log_text->toPlainText();
+    text += "\n";
+    text += s;
+    log_text->setText(text);
+    QTextCursor tmpCursor = log_text->textCursor();
+    tmpCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+    log_text->setTextCursor(tmpCursor);
+}
 
 
 

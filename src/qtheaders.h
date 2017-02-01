@@ -6,6 +6,8 @@
 #include<QDialog>
 #include<QListWidget>
 #include<QPushButton>
+#include<QTextEdit>
+#include<QTextCursor>
 #include"ac.h"
 #include"fractal.h"
 
