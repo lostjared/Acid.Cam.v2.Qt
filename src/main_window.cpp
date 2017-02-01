@@ -32,10 +32,10 @@ void AC_MainWindow::createControls() {
     btn_moveup = new QPushButton("Move Up", this);
     btn_movedown = new QPushButton("Move Down", this);
     
-    btn_add->setGeometry(10, 210, 100, 20);
-    btn_remove->setGeometry(400, 210, 100, 20);
-    btn_moveup->setGeometry(500, 210, 100, 20);
-    btn_movedown->setGeometry(600, 210, 100, 20);
+    btn_add->setGeometry(10, 215, 100, 20);
+    btn_remove->setGeometry(400, 215, 100, 20);
+    btn_moveup->setGeometry(500, 215, 100, 20);
+    btn_movedown->setGeometry(600, 215, 100, 20);
     
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
@@ -51,6 +51,8 @@ void AC_MainWindow::createControls() {
     text += " loaded.\n";
     log_text->setText(text);
     
+    filters->setCurrentRow(0);
+    
 }
 
 void AC_MainWindow::createMenu() {
@@ -59,10 +61,19 @@ void AC_MainWindow::createMenu() {
 
 void AC_MainWindow::addClicked() {
     
+    
+    int row = filters->currentRow();
+    if(row != -1) {
+        custom_filters->addItem(ac::draw_strings[row].c_str());
+    }
+    
 }
 
 void AC_MainWindow::rmvClicked() {
-    
+    int item = custom_filters->currentRow();
+    if(item != -1) {
+        custom_filters->takeItem(item);
+    }
 }
 
 void AC_MainWindow::upClicked() {
