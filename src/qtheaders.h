@@ -10,6 +10,9 @@
 #include<QTextCursor>
 #include<QComboBox>
 #include<QCheckBox>
+#include<QMenu>
+#include<QMenuBar>
+#include<QAction>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

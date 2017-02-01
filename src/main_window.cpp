@@ -14,6 +14,7 @@ void custom_filter(cv::Mat &frame) {
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     generate_map();
     setGeometry(0, 0, 800, 600);
+    setFixedSize(800, 600);
     setWindowTitle("Acid Cam v2 - Qt");
     createControls();
     createMenu();
@@ -76,10 +77,52 @@ void AC_MainWindow::createControls() {
 
 void AC_MainWindow::createMenu() {
     
+    
+    file_menu = menuBar()->addMenu(tr("&File"));
+    controls_menu = menuBar()->addMenu(tr("&Controls"));
+    help_menu = menuBar()->addMenu(tr("Help"));
+    
+    file_new_capture = new QAction(tr("Capture from Webcam"),this);
+    file_new_capture->setShortcut(tr("Ctrl+N"));
+    file_menu->addAction(file_new_capture);
+    
+    file_new_video = new QAction(tr("Capture from Video"), this);
+    file_new_video->setShortcut(tr("Ctrl+V"));
+    file_menu->addAction(file_new_video);
+    
+    file_exit = new QAction(tr("E&xit"), this);
+    file_exit->setShortcut(tr("Ctrl+X"));
+    file_menu->addAction(file_exit);
+    
+    connect(file_new_capture, SIGNAL(triggered()), this, SLOT(file_NewCamera()));
+    connect(file_new_video, SIGNAL(triggered()), this, SLOT(file_NewVideo()));
+    connect(file_exit, SIGNAL(triggered()), this, SLOT(file_Exit()));
+    
+    controls_snapshot = new QAction(tr("&Snap"), this);
+    controls_snapshot->setShortcut(tr("Ctrl+S"));
+    controls_menu->addAction(controls_snapshot);
+    
+    controls_pause = new QAction(tr("&Pause"), this);
+    controls_pause->setShortcut(tr("Ctrl+P"));
+    controls_menu->addAction(controls_pause);
+    
+    controls_step = new QAction(tr("Step"), this);
+    controls_step->setShortcut(tr("Controls+I"));
+    controls_menu->addAction(controls_step);
+    
+    connect(controls_snapshot, SIGNAL(triggered()), this, SLOT(controls_Snap()));
+    connect(controls_pause, SIGNAL(triggered()), this, SLOT(controls_Pause()));
+    connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
+    
+    help_about = new QAction(tr("Help"), this);
+    help_about->setShortcut(tr("Ctrl+A"));
+    help_menu->addAction(help_about);
+    
+    connect(help_about, SIGNAL(triggered()), this, SLOT(help_About()));
+    
 }
 
 void AC_MainWindow::addClicked() {
-    
     
     int row = filters->currentRow();
     if(row != -1) {
@@ -125,5 +168,31 @@ void AC_MainWindow::Log(const QString &s) {
     log_text->setTextCursor(tmpCursor);
 }
 
+void AC_MainWindow::file_Exit() {
+    QApplication::exit(0);
+}
 
+void AC_MainWindow::file_NewVideo() {
+    
+}
+
+void AC_MainWindow::file_NewCamera() {
+    
+}
+
+void AC_MainWindow::controls_Snap() {
+    
+}
+
+void AC_MainWindow::controls_Pause() {
+    
+}
+
+void AC_MainWindow::controls_Step() {
+    
+}
+
+void AC_MainWindow::help_About() {
+    
+}
 

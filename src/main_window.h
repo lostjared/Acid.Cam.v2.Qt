@@ -7,20 +7,30 @@ class AC_MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     AC_MainWindow(QWidget *parent = 0);
+    void Log(const QString &s);
     
     QListWidget *filters, *custom_filters;
     QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown;
     QTextEdit *log_text;
     QCheckBox *chk_negate;
     QComboBox *combo_rgb;
-    
+    QMenu *file_menu, *controls_menu, *help_menu;
+    QAction *file_exit, *file_new_capture, *file_new_video;
+    QAction *controls_snapshot, *controls_pause, *controls_step;
+    QAction *help_about;
 public slots:
     void addClicked();
     void rmvClicked();
     void upClicked();
     void downClicked();
+    void file_Exit();
+    void file_NewVideo();
+    void file_NewCamera();
+    void controls_Snap();
+    void controls_Pause();
+    void controls_Step();
+    void help_About();
     
-    void Log(const QString &s);
     
 private:
     void createControls();
