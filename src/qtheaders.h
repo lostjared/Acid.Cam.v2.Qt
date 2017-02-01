@@ -4,6 +4,8 @@
 #include<QApplication>
 #include<QMainWindow>
 #include<QDialog>
+#include<QListWidget>
+#include<QPushButton>
 #include"ac.h"
 #include"fractal.h"
 

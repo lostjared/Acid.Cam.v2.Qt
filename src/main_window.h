@@ -9,6 +9,21 @@ class AC_MainWindow : public QMainWindow {
 public:
     AC_MainWindow(QWidget *parent = 0);
     
+    
+    QListWidget *filters, *custom_filters;
+    QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown;
+    
+public slots:
+    void addClicked();
+    void rmvClicked();
+    void upClicked();
+    void downClicked();
+    
+    
+private:
+    void createControls();
+    void createMenu();
+    
 };
 
 
