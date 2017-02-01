@@ -77,11 +77,22 @@ void AC_MainWindow::rmvClicked() {
 }
 
 void AC_MainWindow::upClicked() {
-    
+    int item = custom_filters->currentRow();
+    if(item > 0) {
+        QListWidgetItem *i = custom_filters->takeItem(item);
+        custom_filters->insertItem(item-1, i->text());
+        custom_filters->setCurrentRow(item-1);
+    }
 }
 
 void AC_MainWindow::downClicked() {
-    
+    int item = custom_filters->currentRow();
+    if(item < custom_filters->count()-1) {
+    	QListWidgetItem *i = custom_filters->takeItem(item);
+    	custom_filters->insertItem(item+1, i->text());
+    	custom_filters->setCurrentRow(item+1);
+    }
+  
 }
 
 void AC_MainWindow::Log(const QString &s) {
