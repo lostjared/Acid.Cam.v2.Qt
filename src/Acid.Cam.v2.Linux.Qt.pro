@@ -5,7 +5,7 @@
 TEMPLATE = app
 TARGET = Acid.Cam.v2.Qt
 DEPENDPATH += .
-INCLUDEPATH += . /usr/include/
+INCLUDEPATH += . /usr/include/ /usr/local/include
 LIBS +=  -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
 QMAKE_CXXFLAGS += -std=c++11
 RESOURCES += qresource.qrc
