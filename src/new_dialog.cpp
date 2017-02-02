@@ -65,20 +65,47 @@ void CaptureCamera::btn_Start() {
 }
 
 CaptureVideo::CaptureVideo(QWidget *parent) : QDialog(parent) {
-    setFixedSize(640, 480);
+    setFixedSize(330, 100);
     setWindowTitle(("Capture from Video"));
     setWindowIcon(QPixmap(":/images/icon.png"));
     createControls();
 }
 
 void CaptureVideo::createControls() {
+    btn_setedit = new QPushButton("Source File", this);
+    btn_setedit->setGeometry(10, 10, 110, 20);
+    edit_src = new QLineEdit(this);
+    edit_src->setGeometry(120, 10, 200, 20);
+    edit_src->setReadOnly(true);
+    btn_setout = new QPushButton("Set Output", this);
+    btn_setout->setGeometry(10, 30, 110, 20);
+    edit_outdir = new QLineEdit(this);
+    edit_outdir->setGeometry(120, 30, 200, 20);
+    edit_outdir->setReadOnly(true);
+    btn_start = new QPushButton("Start", this);
+    btn_start->setGeometry(10, 60, 100, 20);
+    chk_record = new QCheckBox("Record", this);
+    chk_record->setGeometry(110, 60, 100, 20);
     
+    connect(btn_setedit, SIGNAL(clicked()), this, SLOT(btn_SetSourceFile()));
+    connect(btn_setout, SIGNAL(clicked()), this, SLOT(btn_SetOutputDir()));
+    connect(btn_start, SIGNAL(clicked()), this, SLOT(btn_Start()));
 }
 
 void CaptureVideo::setParent(AC_MainWindow *p) {
     win_parent = p;
 }
 
+void CaptureVideo::btn_SetSourceFile() {
+    
+}
 
+void CaptureVideo::btn_SetOutputDir() {
+    
+}
+
+void CaptureVideo::btn_Start() {
+    
+}
 
 

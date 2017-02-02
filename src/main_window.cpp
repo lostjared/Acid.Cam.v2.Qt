@@ -212,7 +212,16 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     // if successful
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
+    return true;
+}
 
+bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
+    
+    
+    
+    // if successful
+    file_new_capture->setEnabled(false);
+    file_new_video->setEnabled(false);
     return true;
 }
 
@@ -241,6 +250,14 @@ void AC_MainWindow::controls_Pause() {
 }
 
 void AC_MainWindow::controls_Step() {
+    
+}
+
+void AC_MainWindow::timer_Camera() {
+    
+}
+
+void AC_MainWindow::timer_Video() {
     
 }
 

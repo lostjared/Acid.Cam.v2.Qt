@@ -32,7 +32,14 @@ public:
     CaptureVideo(QWidget *parent = 0);
     void createControls();
     void setParent(AC_MainWindow *p);
-
+    
+    QLineEdit *edit_src, *edit_outdir;
+    QPushButton *btn_setedit, *btn_setout, *btn_start;
+    QCheckBox *chk_record;
+public slots:
+    void btn_SetSourceFile();
+    void btn_SetOutputDir();
+    void btn_Start();
 private:
     AC_MainWindow *win_parent;
     

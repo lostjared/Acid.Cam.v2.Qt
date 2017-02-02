@@ -10,7 +10,7 @@ public:
     AC_MainWindow(QWidget *parent = 0);
     void Log(const QString &s);
     bool startCamera(int res, int dev, const QString &outdir, bool record);
-    
+    bool startVideo(const QString &filename, const QString &outdir, bool record);
     QListWidget *filters, *custom_filters;
     QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown;
     QTextEdit *log_text;
@@ -33,14 +33,15 @@ public slots:
     void controls_Pause();
     void controls_Step();
     void help_About();
-    
-    
+    void timer_Camera();
+    void timer_Video();
 private:
     void createControls();
     void createMenu();
     
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
+    cv::VideoCapture capture_camera, capture_video;
     
 };
 
