@@ -6,8 +6,7 @@ TEMPLATE = app
 TARGET = Acid.Cam.v2.Qt
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/
-LIBS +=  -lopencv_calib3d  -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy /usr/lib/x86_64-linux-gnu/libopencv_ml.so -lopencv_ml /usr/lib/x86_64-linux-gnu/libopencv_objdetect.so -lopencv_objdetect /usr/lib/x86_64-linux-gnu/libopencv_ocl.so -lopencv_ocl /usr/lib/x86_64-linux-gnu/libopencv_photo.so -lopencv_photo /usr/lib/x86_64-linux-gnu/libopencv_stitching.so -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab
-
+LIBS +=  -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
 QMAKE_CXXFLAGS += -std=c++11
 RESOURCES += qresource.qrc
 
