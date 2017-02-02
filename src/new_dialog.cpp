@@ -1,4 +1,6 @@
 #include "new_dialog.h"
+#include "main_window.h"
+
 
 CaptureCamera::CaptureCamera(QWidget *parent) : QDialog(parent) {
     setFixedSize(290, 120);
@@ -38,12 +40,28 @@ void CaptureCamera::createControls() {
     connect(btn_select, SIGNAL(clicked()), this, SLOT(btn_Select()));
 }
 
+void CaptureCamera::setParent(AC_MainWindow *p) {
+    win_parent = p;
+}
+
 void CaptureCamera::btn_Select() {
+ 
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     
+    if(dir != "") {
+        output_dir->setText(dir);
+    }
 }
 
 void CaptureCamera::btn_Start() {
-    
+    if(output_dir->text().length() > 0) {
+        if(win_parent->startCamera(combo_res->currentIndex(), combo_device->currentIndex(), output_dir->text(), chk_record->isChecked())) {
+            hide();
+            
+        } else {
+            QMessageBox::information(this, "Could not open Capture device", "Make sure you Webcam is pluged in. If you have more than one Webcam use the proper device index.");
+        }
+    }
 }
 
 CaptureVideo::CaptureVideo(QWidget *parent) : QDialog(parent) {
@@ -56,3 +74,11 @@ CaptureVideo::CaptureVideo(QWidget *parent) : QDialog(parent) {
 void CaptureVideo::createControls() {
     
 }
+
+void CaptureVideo::setParent(AC_MainWindow *p) {
+    win_parent = p;
+}
+
+
+
+

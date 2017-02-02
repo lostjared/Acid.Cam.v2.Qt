@@ -18,6 +18,7 @@
 #include<QLabel>
 #include<QTextStream>
 #include<QLineEdit>
+#include<QFileDialog>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

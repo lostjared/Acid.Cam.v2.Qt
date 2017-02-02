@@ -38,7 +38,10 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     createMenu();
     
     cap_camera = new CaptureCamera(this);
+    cap_camera->setParent(this);
+    
     cap_video = new CaptureVideo(this);
+    cap_video->setParent(this);
     
     statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
 }
@@ -130,7 +133,7 @@ void AC_MainWindow::createMenu() {
     controls_stop->setShortcut(tr("Ctrl+C"));
     controls_menu->addAction(controls_stop);
     
-    controls_snapshot = new QAction(tr("&Snap"), this);
+    controls_snapshot = new QAction(tr("Take &Snapshot"), this);
     controls_snapshot->setShortcut(tr("Ctrl+S"));
     controls_menu->addAction(controls_snapshot);
     
@@ -198,6 +201,19 @@ void AC_MainWindow::Log(const QString &s) {
     QTextCursor tmpCursor = log_text->textCursor();
     tmpCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
     log_text->setTextCursor(tmpCursor);
+}
+
+bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record) {
+    
+    // setup device
+    
+    
+    
+    // if successful
+    file_new_capture->setEnabled(false);
+    file_new_video->setEnabled(false);
+
+    return true;
 }
 
 void AC_MainWindow::controls_Stop() {

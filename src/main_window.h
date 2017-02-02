@@ -9,6 +9,7 @@ class AC_MainWindow : public QMainWindow {
 public:
     AC_MainWindow(QWidget *parent = 0);
     void Log(const QString &s);
+    bool startCamera(int res, int dev, const QString &outdir, bool record);
     
     QListWidget *filters, *custom_filters;
     QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown;
