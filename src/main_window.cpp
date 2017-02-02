@@ -49,11 +49,11 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 void AC_MainWindow::createControls() {
     
     filters = new QListWidget(this);
-    filters->setGeometry(10, 10, 390, 200);
+    filters->setGeometry(10, 30, 390, 180);
     filters->show();
     
     custom_filters = new QListWidget(this);
-    custom_filters->setGeometry(400, 10, 390, 200);
+    custom_filters->setGeometry(400, 30, 390, 180);
     custom_filters->show();
     
     for(int i = 0; i < ac::draw_max-4; ++i) {
@@ -133,6 +133,8 @@ void AC_MainWindow::createMenu() {
     controls_stop->setShortcut(tr("Ctrl+C"));
     controls_menu->addAction(controls_stop);
     
+    controls_stop->setEnabled(false);
+    
     controls_snapshot = new QAction(tr("Take &Snapshot"), this);
     controls_snapshot->setShortcut(tr("Ctrl+S"));
     controls_menu->addAction(controls_snapshot);
@@ -155,6 +157,8 @@ void AC_MainWindow::createMenu() {
     help_menu->addAction(help_about);
     
     connect(help_about, SIGNAL(triggered()), this, SLOT(help_About()));
+    timer_video = new QTimer(this);
+    timer_camera = new QTimer(this);
 }
 
 void AC_MainWindow::addClicked() {
@@ -195,7 +199,6 @@ void AC_MainWindow::downClicked() {
 void AC_MainWindow::Log(const QString &s) {
     QString text;
     text = log_text->toPlainText();
-    text += "\n";
     text += s;
     log_text->setText(text);
     QTextCursor tmpCursor = log_text->textCursor();
@@ -212,21 +215,55 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     // if successful
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
+    controls_stop->setEnabled(true);
     return true;
 }
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
     
+    capture_video.open(filename.toStdString());
+    if(!capture_video.isOpened()) {
+        return false;
+    }
+    video_frames = capture_video.get(CV_CAP_PROP_FRAME_COUNT);
+    if(video_frames <= 0) return false;
+    video_fps = capture_video.get(CV_CAP_PROP_FPS);
     
+    int res_w = capture_video.get(CV_CAP_PROP_FRAME_WIDTH);
+    int res_h = capture_video.get(CV_CAP_PROP_FRAME_HEIGHT);
     
+    QString str;
+    QTextStream stream(&str);
+    
+    stream << "Opened capture device " << res_w << "x" << res_h << "\n";
+    stream << "FPS: " << video_fps << "\n";
+    stream << "Frame Count: " << video_frames << "\n";
+    
+    Log(str);
     // if successful
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
+    controls_stop->setEnabled(true);
+    cv::namedWindow("Acid Cam v2");
+
+    connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
+    timer_video->start(1);
+    
     return true;
 }
 
 void AC_MainWindow::controls_Stop() {
+    if(capture_video.isOpened()) {
+        timer_video->stop();
+        capture_video.release();
+        cv::destroyWindow("Acid Cam v2");
+    }
     
+    if(capture_camera.isOpened()) {
+        timer_camera->stop();
+        capture_camera.release();
+        cv::destroyWindow("Acid Cam v2");
+    }
 }
 
 void AC_MainWindow::file_Exit() {
@@ -259,6 +296,20 @@ void AC_MainWindow::timer_Camera() {
 
 void AC_MainWindow::timer_Video() {
     
+    cv::Mat mat;
+    if(capture_video.read(mat) == false) {
+        controls_Stop();
+        return;
+    }
+    
+    for(int i = 0; i < custom_filters->count(); ++i) {
+        QListWidgetItem *val = custom_filters->item(i);
+        QString name = val->text();
+        if(filter_map[name.toStdString()].first == 0)
+        	ac::draw_func[filter_map[name.toStdString()].second](mat);
+    }
+    
+    cv::imshow("Acid Cam v2", mat);
 }
 
 void AC_MainWindow::help_About() {

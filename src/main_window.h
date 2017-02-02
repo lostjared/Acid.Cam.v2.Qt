@@ -42,7 +42,9 @@ private:
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
     cv::VideoCapture capture_camera, capture_video;
-    
+    unsigned long video_frames;
+    double video_fps;
+    QTimer *timer_video, *timer_camera;
 };
 
 extern const char *filer_names[];

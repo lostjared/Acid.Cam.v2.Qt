@@ -19,6 +19,7 @@
 #include<QTextStream>
 #include<QLineEdit>
 #include<QFileDialog>
+#include<QTimer>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

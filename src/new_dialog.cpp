@@ -61,6 +61,8 @@ void CaptureCamera::btn_Start() {
         } else {
             QMessageBox::information(this, "Could not open Capture device", "Make sure you Webcam is pluged in. If you have more than one Webcam use the proper device index.");
         }
+    } else {
+        QMessageBox::information(this, tr("Error could not open device"), tr("Could not open capture device"));
     }
 }
 
@@ -97,15 +99,32 @@ void CaptureVideo::setParent(AC_MainWindow *p) {
 }
 
 void CaptureVideo::btn_SetSourceFile() {
-    
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Video"), "/home", tr("Video Files (*.avi *.mov *.mp4 *.mkv)"));
+    if(fileName != "")
+        edit_src->setText(fileName);
 }
 
 void CaptureVideo::btn_SetOutputDir() {
-    
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(dir != "")
+        edit_outdir->setText(dir);
 }
 
 void CaptureVideo::btn_Start() {
+    if(edit_src->text().length() <= 0) {
+        QMessageBox::information(this, tr("No Input"), tr("Please Select a Video File"));
+        return;
+    }
+    if(edit_outdir->text().length() <= 0) {
+        QMessageBox::information(this, tr("No Output"), tr("Please Select Output Directory"));
+        return;
+    }
     
+    if(win_parent->startVideo(edit_src->text(), edit_outdir->text(), chk_record->isChecked())) {
+        hide();
+    } else {
+        QMessageBox::information(this, tr("Could not open file"), tr("Could not open video file, an error has occured"));
+    }
 }
 
 
