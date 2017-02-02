@@ -15,6 +15,9 @@
 #include<QAction>
 #include<QStatusBar>
 #include<QMessageBox>
+#include<QLabel>
+#include<QTextStream>
+#include<QLineEdit>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>
