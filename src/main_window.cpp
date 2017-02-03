@@ -165,7 +165,8 @@ void AC_MainWindow::addClicked() {
     
     int row = filters->currentRow();
     if(row != -1) {
-        custom_filters->addItem(ac::draw_strings[row].c_str());
+        QListWidgetItem *item = filters->item(row);
+        custom_filters->addItem(item->text());
     }
     
 }
@@ -220,7 +221,6 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 }
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
-    
     capture_video.open(filename.toStdString());
     if(!capture_video.isOpened()) {
         return false;
@@ -245,7 +245,23 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
     cv::namedWindow("Acid Cam v2");
-
+    paused = false;
+    recording = record;
+    QString output_name;
+    QTextStream stream_(&output_name);
+    static unsigned int index = 0;
+    stream_ << outdir << "/" << "AC2.Output." << ++index << ".avi";
+    
+    if(recording) {
+        writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+        if(!writer.isOpened()) {
+            Log("Error could not open video writer.\n");
+        }
+        QString out_s;
+        QTextStream out_stream(&out_s);
+        out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
+        Log(out_s);
+    }
     connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
     timer_video->start(1);
     
@@ -256,13 +272,19 @@ void AC_MainWindow::controls_Stop() {
     if(capture_video.isOpened()) {
         timer_video->stop();
         capture_video.release();
+        writer.release();
         cv::destroyWindow("Acid Cam v2");
+        file_new_capture->setEnabled(true);
+        file_new_video->setEnabled(true);
     }
     
     if(capture_camera.isOpened()) {
         timer_camera->stop();
         capture_camera.release();
+        writer.release();
         cv::destroyWindow("Acid Cam v2");
+        file_new_capture->setEnabled(true);
+        file_new_video->setEnabled(true);
     }
 }
 
@@ -296,6 +318,8 @@ void AC_MainWindow::timer_Camera() {
 
 void AC_MainWindow::timer_Video() {
     
+    if(paused == true) return;
+    
     cv::Mat mat;
     if(capture_video.read(mat) == false) {
         controls_Stop();
@@ -307,9 +331,21 @@ void AC_MainWindow::timer_Video() {
         QString name = val->text();
         if(filter_map[name.toStdString()].first == 0)
         	ac::draw_func[filter_map[name.toStdString()].second](mat);
+        else {
+            red = green = blue = 0;
+            current_filterx = filter_map[name.toStdString()].second;
+            ac::alphaFlame(mat);
+        }
     }
     
     cv::imshow("Acid Cam v2", mat);
+    
+    if(recording) {
+        writer.write(mat);
+        std::cout << "Wrote..\n";
+        // seek to end of file
+        // set frame index
+    }
 }
 
 void AC_MainWindow::help_About() {
