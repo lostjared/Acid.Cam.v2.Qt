@@ -47,6 +47,7 @@ private:
     double video_fps;
     QTimer *timer_video, *timer_camera;
     bool paused, recording;
+    QString video_file_name;
 };
 
 extern const char *filer_names[];

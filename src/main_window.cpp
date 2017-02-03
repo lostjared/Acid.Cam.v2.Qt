@@ -152,6 +152,10 @@ void AC_MainWindow::createMenu() {
     connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
     connect(controls_stop, SIGNAL(triggered()), this, SLOT(controls_Stop()));
     
+    controls_pause->setCheckable(true);
+    controls_pause->setText("Pause");
+    controls_pause->setChecked(false);
+    
     help_about = new QAction(tr("About"), this);
     help_about->setShortcut(tr("Ctrl+A"));
     help_menu->addAction(help_about);
@@ -167,6 +171,10 @@ void AC_MainWindow::addClicked() {
     if(row != -1) {
         QListWidgetItem *item = filters->item(row);
         custom_filters->addItem(item->text());
+        QString qs;
+        QTextStream stream(&qs);
+        stream << "Added Filter: " << item->text() << "\n";
+        Log(qs);
     }
     
 }
@@ -174,7 +182,11 @@ void AC_MainWindow::addClicked() {
 void AC_MainWindow::rmvClicked() {
     int item = custom_filters->currentRow();
     if(item != -1) {
-        custom_filters->takeItem(item);
+        QListWidgetItem *i = custom_filters->takeItem(item);
+        QString qs;
+        QTextStream stream(&qs);
+        stream << "Removed Filter: " << i->text() << "\n";
+        Log(qs);
     }
 }
 
@@ -221,6 +233,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 }
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
+    video_file_name = "";
     capture_video.open(filename.toStdString());
     if(!capture_video.isOpened()) {
         return false;
@@ -253,7 +266,12 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     stream_ << outdir << "/" << "AC2.Output." << ++index << ".avi";
     
     if(recording) {
+        video_file_name = output_name;
+#if defined(__linux__) || defined(__APPLE__)
         writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+#else
+        writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
+#endif
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
         }
@@ -276,6 +294,12 @@ void AC_MainWindow::controls_Stop() {
         cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
+        if(recording) {
+            QString stream_;
+            QTextStream stream(&stream_);
+            stream << "Wrote video file: " << video_file_name << "\n";
+            Log(stream_);
+        }
     }
     
     if(capture_camera.isOpened()) {
@@ -305,7 +329,16 @@ void AC_MainWindow::controls_Snap() {
 }
 
 void AC_MainWindow::controls_Pause() {
-    
+    QString p = controls_pause->text();
+    if(p == "Pause") {
+        controls_pause->setText("Paused");
+        controls_pause->setChecked(Qt::Checked);
+        paused = true;
+    } else {
+        controls_pause->setText("Pause");
+        controls_pause->setChecked(Qt::Unchecked);
+        paused = false;
+    }
 }
 
 void AC_MainWindow::controls_Step() {
@@ -319,6 +352,8 @@ void AC_MainWindow::timer_Camera() {
 void AC_MainWindow::timer_Video() {
     
     if(paused == true) return;
+    
+    
     
     cv::Mat mat;
     if(capture_video.read(mat) == false) {
@@ -342,9 +377,6 @@ void AC_MainWindow::timer_Video() {
     
     if(recording) {
         writer.write(mat);
-        std::cout << "Wrote..\n";
-        // seek to end of file
-        // set frame index
     }
 }
 
