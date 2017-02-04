@@ -223,13 +223,79 @@ void AC_MainWindow::Log(const QString &s) {
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record) {
     
     // setup device
+    video_file_name = "";
+    capture_camera.open(dev);
+    if(!capture_camera.isOpened()) {
+        return false;
+    }
+    video_frames = 0;
+    video_fps = capture_camera.get(CV_CAP_PROP_FPS);
     
+    int res_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
+    int res_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
     
+    QString str;
+    QTextStream stream(&str);
+    
+    stream << "Opened capture device " << res_w << "x" << res_h << "\n";
+    stream << "FPS: " << video_fps << "\n";
+    output_directory = outdir;
+    frame_index = 0;
+    Log(str);
+    paused = false;
+    recording = record;
+    cv::namedWindow("Acid Cam v2");
+    QString output_name;
+    QTextStream stream_(&output_name);
+    static unsigned int index = 0;
+    stream_ << outdir << "/" << "AC2.Output." << ++index << ".avi";
+   
+    switch(res) {
+        case 0:
+            res_w = 640;
+            res_h = 480;
+            break;
+        case 1:
+            res_w = 1280;
+            res_h = 720;
+            break;
+        case 2:
+            res_w = 1920;
+            res_h = 1080;
+            break;
+    }
+    capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
+    capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+    
+    QString res_str;
+    QTextStream res_s(&res_str);
+    res_s << "Resolution set to: " << res_w << "x" << res_h << "\n";
+    Log(res_str);
+    if(recording) {
+        video_file_name = output_name;
+#if defined(__linux__) || defined(__APPLE__)
+        writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+#else
+        writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
+#endif
+        if(!writer.isOpened()) {
+            Log("Could not create video writer..\n");
+        }
+        QString out_s;
+        QTextStream out_stream(&out_s);
+        out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
+        Log(out_s);
+        file_size.open(output_name.toStdString(), std::ios::in | std::ios::binary);
+    }
     
     // if successful
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
+    
+    connect(timer_camera, SIGNAL(timeout()), this, SLOT(timer_Camera()));
+    timer_camera->start(1000/video_fps);
+    
     return true;
 }
 
@@ -282,9 +348,12 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
         file_size.open(output_name.toStdString(), std::ios::in | std::ios::binary);
+        file_size.seekg(0, std::ios::end);
     }
     connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
-    timer_video->start(1000/video_fps);
+    
+    timer_video->setInterval((static_cast<int>(1000/ac::fps)/6));
+    timer_video->start();
     
     return true;
 }
@@ -305,7 +374,6 @@ void AC_MainWindow::controls_Stop() {
             file_size.close();
         }
     }
-    
     if(capture_camera.isOpened()) {
         timer_camera->stop();
         capture_camera.release();
@@ -313,6 +381,13 @@ void AC_MainWindow::controls_Stop() {
         cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
+        if(recording) {
+            QString stream_;
+            QTextStream stream(&stream_);
+            stream << "Wrote video file: " << video_file_name << "\n";
+            Log(stream_);
+            file_size.close();
+        }
     }
 }
 
@@ -350,6 +425,57 @@ void AC_MainWindow::controls_Step() {
 }
 
 void AC_MainWindow::timer_Camera() {
+    
+    if(paused == true) return;
+    ac::isNegative = chk_negate->isChecked();
+    ac::color_order = combo_rgb->currentIndex();
+    cv::Mat mat;
+    if(capture_camera.read(mat) == false) {
+        controls_Stop();
+        return;
+    }
+    ac::in_custom = true;
+    for(int i = 0; i < custom_filters->count(); ++i) {
+        if(i == custom_filters->count()-1)
+            ac::in_custom = false;
+        
+        QListWidgetItem *val = custom_filters->item(i);
+        QString name = val->text();
+        if(filter_map[name.toStdString()].first == 0)
+            ac::draw_func[filter_map[name.toStdString()].second](mat);
+        else {
+            red = green = blue = 0;
+            current_filterx = filter_map[name.toStdString()].second;
+            ac::alphaFlame(mat);
+        }
+    }
+    if(take_snapshot == true) {
+        static int index = 0;
+        QString text;
+        QTextStream stream(&text);
+        stream << output_directory << "/" << "AC.Snapshot." << ++index << ".png";
+        cv::imwrite(text.toStdString(), mat);
+        QString total;
+        QTextStream stream_total(&total);
+        stream_total << "Took Snapshot: " << text << "\n";
+        Log(total);
+        take_snapshot = false;
+    }
+    
+    cv::imshow("Acid Cam v2", mat);
+    if(recording) {
+        writer.write(mat);
+        file_size.seekg(0, std::ios::end);
+        file_pos = file_size.tellg();
+    }
+    
+    frame_index++;
+    QString frame_string;
+    QTextStream frame_stream(&frame_string);
+    
+    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
+    
+    statusBar()->showMessage(frame_string);
     
 }
 
@@ -400,7 +526,7 @@ void AC_MainWindow::timer_Video() {
     QString frame_string;
     QTextStream frame_stream(&frame_string);
     
-    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (video_frames/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
+    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
     
     statusBar()->showMessage(frame_string);
 }
