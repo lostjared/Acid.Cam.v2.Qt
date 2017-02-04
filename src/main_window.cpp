@@ -44,6 +44,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     cap_video->setParent(this);
     
     statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
+    take_snapshot = false;
 }
 
 void AC_MainWindow::createControls() {
@@ -251,7 +252,8 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
     stream << "FPS: " << video_fps << "\n";
     stream << "Frame Count: " << video_frames << "\n";
-    
+    output_directory = outdir;
+    frame_index = 0;
     Log(str);
     // if successful
     file_new_capture->setEnabled(false);
@@ -279,9 +281,10 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         QTextStream out_stream(&out_s);
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
+        file_size.open(output_name.toStdString(), std::ios::in | std::ios::binary);
     }
     connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
-    timer_video->start(1);
+    timer_video->start(1000/video_fps);
     
     return true;
 }
@@ -299,6 +302,7 @@ void AC_MainWindow::controls_Stop() {
             QTextStream stream(&stream_);
             stream << "Wrote video file: " << video_file_name << "\n";
             Log(stream_);
+            file_size.close();
         }
     }
     
@@ -325,7 +329,7 @@ void AC_MainWindow::file_NewCamera() {
 }
 
 void AC_MainWindow::controls_Snap() {
-    
+    take_snapshot = true;
 }
 
 void AC_MainWindow::controls_Pause() {
@@ -350,18 +354,19 @@ void AC_MainWindow::timer_Camera() {
 }
 
 void AC_MainWindow::timer_Video() {
-    
     if(paused == true) return;
-    
-    
-    
+    ac::isNegative = chk_negate->isChecked();
+    ac::color_order = combo_rgb->currentIndex();
     cv::Mat mat;
     if(capture_video.read(mat) == false) {
         controls_Stop();
         return;
     }
-    
+    ac::in_custom = true;
     for(int i = 0; i < custom_filters->count(); ++i) {
+        if(i == custom_filters->count()-1)
+            ac::in_custom = false;
+        
         QListWidgetItem *val = custom_filters->item(i);
         QString name = val->text();
         if(filter_map[name.toStdString()].first == 0)
@@ -372,12 +377,32 @@ void AC_MainWindow::timer_Video() {
             ac::alphaFlame(mat);
         }
     }
-    
+    if(take_snapshot == true) {
+    	static int index = 0;
+    	QString text;
+    	QTextStream stream(&text);
+    	stream << output_directory << "/" << "AC.Snapshot." << ++index << ".png";
+    	cv::imwrite(text.toStdString(), mat);
+    	QString total;
+    	QTextStream stream_total(&total);
+    	stream_total << "Took Snapshot: " << text << "\n";
+    	Log(total);
+        take_snapshot = false;
+    }
     cv::imshow("Acid Cam v2", mat);
-    
     if(recording) {
         writer.write(mat);
+        file_size.seekg(0, std::ios::end);
+        file_pos = file_size.tellg();
     }
+    
+    frame_index++;
+    QString frame_string;
+    QTextStream frame_stream(&frame_string);
+    
+    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (video_frames/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
+    
+    statusBar()->showMessage(frame_string);
 }
 
 void AC_MainWindow::help_About() {

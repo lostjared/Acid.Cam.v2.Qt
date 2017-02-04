@@ -48,6 +48,10 @@ private:
     QTimer *timer_video, *timer_camera;
     bool paused, recording;
     QString video_file_name;
+    QString output_directory;
+    bool take_snapshot;
+    std::fstream file_size;
+    unsigned long file_pos, frame_index;
 };
 
 extern const char *filer_names[];
