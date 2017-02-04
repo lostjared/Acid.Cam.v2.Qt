@@ -266,7 +266,6 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     }
     capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
     capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
-    
     QString res_str;
     QTextStream res_s(&res_str);
     res_s << "Resolution set to: " << res_w << "x" << res_h << "\n";
@@ -287,15 +286,13 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         Log(out_s);
         file_size.open(output_name.toStdString(), std::ios::in | std::ios::binary);
     }
-    
     // if successful
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
-    
     connect(timer_camera, SIGNAL(timeout()), this, SLOT(timer_Camera()));
-    timer_camera->start(1000/video_fps);
-    
+    timer_camera->setInterval(1000/video_fps);
+    timer_camera->start();
     return true;
 }
 
@@ -352,7 +349,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     }
     connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
     
-    timer_video->setInterval((static_cast<int>(1000/ac::fps)/6));
+    timer_video->setInterval((1000/ac::fps));
     timer_video->start();
     
     return true;
