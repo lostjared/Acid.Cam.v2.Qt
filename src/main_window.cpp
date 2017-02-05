@@ -221,22 +221,20 @@ void AC_MainWindow::Log(const QString &s) {
 }
 
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record) {
-    
     // setup device
+    step_frame = false;
     video_file_name = "";
+    frame_index = 0;
     capture_camera.open(dev);
     if(!capture_camera.isOpened()) {
         return false;
     }
     video_frames = 0;
-    video_fps = capture_camera.get(CV_CAP_PROP_FPS);
-    
+    video_fps = 24;
     int res_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
     int res_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
-    
     QString str;
     QTextStream stream(&str);
-    
     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
     stream << "FPS: " << video_fps << "\n";
     output_directory = outdir;
@@ -248,8 +246,12 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     QString output_name;
     QTextStream stream_(&output_name);
     static unsigned int index = 0;
-    stream_ << outdir << "/" << "AC2.Output." << ++index << ".avi";
-   
+    time_t t = time(0);
+    struct tm *m;
+    m = localtime(&t);
+    std::ostringstream time_stream;
+    time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
+    stream_ << outdir << "/" << "Video." << time_stream.str().c_str() << "AC2.Output." << (++index) << ".avi";
     switch(res) {
         case 0:
             res_w = 640;
@@ -291,13 +293,14 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
     connect(timer_camera, SIGNAL(timeout()), this, SLOT(timer_Camera()));
-    timer_camera->setInterval(1000/video_fps);
+    timer_camera->setInterval(1000/24);
     timer_camera->start();
     return true;
 }
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
     video_file_name = "";
+    step_frame = false;
     capture_video.open(filename.toStdString());
     if(!capture_video.isOpened()) {
         return false;
@@ -305,13 +308,10 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     video_frames = capture_video.get(CV_CAP_PROP_FRAME_COUNT);
     if(video_frames <= 0) return false;
     video_fps = capture_video.get(CV_CAP_PROP_FPS);
-    
     int res_w = capture_video.get(CV_CAP_PROP_FRAME_WIDTH);
     int res_h = capture_video.get(CV_CAP_PROP_FRAME_HEIGHT);
-    
     QString str;
     QTextStream stream(&str);
-    
     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
     stream << "FPS: " << video_fps << "\n";
     stream << "Frame Count: " << video_frames << "\n";
@@ -329,7 +329,6 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     QTextStream stream_(&output_name);
     static unsigned int index = 0;
     stream_ << outdir << "/" << "AC2.Output." << ++index << ".avi";
-    
     if(recording) {
         video_file_name = output_name;
 #if defined(__linux__) || defined(__APPLE__)
@@ -418,12 +417,14 @@ void AC_MainWindow::controls_Pause() {
 }
 
 void AC_MainWindow::controls_Step() {
-    
+    step_frame = true;
 }
 
 void AC_MainWindow::timer_Camera() {
-    
-    if(paused == true) return;
+    if(step_frame == true  && paused == true) {
+        step_frame = false;
+    }
+    else if(paused == true) return;
     ac::isNegative = chk_negate->isChecked();
     ac::color_order = combo_rgb->currentIndex();
     cv::Mat mat;
@@ -477,7 +478,10 @@ void AC_MainWindow::timer_Camera() {
 }
 
 void AC_MainWindow::timer_Video() {
-    if(paused == true) return;
+    if(step_frame == true  && paused == true)
+        step_frame = false;
+    else if(paused == true) return;
+
     ac::isNegative = chk_negate->isChecked();
     ac::color_order = combo_rgb->currentIndex();
     cv::Mat mat;

@@ -46,7 +46,7 @@ private:
     unsigned long video_frames;
     double video_fps;
     QTimer *timer_video, *timer_camera;
-    bool paused, recording;
+    bool paused, recording, step_frame;
     QString video_file_name;
     QString output_directory;
     bool take_snapshot;
