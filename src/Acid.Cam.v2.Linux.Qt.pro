@@ -4,6 +4,7 @@
 
 TEMPLATE = app
 TARGET = Acid.Cam.v2.Qt
+QT += core gui widgets
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/ /usr/local/include
 LIBS +=  -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
