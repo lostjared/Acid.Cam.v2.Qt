@@ -3,6 +3,7 @@
 
 
 CaptureCamera::CaptureCamera(QWidget *parent) : QDialog(parent) {
+    setGeometry(100, 100, 290, 120);
     setFixedSize(290, 120);
     setWindowTitle("Capture from Webcam");
     setWindowIcon(QPixmap(":/images/icon.png"));
@@ -67,6 +68,7 @@ void CaptureCamera::btn_Start() {
 }
 
 CaptureVideo::CaptureVideo(QWidget *parent) : QDialog(parent) {
+    setGeometry(100, 100, 330, 100);
     setFixedSize(330, 100);
     setWindowTitle(("Capture from Video"));
     setWindowIcon(QPixmap(":/images/icon.png"));

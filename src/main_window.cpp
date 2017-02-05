@@ -31,7 +31,7 @@ void custom_filter(cv::Mat &frame) {
 
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     generate_map();
-    setGeometry(0, 0, 800, 600);
+    setGeometry(100, 100, 800, 600);
     setFixedSize(800, 600);
     setWindowTitle("Acid Cam v2 - Qt");
     createControls();
@@ -137,21 +137,26 @@ void AC_MainWindow::createMenu() {
     controls_stop->setEnabled(false);
     
     controls_snapshot = new QAction(tr("Take &Snapshot"), this);
-    controls_snapshot->setShortcut(tr("Ctrl+S"));
+    controls_snapshot->setShortcut(tr("S"));
     controls_menu->addAction(controls_snapshot);
     
     controls_pause = new QAction(tr("&Pause"), this);
-    controls_pause->setShortcut(tr("Ctrl+P"));
+    controls_pause->setShortcut(tr("P"));
     controls_menu->addAction(controls_pause);
     
     controls_step = new QAction(tr("Step"), this);
-    controls_step->setShortcut(tr("Controls+I"));
+    controls_step->setShortcut(tr("I"));
     controls_menu->addAction(controls_step);
+    
+    controls_setimage = new QAction(tr("Set Image"), this);
+    controls_setimage->setShortcut(tr("Ctrl+I"));
+    controls_menu->addAction(controls_setimage);
     
     connect(controls_snapshot, SIGNAL(triggered()), this, SLOT(controls_Snap()));
     connect(controls_pause, SIGNAL(triggered()), this, SLOT(controls_Pause()));
     connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
     connect(controls_stop, SIGNAL(triggered()), this, SLOT(controls_Stop()));
+    connect(controls_setimage, SIGNAL(triggered()), this, SLOT(controls_SetImage()));
     
     controls_pause->setCheckable(true);
     controls_pause->setText("Pause");
@@ -328,7 +333,14 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     QString output_name;
     QTextStream stream_(&output_name);
     static unsigned int index = 0;
-    stream_ << outdir << "/" << "AC2.Output." << ++index << ".avi";
+    time_t t = time(0);
+    struct tm *m;
+    m = localtime(&t);
+    std::ostringstream time_stream;
+    time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
+    stream_ << outdir << "/" << "Video." << time_stream.str().c_str() << "AC2.Output." << (++index) << ".avi";
+
+    
     if(recording) {
         video_file_name = output_name;
 #if defined(__linux__) || defined(__APPLE__)
@@ -413,6 +425,17 @@ void AC_MainWindow::controls_Pause() {
         controls_pause->setText("Pause");
         controls_pause->setChecked(Qt::Unchecked);
         paused = false;
+    }
+}
+
+void AC_MainWindow::controls_SetImage() {
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), "/home", tr("Image Files (*.png *.jpg)"));
+    if(fileName != "") {
+        blend_image = cv::imread(fileName.toStdString());
+        if(!blend_image.empty()) {
+            blend_set = true;
+            QMessageBox::information(this, tr("Loaded Image"), tr("Image set"));
+        }
     }
 }
 

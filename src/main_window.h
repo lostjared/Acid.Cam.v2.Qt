@@ -18,7 +18,7 @@ public:
     QComboBox *combo_rgb;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
-    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop;
+    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage;
     QAction *help_about;
 public slots:
     void addClicked();
@@ -32,6 +32,7 @@ public slots:
     void controls_Snap();
     void controls_Pause();
     void controls_Step();
+    void controls_SetImage();
     void help_About();
     void timer_Camera();
     void timer_Video();
