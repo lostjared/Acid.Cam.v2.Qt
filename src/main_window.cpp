@@ -59,6 +59,16 @@ void Playback::setVector(std::vector<std::pair<int, int>> v) {
     mutex.unlock();
 }
 
+void Playback::setOptions(bool n, int c) {
+    mutex.lock();
+    ac::isNegative = n;
+    negate = n;
+    reverse = c;
+    ac::color_order = c;
+    ac::in_custom = true;
+    mutex.unlock();
+}
+
 void Playback::run() {
     int delay = (1000/frame_rate);
     while(!stop) {
@@ -67,7 +77,14 @@ void Playback::run() {
         }
         mutex.lock();
         if(current.size()>0) {
+            
+            ac::in_custom = true;
+
             for(unsigned int i = 0; i < current.size(); ++i) {
+                
+                if(i == current.size()-1)
+                    ac::in_custom = false;
+                
                 if(current[i].first == 0) {
                     ac::draw_func[current[i].second](frame);
                 } else {
@@ -214,6 +231,8 @@ void AC_MainWindow::createControls() {
     chk_negate->setGeometry(120,215,100, 20);
     chk_negate->setCheckState(Qt::Unchecked);
     
+    connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
+    
     combo_rgb = new QComboBox(this);
     combo_rgb->setGeometry(200,215, 190, 25);
     combo_rgb->addItem("RGB");
@@ -275,6 +294,8 @@ void AC_MainWindow::createMenu() {
     connect(controls_stop, SIGNAL(triggered()), this, SLOT(controls_Stop()));
     connect(controls_setimage, SIGNAL(triggered()), this, SLOT(controls_SetImage()));
     
+    connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
+    
     controls_pause->setCheckable(true);
     controls_pause->setText("Pause");
     controls_pause->setChecked(false);
@@ -288,6 +309,13 @@ void AC_MainWindow::createMenu() {
     timer_camera = new QTimer(this);
 }
 
+void AC_MainWindow::chk_Clicked() {
+    playback->setOptions(chk_negate->isChecked(), combo_rgb->currentIndex());
+}
+void AC_MainWindow::cb_SetIndex(int index) {
+    playback->setOptions(chk_negate->isChecked(), index);
+    
+}
 void AC_MainWindow::addClicked() {
     
     int row = filters->currentRow();
@@ -515,7 +543,7 @@ void AC_MainWindow::controls_Stop() {
     if(capture_camera.isOpened()) {
         playback->Stop();
         capture_camera.release();
-        if(recording = true) writer.release();
+        if(recording == true) writer.release();
         cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
@@ -575,6 +603,7 @@ void AC_MainWindow::controls_Step() {
 }
 
 void AC_MainWindow::timer_Camera() {
+    /*
     if(step_frame == true  && paused == true) {
         step_frame = false;
     }
@@ -627,13 +656,13 @@ void AC_MainWindow::timer_Camera() {
     QTextStream frame_stream(&frame_string);
     
     frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
-    
-
+     */
     
 }
 
 void AC_MainWindow::timer_Video() {
     
+    /*
     if(step_frame == true  && paused == true)
         step_frame = false;
     else if(paused == true) return;
@@ -686,15 +715,12 @@ void AC_MainWindow::timer_Video() {
     
     frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
     
-    statusBar()->showMessage(frame_string);
+    statusBar()->showMessage(frame_string); */
 }
 
 void AC_MainWindow::buildVector(std::vector<std::pair<int,int>> &v) {
     if(!v.empty()) v.erase(v.begin(), v.end());
     for(int i = 0; i < custom_filters->count(); ++i) {
-        if(i == custom_filters->count()-1)
-            ac::in_custom = false;
-        
         QListWidgetItem *val = custom_filters->item(i);
         QString name = val->text();
         v.push_back(filter_map[name.toStdString()]);
@@ -718,59 +744,6 @@ QImage Mat2QImage(cv::Mat const& src)
     dest.bits();
     return dest;
 }
-
-void AC_MainWindow::proc_Frame(cv::Mat &mat) {
-    /*
-    if(step_frame == true  && paused == true)
-        step_frame = false;
-    else if(paused == true) return; */
-    
-    ac::isNegative = chk_negate->isChecked();
-    ac::color_order = combo_rgb->currentIndex();
-    negate = ac::isNegative;
-    reverse = ac::color_order;
-    ac::in_custom = true;
-    for(int i = 0; i < custom_filters->count(); ++i) {
-        if(i == custom_filters->count()-1)
-            ac::in_custom = false;
-        
-        QListWidgetItem *val = custom_filters->item(i);
-        QString name = val->text();
-        if(filter_map[name.toStdString()].first == 0)
-            ac::draw_func[filter_map[name.toStdString()].second](mat);
-        else {
-            red = green = blue = 0;
-            current_filterx = filter_map[name.toStdString()].second;
-            ac::alphaFlame(mat);
-        }
-    }
-    if(take_snapshot == true) {
-        static int index = 0;
-        QString text;
-        QTextStream stream(&text);
-        stream << output_directory << "/" << "AC.Snapshot." << ++index << ".png";
-        cv::imwrite(text.toStdString(), mat);
-        QString total;
-        QTextStream stream_total(&total);
-        stream_total << "Took Snapshot: " << text << "\n";
-        Log(total);
-        take_snapshot = false;
-    }
-    if(recording) {
-        writer.write(mat);
-        file_size.seekg(0, std::ios::end);
-        file_pos = file_size.tellg();
-    }
-    
-    frame_index++;
-    QString frame_string;
-    QTextStream frame_stream(&frame_string);
-    
-    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
-    
-    statusBar()->showMessage(frame_string);
-}
-
 
 
 void AC_MainWindow::updateFrame(QImage img) {

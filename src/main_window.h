@@ -27,6 +27,7 @@ public:
     void run();
     void msleep(int ms);
     void setVector(std::vector<std::pair<int, int>> s);
+    void setOptions(bool n, int c);
 signals:
     void procImage(const QImage &image);
     void procCameraFrame(void *frame);
@@ -79,7 +80,8 @@ public slots:
     void timer_Video();
     void updateFrame(QImage img);
     void CameraFrame(void *frame);
-    void buildVector(std::vector<std::pair<int,int>> &v);
+    void chk_Clicked();
+    void cb_SetIndex(int index);
 private:
     void createControls();
     void createMenu();
@@ -99,7 +101,7 @@ private:
     unsigned long file_pos, frame_index;
     Playback *playback;
     
-    void proc_Frame(cv::Mat &frame);
+    void buildVector(std::vector<std::pair<int,int>> &v);
 };
 
 extern const char *filer_names[];
