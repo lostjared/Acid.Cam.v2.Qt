@@ -1552,6 +1552,9 @@ void changePixel(cv::Mat &full_buffer, int i, int z, cv::Vec3b &buffer, double p
         }
             break;
     }
+    
+    if(ac::in_custom == true) return;
+    
     buffer[0] += red;
     buffer[1] += green;
     buffer[2] += blue;

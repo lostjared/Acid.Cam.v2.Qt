@@ -450,6 +450,8 @@ void AC_MainWindow::timer_Camera() {
     else if(paused == true) return;
     ac::isNegative = chk_negate->isChecked();
     ac::color_order = combo_rgb->currentIndex();
+    negate = ac::isNegative;
+    reverse = ac::color_order;
     cv::Mat mat;
     if(capture_camera.read(mat) == false) {
         controls_Stop();
@@ -507,6 +509,8 @@ void AC_MainWindow::timer_Video() {
 
     ac::isNegative = chk_negate->isChecked();
     ac::color_order = combo_rgb->currentIndex();
+    negate = ac::isNegative;
+    reverse = ac::color_order;
     cv::Mat mat;
     if(capture_video.read(mat) == false) {
         controls_Stop();
