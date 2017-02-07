@@ -16,6 +16,7 @@ private:
     cv::VideoWriter  *writer;
     cv::Mat rgb_frame;
     QImage img;
+    std::vector<std::pair<int, int>> current;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -25,6 +26,7 @@ public:
     bool isStopped() const;
     void run();
     void msleep(int ms);
+    void setVector(std::vector<std::pair<int, int>> s);
 signals:
     void procImage(const QImage &image);
     void procCameraFrame(void *frame);
@@ -77,7 +79,7 @@ public slots:
     void timer_Video();
     void updateFrame(QImage img);
     void CameraFrame(void *frame);
-
+    void buildVector(std::vector<std::pair<int,int>> &v);
 private:
     void createControls();
     void createMenu();

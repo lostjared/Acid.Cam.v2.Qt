@@ -53,14 +53,30 @@ void Playback::setVideo(cv::VideoCapture *cap, cv::VideoWriter *wr) {
     }
 }
 
+void Playback::setVector(std::vector<std::pair<int, int>> v) {
+    mutex.lock();
+    current = v;
+    mutex.unlock();
+}
+
 void Playback::run() {
     int delay = (1000/frame_rate);
     while(!stop) {
         if(!capture->read(frame)) {
             stop = true;
         }
-        /* Add code to proc the image here */
-        
+        mutex.lock();
+        if(current.size()>0) {
+            for(unsigned int i = 0; i < current.size(); ++i) {
+                if(current[i].first == 0) {
+                    ac::draw_func[current[i].second](frame);
+                } else {
+                    current_filterx = current[i].second;
+                    ac::alphaFlame(frame);
+                }
+            }
+        }
+        mutex.unlock();
         if(frame.channels()==3) {
             cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
             img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
@@ -68,10 +84,10 @@ void Playback::run() {
             img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
             
         }
-        emit procImage(img);
         if(writer != 0 && writer->isOpened()) {
             writer->write(frame);
         }
+        emit procImage(img);
         this->msleep(delay);
     }
 }
@@ -282,8 +298,10 @@ void AC_MainWindow::addClicked() {
         QTextStream stream(&qs);
         stream << "Added Filter: " << item->text() << "\n";
         Log(qs);
+        std::vector<std::pair<int, int>> v;
+        buildVector(v);
+        playback->setVector(v);
     }
-    
 }
 
 void AC_MainWindow::rmvClicked() {
@@ -294,6 +312,10 @@ void AC_MainWindow::rmvClicked() {
         QTextStream stream(&qs);
         stream << "Removed Filter: " << i->text() << "\n";
         Log(qs);
+        std::vector<std::pair<int, int>> v;
+        buildVector(v);
+        playback->setVector(v);
+        
     }
 }
 
@@ -303,6 +325,10 @@ void AC_MainWindow::upClicked() {
         QListWidgetItem *i = custom_filters->takeItem(item);
         custom_filters->insertItem(item-1, i->text());
         custom_filters->setCurrentRow(item-1);
+        std::vector<std::pair<int, int>> v;
+        buildVector(v);
+        playback->setVector(v);
+    
     }
 }
 
@@ -312,6 +338,9 @@ void AC_MainWindow::downClicked() {
     	QListWidgetItem *i = custom_filters->takeItem(item);
     	custom_filters->insertItem(item+1, i->text());
     	custom_filters->setCurrentRow(item+1);
+        std::vector<std::pair<int, int>> v;
+        buildVector(v);
+        playback->setVector(v);
     }
   
 }
@@ -470,7 +499,7 @@ void AC_MainWindow::controls_Stop() {
     if(capture_video.isOpened()) {
         playback->Stop();
         capture_video.release();
-        writer.release();
+        if(recording == true) writer.release();
         cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
@@ -486,7 +515,7 @@ void AC_MainWindow::controls_Stop() {
     if(capture_camera.isOpened()) {
         playback->Stop();
         capture_camera.release();
-        writer.release();
+        if(recording = true) writer.release();
         cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
@@ -658,6 +687,18 @@ void AC_MainWindow::timer_Video() {
     frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
     
     statusBar()->showMessage(frame_string);
+}
+
+void AC_MainWindow::buildVector(std::vector<std::pair<int,int>> &v) {
+    if(!v.empty()) v.erase(v.begin(), v.end());
+    for(int i = 0; i < custom_filters->count(); ++i) {
+        if(i == custom_filters->count()-1)
+            ac::in_custom = false;
+        
+        QListWidgetItem *val = custom_filters->item(i);
+        QString name = val->text();
+        v.push_back(filter_map[name.toStdString()]);
+    }
 }
 
 
