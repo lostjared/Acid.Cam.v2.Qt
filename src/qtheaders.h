@@ -20,6 +20,11 @@
 #include<QLineEdit>
 #include<QFileDialog>
 #include<QTimer>
+#include<QMutex>
+#include<QThread>
+#include<QImage>
+#include<QPainter>
+#include<QWaitCondition>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

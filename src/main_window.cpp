@@ -1,4 +1,5 @@
 #include "main_window.h"
+#include<mutex>
 
 std::unordered_map<std::string, std::pair<int, int>> filter_map;
 
@@ -29,6 +30,101 @@ void custom_filter(cv::Mat &) {
     
 }
 
+
+Playback::Playback(QObject *parent) : QThread(parent) {
+    stop = true;
+}
+
+void Playback::Play() {
+    if(!isRunning()) {
+        if(isStopped()) {
+            stop = false;
+        }
+    }
+    start(LowPriority);
+}
+
+void Playback::setVideo(cv::VideoCapture *cap, cv::VideoWriter *wr) {
+    capture = cap;
+    writer = wr;
+    if(capture->isOpened()) {
+        frame_rate = (int) capture->get(CV_CAP_PROP_FPS);
+        if(frame_rate <= 0) frame_rate = 24;
+    }
+}
+
+void Playback::run() {
+    int delay = (1000/frame_rate);
+    while(!stop) {
+        if(!capture->read(frame)) {
+            stop = true;
+        }
+        /* Add code to proc the image here */
+        
+        if(frame.channels()==3) {
+            cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
+            img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
+        } else {
+            img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
+            
+        }
+        emit procImage(img);
+        if(writer != 0 && writer->isOpened()) {
+            writer->write(frame);
+        }
+        this->msleep(delay);
+    }
+}
+
+Playback::~Playback() {
+    mutex.lock();
+    stop = true;
+    condition.wakeOne();
+    mutex.unlock();
+    wait();
+}
+
+void Playback::Stop() {
+    stop = true;
+}
+
+void Playback::msleep(int ms) {
+    struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000};
+    nanosleep(&ts, NULL);
+}
+
+bool Playback::isStopped() const {
+    return this->stop;
+}
+
+
+DisplayWindow::DisplayWindow(QWidget *parent) : QDialog(parent) {
+    createControls();
+    setGeometry(900, 200, 640, 480);
+    setFixedSize(640, 480);
+    setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    hide();
+}
+void DisplayWindow::createControls() {
+    img_label = new QLabel(this);
+    img_label->setGeometry(0,0,640, 480);
+}
+void DisplayWindow::displayImage(const QImage &img) {
+    
+    img_label->setPixmap(QPixmap::fromImage(img).scaled(img_label->size(),
+                                                     Qt::KeepAspectRatio, Qt::FastTransformation));
+}
+
+
+void DisplayWindow::paintEvent(QPaintEvent *) {
+    QPainter painter(this);
+    painter.fillRect(QRect(0, 0,640,480), QColor(0,0,0));
+}
+
+
+AC_MainWindow::~AC_MainWindow() {
+    delete playback;
+}
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     generate_map();
     setGeometry(100, 100, 800, 600);
@@ -45,6 +141,11 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     
     statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
     take_snapshot = false;
+    disp = new DisplayWindow(this);
+    playback = new Playback();
+    QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
+    QObject::connect(playback, SIGNAL(procCameraFrame(void *)), this, SLOT(CameraFrame(void *)));
+    
 }
 
 void AC_MainWindow::createControls() {
@@ -247,7 +348,6 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     Log(str);
     paused = false;
     recording = record;
-    cv::namedWindow("Acid Cam v2");
     QString output_name;
     QTextStream stream_(&output_name);
     static unsigned int index = 0;
@@ -298,8 +398,10 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
     connect(timer_camera, SIGNAL(timeout()), this, SLOT(timer_Camera()));
-    timer_camera->setInterval(1000/24);
-    timer_camera->start();
+    disp->show();
+    
+    playback->setVideo(&capture_video, (recording == true) ? &writer : 0);
+    playback->Play();
     return true;
 }
 
@@ -327,7 +429,6 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
-    cv::namedWindow("Acid Cam v2");
     paused = false;
     recording = record;
     QString output_name;
@@ -359,16 +460,15 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         file_size.seekg(0, std::ios::end);
     }
     connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
-    
-    timer_video->setInterval((1000/ac::fps));
-    timer_video->start();
-    
+    disp->show();
+    playback->setVideo(&capture_video, (recording == true) ? &writer : 0);
+    playback->Play();
     return true;
 }
 
 void AC_MainWindow::controls_Stop() {
     if(capture_video.isOpened()) {
-        timer_video->stop();
+        playback->Stop();
         capture_video.release();
         writer.release();
         cv::destroyWindow("Acid Cam v2");
@@ -381,9 +481,10 @@ void AC_MainWindow::controls_Stop() {
             Log(stream_);
             file_size.close();
         }
+        disp->hide();
     }
     if(capture_camera.isOpened()) {
-        timer_camera->stop();
+        playback->Stop();
         capture_camera.release();
         writer.release();
         cv::destroyWindow("Acid Cam v2");
@@ -396,6 +497,7 @@ void AC_MainWindow::controls_Stop() {
             Log(stream_);
             file_size.close();
         }
+        disp->hide();
     }
 }
 
@@ -485,7 +587,6 @@ void AC_MainWindow::timer_Camera() {
         take_snapshot = false;
     }
     
-    cv::imshow("Acid Cam v2", mat);
     if(recording) {
         writer.write(mat);
         file_size.seekg(0, std::ios::end);
@@ -498,11 +599,12 @@ void AC_MainWindow::timer_Camera() {
     
     frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
     
-    statusBar()->showMessage(frame_string);
+
     
 }
 
 void AC_MainWindow::timer_Video() {
+    
     if(step_frame == true  && paused == true)
         step_frame = false;
     else if(paused == true) return;
@@ -543,7 +645,6 @@ void AC_MainWindow::timer_Video() {
     	Log(total);
         take_snapshot = false;
     }
-    cv::imshow("Acid Cam v2", mat);
     if(recording) {
         writer.write(mat);
         file_size.seekg(0, std::ios::end);
@@ -557,6 +658,90 @@ void AC_MainWindow::timer_Video() {
     frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
     
     statusBar()->showMessage(frame_string);
+}
+
+
+cv::Mat QImage2Mat(QImage const& src)
+{
+    cv::Mat tmp(src.height(),src.width(),CV_8UC3,(uchar*)src.bits(),src.bytesPerLine());
+    cv::Mat result;
+    cvtColor(tmp, result,CV_BGR2RGB);
+    return result;
+}
+
+QImage Mat2QImage(cv::Mat const& src)
+{
+    cv::Mat temp;
+    cvtColor(src, temp,CV_BGR2RGB);
+    QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
+    dest.bits();
+    return dest;
+}
+
+void AC_MainWindow::proc_Frame(cv::Mat &mat) {
+    /*
+    if(step_frame == true  && paused == true)
+        step_frame = false;
+    else if(paused == true) return; */
+    
+    ac::isNegative = chk_negate->isChecked();
+    ac::color_order = combo_rgb->currentIndex();
+    negate = ac::isNegative;
+    reverse = ac::color_order;
+    ac::in_custom = true;
+    for(int i = 0; i < custom_filters->count(); ++i) {
+        if(i == custom_filters->count()-1)
+            ac::in_custom = false;
+        
+        QListWidgetItem *val = custom_filters->item(i);
+        QString name = val->text();
+        if(filter_map[name.toStdString()].first == 0)
+            ac::draw_func[filter_map[name.toStdString()].second](mat);
+        else {
+            red = green = blue = 0;
+            current_filterx = filter_map[name.toStdString()].second;
+            ac::alphaFlame(mat);
+        }
+    }
+    if(take_snapshot == true) {
+        static int index = 0;
+        QString text;
+        QTextStream stream(&text);
+        stream << output_directory << "/" << "AC.Snapshot." << ++index << ".png";
+        cv::imwrite(text.toStdString(), mat);
+        QString total;
+        QTextStream stream_total(&total);
+        stream_total << "Took Snapshot: " << text << "\n";
+        Log(total);
+        take_snapshot = false;
+    }
+    if(recording) {
+        writer.write(mat);
+        file_size.seekg(0, std::ios::end);
+        file_pos = file_size.tellg();
+    }
+    
+    frame_index++;
+    QString frame_string;
+    QTextStream frame_stream(&frame_string);
+    
+    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
+    
+    statusBar()->showMessage(frame_string);
+}
+
+
+
+void AC_MainWindow::updateFrame(QImage img) {
+    if(playback->isStopped() == false) {
+      /*  cv::Mat mat = QImage2Mat(img);
+        proc_Frame(mat);
+        QImage i = Mat2QImage(mat); */
+    	disp->displayImage(img);
+    }
+}
+
+void AC_MainWindow::CameraFrame(void *frame) {
 }
 
 void AC_MainWindow::help_About() {

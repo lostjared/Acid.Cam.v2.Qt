@@ -4,10 +4,49 @@
 #include "qtheaders.h"
 #include "new_dialog.h"
 
+class Playback : public QThread {
+Q_OBJECT
+private:
+    bool stop;
+    QMutex mutex;
+    QWaitCondition condition;
+    cv::Mat frame;
+    int frame_rate;
+    cv::VideoCapture *capture;
+    cv::VideoWriter  *writer;
+    cv::Mat rgb_frame;
+    QImage img;
+public:
+    Playback(QObject *parent = 0);
+    ~Playback();
+    void Play();
+    void Stop();
+    void setVideo(cv::VideoCapture *cap, cv::VideoWriter *writer);
+    bool isStopped() const;
+    void run();
+    void msleep(int ms);
+signals:
+    void procImage(const QImage &image);
+    void procCameraFrame(void *frame);
+    
+};
+
+class DisplayWindow : public QDialog {
+    Q_OBJECT
+public:
+    DisplayWindow(QWidget *parent = 0);
+    void createControls();
+    void displayImage(const QImage &img);
+    void paintEvent(QPaintEvent *paint);
+private:
+    QLabel *img_label;
+};
+
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     AC_MainWindow(QWidget *parent = 0);
+    ~AC_MainWindow();
     void Log(const QString &s);
     bool startCamera(int res, int dev, const QString &outdir, bool record);
     bool startVideo(const QString &filename, const QString &outdir, bool record);
@@ -36,10 +75,13 @@ public slots:
     void help_About();
     void timer_Camera();
     void timer_Video();
+    void updateFrame(QImage img);
+    void CameraFrame(void *frame);
+
 private:
     void createControls();
     void createMenu();
-    
+    DisplayWindow *disp;
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
     cv::VideoCapture capture_camera, capture_video;
@@ -53,6 +95,9 @@ private:
     bool take_snapshot;
     std::fstream file_size;
     unsigned long file_pos, frame_index;
+    Playback *playback;
+    
+    void proc_Frame(cv::Mat &frame);
 };
 
 extern const char *filer_names[];
