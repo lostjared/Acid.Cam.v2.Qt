@@ -1,5 +1,5 @@
 #include "plugin.h"
 
-void ac::plugin(cv::Mat &frame) {
+void ac::plugin(cv::Mat &/*frame*/) {
     
 }

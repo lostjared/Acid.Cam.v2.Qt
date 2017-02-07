@@ -83,7 +83,7 @@ void frac::FractalLogic() {
    // std::cout << paramA << ": " << paramB << " :" << " dir: " << dir << "\n";
 }
 
-void frac::DrawFractal(cv::Mat &frame, bool neg)
+void frac::DrawFractal(cv::Mat &frame, bool /*neg*/)
 {
     float x1=mod_x-1.0f*zoom_x;
     float x2=mod_x+1.0f*zoom_w;

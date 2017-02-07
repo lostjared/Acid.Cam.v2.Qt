@@ -25,7 +25,7 @@ void generate_map() {
     }
 }
 
-void custom_filter(cv::Mat &frame) {
+void custom_filter(cv::Mat &) {
     
 }
 
@@ -86,7 +86,7 @@ void AC_MainWindow::createControls() {
     log_text->setGeometry(10, 250, 780,310);
     log_text->setReadOnly(true);
     
-    QString text = "Acid Cam v";
+    QString text = "Acid Cam Filters v";
     text += ac::version.c_str();
     text += " loaded.\n";
     log_text->setText(text);
