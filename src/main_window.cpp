@@ -33,6 +33,7 @@ void custom_filter(cv::Mat &) {
 
 Playback::Playback(QObject *parent) : QThread(parent) {
     stop = true;
+    isStep = false;
 }
 
 void Playback::Play() {
@@ -73,18 +74,18 @@ void Playback::setOptions(bool n, int c) {
 }
 
 void Playback::run() {
+    
     int delay = (1000/frame_rate);
     while(!stop) {
         mutex.lock();
+        
         if(!capture.read(frame)) {
             stop = true;
             mutex.unlock();
             return;
         }
         if(current.size()>0) {
-            
             ac::in_custom = true;
-
             for(unsigned int i = 0; i < current.size(); ++i) {
                 
                 if(i == current.size()-1)
@@ -99,6 +100,7 @@ void Playback::run() {
             }
         }
         mutex.unlock();
+        
         if(frame.channels()==3) {
             cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
             img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
@@ -111,6 +113,10 @@ void Playback::run() {
         }
         emit procImage(img);
         this->msleep(delay);
+        if(isStep == true) {
+            isStep = false;
+            return;
+        }
     }
 }
 
@@ -123,7 +129,9 @@ Playback::~Playback() {
 }
 
 void Playback::Stop() {
+    mutex.lock();
     stop = true;
+    mutex.unlock();
 }
 
 void Playback::msleep(int ms) {
@@ -132,6 +140,12 @@ void Playback::msleep(int ms) {
 
 bool Playback::isStopped() const {
     return this->stop;
+}
+
+void Playback::setStep() {
+    mutex.lock();
+    isStep = true;
+    mutex.unlock();
 }
 
 void Playback::setImage(const cv::Mat &frame) {
@@ -586,9 +600,11 @@ void AC_MainWindow::controls_Pause() {
         controls_pause->setText("Paused");
         controls_pause->setChecked(Qt::Checked);
         paused = true;
+        playback->Stop();
     } else {
         controls_pause->setText("Pause");
         controls_pause->setChecked(Qt::Unchecked);
+        playback->Play();
         paused = false;
     }
 }
@@ -605,6 +621,8 @@ void AC_MainWindow::controls_SetImage() {
 }
 
 void AC_MainWindow::controls_Step() {
+    playback->setStep();
+    playback->Play();
     step_frame = true;
 }
 

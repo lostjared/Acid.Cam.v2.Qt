@@ -18,6 +18,7 @@ private:
     cv::Mat rgb_frame;
     QImage img;
     std::vector<std::pair<int, int>> current;
+    bool isPaused, isStep;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -30,6 +31,7 @@ public:
     void setVector(std::vector<std::pair<int, int>> s);
     void setOptions(bool n, int c);
     void setImage(const cv::Mat &image);
+    void setStep();
 signals:
     void procImage(const QImage &image);
     void procCameraFrame(void *frame);
