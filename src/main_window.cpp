@@ -125,8 +125,9 @@ void Playback::Stop() {
 }
 
 void Playback::msleep(int ms) {
-    struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000};
-    nanosleep(&ts, NULL);
+    //struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000};
+    //nanosleep(&ts, NULL);
+    QThread::msleep(ms);
 }
 
 bool Playback::isStopped() const {
@@ -529,7 +530,6 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 void AC_MainWindow::controls_Stop() {
     playback->Stop();
     if(capture_video.isOpened()) {
-        
         capture_video.release();
         if(recording == true) writer.release();
         cv::destroyWindow("Acid Cam v2");
