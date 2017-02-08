@@ -84,6 +84,7 @@ void Playback::run() {
             mutex.unlock();
             return;
         }
+        ac::orig_frame = frame.clone();
         if(current.size()>0) {
             ac::in_custom = true;
             for(unsigned int i = 0; i < current.size(); ++i) {
