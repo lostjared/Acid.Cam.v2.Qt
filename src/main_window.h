@@ -97,7 +97,6 @@ private:
     QString video_file_name;
     QString output_directory;
     bool take_snapshot;
-    std::fstream file_size;
     unsigned long file_pos, frame_index;
     Playback *playback;
     

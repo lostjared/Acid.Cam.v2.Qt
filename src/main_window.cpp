@@ -45,12 +45,14 @@ void Playback::Play() {
 }
 
 void Playback::setVideo(cv::VideoCapture *cap, cv::VideoWriter *wr) {
+    mutex.lock();
     capture = cap;
     writer = wr;
     if(capture->isOpened()) {
         frame_rate = (int) capture->get(CV_CAP_PROP_FPS);
         if(frame_rate <= 0) frame_rate = 24;
     }
+    mutex.unlock();
 }
 
 void Playback::setVector(std::vector<std::pair<int, int>> v) {
@@ -72,10 +74,11 @@ void Playback::setOptions(bool n, int c) {
 void Playback::run() {
     int delay = (1000/frame_rate);
     while(!stop) {
+        mutex.lock();
         if(!capture->read(frame)) {
             stop = true;
+            return;
         }
-        mutex.lock();
         if(current.size()>0) {
             
             ac::in_custom = true;
@@ -133,9 +136,9 @@ bool Playback::isStopped() const {
 
 DisplayWindow::DisplayWindow(QWidget *parent) : QDialog(parent) {
     createControls();
-    setGeometry(900, 200, 640, 480);
-    setFixedSize(640, 480);
-    setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    setGeometry(950, 200, 640, 480);
+    //setFixedSize(640, 480);
+    setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     hide();
 }
 void DisplayWindow::createControls() {
@@ -143,15 +146,18 @@ void DisplayWindow::createControls() {
     img_label->setGeometry(0,0,640, 480);
 }
 void DisplayWindow::displayImage(const QImage &img) {
-    
-    img_label->setPixmap(QPixmap::fromImage(img).scaled(img_label->size(),
-                                                     Qt::KeepAspectRatio, Qt::FastTransformation));
+    QRect src(QPoint(0, 0), size());
+    QPixmap p = QPixmap::fromImage(img).scaled(size(),Qt::KeepAspectRatio, Qt::FastTransformation);
+    QRect dst(QPoint(0,0),p.size());
+    dst.moveCenter(src.center());
+    img_label->setGeometry(dst);
+    img_label->setPixmap(p);
 }
 
 
 void DisplayWindow::paintEvent(QPaintEvent *) {
     QPainter painter(this);
-    painter.fillRect(QRect(0, 0,640,480), QColor(0,0,0));
+    painter.fillRect(QRect(QPoint(0, 0), size()), QColor(0,0,0));
 }
 
 
@@ -448,7 +454,6 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         QTextStream out_stream(&out_s);
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
-        file_size.open(output_name.toStdString(), std::ios::in | std::ios::binary);
     }
     // if successful
     file_new_capture->setEnabled(false);
@@ -513,19 +518,18 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         QTextStream out_stream(&out_s);
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
-        file_size.open(output_name.toStdString(), std::ios::in | std::ios::binary);
-        file_size.seekg(0, std::ios::end);
     }
     connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
-    disp->show();
     playback->setVideo(&capture_video, (recording == true) ? &writer : 0);
     playback->Play();
+    disp->show();
     return true;
 }
 
 void AC_MainWindow::controls_Stop() {
+    playback->Stop();
     if(capture_video.isOpened()) {
-        playback->Stop();
+        
         capture_video.release();
         if(recording == true) writer.release();
         cv::destroyWindow("Acid Cam v2");
@@ -536,12 +540,10 @@ void AC_MainWindow::controls_Stop() {
             QTextStream stream(&stream_);
             stream << "Wrote video file: " << video_file_name << "\n";
             Log(stream_);
-            file_size.close();
         }
         disp->hide();
     }
     if(capture_camera.isOpened()) {
-        playback->Stop();
         capture_camera.release();
         if(recording == true) writer.release();
         cv::destroyWindow("Acid Cam v2");
@@ -552,7 +554,6 @@ void AC_MainWindow::controls_Stop() {
             QTextStream stream(&stream_);
             stream << "Wrote video file: " << video_file_name << "\n";
             Log(stream_);
-            file_size.close();
         }
         disp->hide();
     }
@@ -748,10 +749,12 @@ QImage Mat2QImage(cv::Mat const& src)
 
 void AC_MainWindow::updateFrame(QImage img) {
     if(playback->isStopped() == false) {
-      /*  cv::Mat mat = QImage2Mat(img);
-        proc_Frame(mat);
-        QImage i = Mat2QImage(mat); */
     	disp->displayImage(img);
+        frame_index++;
+        QString frame_string;
+        QTextStream frame_stream(&frame_string);
+        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps);
+        statusBar()->showMessage(frame_string);
     }
 }
 
