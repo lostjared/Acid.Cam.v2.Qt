@@ -12,8 +12,9 @@ private:
     QWaitCondition condition;
     cv::Mat frame;
     int frame_rate;
-    cv::VideoCapture *capture;
-    cv::VideoWriter  *writer;
+    bool recording;
+    cv::VideoCapture capture;
+    cv::VideoWriter  writer;
     cv::Mat rgb_frame;
     QImage img;
     std::vector<std::pair<int, int>> current;
@@ -22,12 +23,13 @@ public:
     ~Playback();
     void Play();
     void Stop();
-    void setVideo(cv::VideoCapture *cap, cv::VideoWriter *writer);
+    void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record);
     bool isStopped() const;
     void run();
     void msleep(int ms);
     void setVector(std::vector<std::pair<int, int>> s);
     void setOptions(bool n, int c);
+    void setImage(const cv::Mat &image);
 signals:
     void procImage(const QImage &image);
     void procCameraFrame(void *frame);

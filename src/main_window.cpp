@@ -44,12 +44,13 @@ void Playback::Play() {
     start(LowPriority);
 }
 
-void Playback::setVideo(cv::VideoCapture *cap, cv::VideoWriter *wr) {
+void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
     mutex.lock();
     capture = cap;
     writer = wr;
-    if(capture->isOpened()) {
-        frame_rate = (int) capture->get(CV_CAP_PROP_FPS);
+    recording = record;
+    if(capture.isOpened()) {
+        frame_rate = (int) capture.get(CV_CAP_PROP_FPS);
         if(frame_rate <= 0) frame_rate = 24;
     }
     mutex.unlock();
@@ -75,8 +76,9 @@ void Playback::run() {
     int delay = (1000/frame_rate);
     while(!stop) {
         mutex.lock();
-        if(!capture->read(frame)) {
+        if(!capture.read(frame)) {
             stop = true;
+            mutex.unlock();
             return;
         }
         if(current.size()>0) {
@@ -104,8 +106,8 @@ void Playback::run() {
             img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
             
         }
-        if(writer != 0 && writer->isOpened()) {
-            writer->write(frame);
+        if(recording && writer.isOpened()) {
+            writer.write(frame);
         }
         emit procImage(img);
         this->msleep(delay);
@@ -125,8 +127,6 @@ void Playback::Stop() {
 }
 
 void Playback::msleep(int ms) {
-    //struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000};
-    //nanosleep(&ts, NULL);
     QThread::msleep(ms);
 }
 
@@ -134,11 +134,16 @@ bool Playback::isStopped() const {
     return this->stop;
 }
 
+void Playback::setImage(const cv::Mat &frame) {
+    mutex.lock();
+    blend_set = true;
+    blend_image = frame;
+    mutex.unlock();
+}
 
 DisplayWindow::DisplayWindow(QWidget *parent) : QDialog(parent) {
     createControls();
     setGeometry(950, 200, 640, 480);
-    //setFixedSize(640, 480);
     setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
     hide();
 }
@@ -463,7 +468,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     connect(timer_camera, SIGNAL(timeout()), this, SLOT(timer_Camera()));
     disp->show();
     
-    playback->setVideo(&capture_video, (recording == true) ? &writer : 0);
+    playback->setVideo(capture_video, writer, recording);
     playback->Play();
     return true;
 }
@@ -521,7 +526,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         Log(out_s);
     }
     connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
-    playback->setVideo(&capture_video, (recording == true) ? &writer : 0);
+    playback->setVideo(capture_video,writer,recording);
     playback->Play();
     disp->show();
     return true;
@@ -591,9 +596,9 @@ void AC_MainWindow::controls_Pause() {
 void AC_MainWindow::controls_SetImage() {
     QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), "/home", tr("Image Files (*.png *.jpg)"));
     if(fileName != "") {
-        blend_image = cv::imread(fileName.toStdString());
-        if(!blend_image.empty()) {
-            blend_set = true;
+        cv::Mat tblend_image = cv::imread(fileName.toStdString());
+        if(!tblend_image.empty()) {
+            playback->setImage(tblend_image);
             QMessageBox::information(this, tr("Loaded Image"), tr("Image set"));
         }
     }
@@ -755,6 +760,25 @@ void AC_MainWindow::updateFrame(QImage img) {
         QTextStream frame_stream(&frame_string);
         frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps);
         statusBar()->showMessage(frame_string);
+        
+        if(take_snapshot == true) {
+            cv::Mat mat = QImage2Mat(img);
+            static int index = 0;
+            QString text;
+            QTextStream stream(&text);
+            time_t t = time(0);
+            struct tm *m;
+            m = localtime(&t);
+            std::ostringstream time_stream;
+            time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
+            stream << output_directory << "/" << "AC.Snapshot." << time_stream.str().c_str() << "." << ++index << ".png";
+            cv::imwrite(text.toStdString(), mat);
+            QString total;
+            QTextStream stream_total(&total);
+            stream_total << "Took Snapshot: " << text << "\n";
+            Log(total);
+            take_snapshot = false;
+        }
     }
 }
 
