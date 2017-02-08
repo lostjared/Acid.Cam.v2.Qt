@@ -24,6 +24,7 @@ public:
     ~Playback();
     void Play();
     void Stop();
+    void Release();
     void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record);
     bool isStopped() const;
     void run();

@@ -135,6 +135,16 @@ void Playback::Stop() {
     mutex.unlock();
 }
 
+void Playback::Release() {
+    
+    if(capture.isOpened()) {
+        capture.release();
+    }
+    if(writer.isOpened()) {
+        writer.release();
+    }
+}
+
 void Playback::msleep(int ms) {
     QThread::msleep(ms);
 }
@@ -549,8 +559,8 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 void AC_MainWindow::controls_Stop() {
     playback->Stop();
     if(capture_video.isOpened()) {
-        capture_video.release();
-        if(recording == true) writer.release();
+        //capture_video.release();
+        //if(recording == true) writer.release();
         cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
@@ -561,10 +571,11 @@ void AC_MainWindow::controls_Stop() {
             Log(stream_);
         }
         disp->hide();
+        playback->Release();
     }
     if(capture_camera.isOpened()) {
-        capture_camera.release();
-        if(recording == true) writer.release();
+    //    capture_camera.release();
+    //    if(recording == true) writer.release();
         cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
@@ -575,7 +586,9 @@ void AC_MainWindow::controls_Stop() {
             Log(stream_);
         }
         disp->hide();
+        playback->Release();
     }
+    
 }
 
 void AC_MainWindow::file_Exit() {
