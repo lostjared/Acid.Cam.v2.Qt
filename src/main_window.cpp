@@ -34,6 +34,7 @@ void custom_filter(cv::Mat &) {
 Playback::Playback(QObject *parent) : QThread(parent) {
     stop = true;
     isStep = false;
+    isPaused = false;
 }
 
 void Playback::Play() {
@@ -78,7 +79,6 @@ void Playback::run() {
     int delay = (1000/frame_rate);
     while(!stop) {
         mutex.lock();
-        
         if(!capture.read(frame)) {
             stop = true;
             mutex.unlock();
@@ -480,10 +480,9 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
     connect(timer_camera, SIGNAL(timeout()), this, SLOT(timer_Camera()));
-    disp->show();
-    
-    playback->setVideo(capture_video, writer, recording);
+    playback->setVideo(capture_camera, writer, recording);
     playback->Play();
+    disp->show();
     return true;
 }
 
