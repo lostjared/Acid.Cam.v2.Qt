@@ -813,6 +813,6 @@ void AC_MainWindow::updateFrame(QImage img) {
 }
 
 void AC_MainWindow::help_About() {
-    QMessageBox::information(this, tr("About Acid Cam"), tr("Written by <b>Jared Bruni</b><br><br><b>Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostjared\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">Facebook</a><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n"));
+    QMessageBox::information(this, tr("About Acid Cam"), tr("Written by <b>Jared Bruni</b><br><br><b>Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostjared\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">Facebook</a><br><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n"));
 }
 
