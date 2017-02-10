@@ -215,8 +215,6 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     disp = new DisplayWindow(this);
     playback = new Playback();
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
-    QObject::connect(playback, SIGNAL(procCameraFrame(void *)), this, SLOT(CameraFrame(void *)));
-    
 }
 
 void AC_MainWindow::createControls() {
@@ -790,7 +788,7 @@ void AC_MainWindow::updateFrame(QImage img) {
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
-        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps);
+        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << ") ";
         statusBar()->showMessage(frame_string);
         
         if(take_snapshot == true) {
@@ -814,10 +812,7 @@ void AC_MainWindow::updateFrame(QImage img) {
     }
 }
 
-void AC_MainWindow::CameraFrame(void *frame) {
-}
-
 void AC_MainWindow::help_About() {
-    QMessageBox::information(this, tr("About Acid Cam"), tr("Written by <b>Jared Bruni</b><br><br><b>Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostjared\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">Facebook</a><br><br>\n"));
+    QMessageBox::information(this, tr("About Acid Cam"), tr("Written by <b>Jared Bruni</b><br><br><b>Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostjared\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">Facebook</a><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n"));
 }
 

@@ -84,7 +84,6 @@ public slots:
     void timer_Camera();
     void timer_Video();
     void updateFrame(QImage img);
-    void CameraFrame(void *frame);
     void chk_Clicked();
     void cb_SetIndex(int index);
 private:
