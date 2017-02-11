@@ -200,7 +200,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     generate_map();
     setGeometry(100, 100, 800, 600);
     setFixedSize(800, 600);
-    setWindowTitle("Acid Cam v2 - Qt");
+    setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
     
@@ -237,10 +237,10 @@ void AC_MainWindow::createControls() {
         filters->addItem(filter_n.c_str());
     }
     
-    btn_add = new QPushButton("Add", this);
-    btn_remove = new QPushButton("Remove", this);
-    btn_moveup = new QPushButton("Move Up", this);
-    btn_movedown = new QPushButton("Move Down", this);
+    btn_add = new QPushButton(tr("Add"), this);
+    btn_remove = new QPushButton(tr("Remove"), this);
+    btn_moveup = new QPushButton(tr("Move Up"), this);
+    btn_movedown = new QPushButton(tr("Move Down"), this);
     
     btn_add->setGeometry(10, 215, 100, 20);
     btn_remove->setGeometry(400, 215, 100, 20);
@@ -256,14 +256,14 @@ void AC_MainWindow::createControls() {
     log_text->setGeometry(10, 250, 780,310);
     log_text->setReadOnly(true);
     
-    QString text = "Acid Cam Filters v";
+    QString text = tr("Acid Cam Filters v");
     text += ac::version.c_str();
     text += " loaded.\n";
     log_text->setText(text);
     
     filters->setCurrentRow(0);
     
-    chk_negate = new QCheckBox("Negate", this);
+    chk_negate = new QCheckBox(tr("Negate"), this);
     chk_negate->setGeometry(120,215,100, 20);
     chk_negate->setCheckState(Qt::Unchecked);
     
@@ -271,10 +271,10 @@ void AC_MainWindow::createControls() {
     
     combo_rgb = new QComboBox(this);
     combo_rgb->setGeometry(200,215, 190, 25);
-    combo_rgb->addItem("RGB");
-    combo_rgb->addItem("BGR");
-    combo_rgb->addItem("BRG");
-    combo_rgb->addItem("GRB");
+    combo_rgb->addItem(tr("RGB"));
+    combo_rgb->addItem(tr("BGR"));
+    combo_rgb->addItem(tr("BRG"));
+    combo_rgb->addItem(tr("GRB"));
     
     setWindowIcon(QPixmap(":/images/icon.png"));
     
@@ -333,7 +333,7 @@ void AC_MainWindow::createMenu() {
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
     
     controls_pause->setCheckable(true);
-    controls_pause->setText("Pause");
+    controls_pause->setText(tr("Pause"));
     controls_pause->setChecked(false);
     
     help_about = new QAction(tr("About"), this);
@@ -801,7 +801,7 @@ void AC_MainWindow::updateFrame(QImage img) {
             m = localtime(&t);
             std::ostringstream time_stream;
             time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
-            stream << output_directory << "/" << "AC.Snapshot." << time_stream.str().c_str() << "." << ++index << ".png";
+            stream << output_directory << "/" << "AC2.Snapshot." << time_stream.str().c_str() << "." << ++index << ".png";
             cv::imwrite(text.toStdString(), mat);
             QString total;
             QTextStream stream_total(&total);
