@@ -141,6 +141,11 @@ void Playback::Stop() {
 
 void Playback::Release() {
     
+    mutex.lock();
+    stop = true;
+    if(capture.isOpened()) capture.release();
+    if(writer.isOpened()) writer.release();
+    mutex.unlock();
 }
 
 void Playback::msleep(int ms) {
