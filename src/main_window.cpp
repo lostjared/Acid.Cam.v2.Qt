@@ -173,6 +173,7 @@ DisplayWindow::DisplayWindow(QWidget *parent) : QDialog(parent) {
     createControls();
     setGeometry(950, 200, 640, 480);
     setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
+    setWindowTitle(tr("Acid Cam v2 - Display Window"));
     hide();
 }
 void DisplayWindow::createControls() {
