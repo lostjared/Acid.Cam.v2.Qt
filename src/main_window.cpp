@@ -478,7 +478,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
 #endif
         if(!writer.isOpened()) {
-            Log("Could not create video writer..\n");
+            Log(tr("Could not create video writer..\n"));
         }
         QString out_s;
         QTextStream out_stream(&out_s);
