@@ -25,9 +25,12 @@
 #include<QImage>
 #include<QPainter>
 #include<QWaitCondition>
+#include<QLibrary>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>
 #include<utility>
+
+void init_plugins();
 
 #endif

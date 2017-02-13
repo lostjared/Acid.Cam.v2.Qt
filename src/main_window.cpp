@@ -1,5 +1,7 @@
 #include "main_window.h"
 #include<mutex>
+#include"plugin.h"
+
 
 std::unordered_map<std::string, std::pair<int, int>> filter_map;
 
@@ -204,6 +206,7 @@ AC_MainWindow::~AC_MainWindow() {
 }
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     generate_map();
+    init_plugins();
     setGeometry(100, 100, 800, 600);
     setFixedSize(800, 600);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
@@ -221,6 +224,13 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     disp = new DisplayWindow(this);
     playback = new Playback();
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
+    
+    for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
+        QString text;
+        QTextStream stream(&text);
+        stream << "Loaded Plugin: " << plugins.plugin_list[i]->name().c_str() << "\n";
+        Log(text);
+    }
 }
 
 void AC_MainWindow::createControls() {
