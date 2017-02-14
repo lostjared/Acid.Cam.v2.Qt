@@ -80,13 +80,13 @@ bool Plugin::loadPlugin(const std::string &text) {
     
     pixel_function = (pixel) library->resolve("pixel");
     if(!pixel_function) {
-        QMessageBox::information(0, "Could not find pixel function", text.c_str());
+        QMessageBox::information(0, text.c_str(), "Could not find pixel function");
         return false;
     }
     
     complete_function = (complete) library->resolve("complete");
     if(!complete_function) {
-        QMessageBox::information(0,  "Could not find complete function", text.c_str());
+        QMessageBox::information(0, text.c_str(), "Could not find complete function");
         return false;
     }
     mod_name = text;
