@@ -1,50 +1,31 @@
 #include "plugin.h"
-#if defined(__linux__) || defined(__APPLE__)
-#include<dirent.h>
-#include<sys/stat.h>
-#else
-
-#endif
 
 PluginList plugins;
 
-#if defined(__linux__) || defined(__APPLE__)
-void add_directory(std::string path, std::vector<std::string> &files) {
-    DIR *dir = opendir(path.c_str());
-    if(dir == NULL) {
-        std::cerr << "Error could not open directory: " << path << "\n";
-        return;
-    }
-    dirent *file_info;
-    while( (file_info = readdir(dir)) != 0 ) {
-        std::string f_info = file_info->d_name;
-        if(f_info == "." || f_info == "..")  continue;
-        std::string fullpath=path+"/"+f_info;
-        struct stat s;
-        
-        lstat(fullpath.c_str(), &s);
-        if(S_ISDIR(s.st_mode)) {
-            if(f_info.length()>0 && f_info[0] != '.')
-                add_directory(path+"/"+f_info, files);
-            
+void add_directory(QDir &cdir, std::vector<std::string> &files) {
+    cdir.setFilter(QDir::Files | QDir::Dirs);
+    QFileInfoList list = cdir.entryInfoList();
+    int pos = 0;
+   	while(pos < list.size()) {
+        QFileInfo info = list.at(pos);
+        if(info.isDir() && info.fileName() != "." && info.fileName() != "..") {
+            QDir cdir = info.dir();
+            cdir.cd(info.fileName());
+            add_directory(cdir, files);
+            ++pos;
             continue;
         }
-        if(f_info.length()>0 && f_info[0] != '.' && fullpath.rfind(".so") != std::string::npos) {
-            files.push_back(fullpath);
-            std::cout << "found: " << fullpath << "\n";
+        else if(info.isFile() && info.fileName() != "." && info.fileName() != ".." && info.fileName().contains(".so")) {
+            files.push_back(info.filePath().toStdString());
         }
+        ++pos;
     }
-    closedir(dir);
 }
-#else
-void add_directory(std::string path, std::vector<std::string> &files) {
-    
-}
-#endif
 
 void init_plugins() {
     std::vector<std::string> files;
-    add_directory("plugins", files);
+    QDir d("plugins");
+    add_directory(d, files);
     if(files.size()>0) {
         for(unsigned int i = 0; i < files.size(); ++i) {
             Plugin *p = new Plugin();

@@ -26,6 +26,8 @@
 #include<QPainter>
 #include<QWaitCondition>
 #include<QLibrary>
+#include<QDir>
+#include<QFile>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>
