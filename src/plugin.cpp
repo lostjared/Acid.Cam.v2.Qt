@@ -6,6 +6,12 @@ void add_directory(QDir &cdir, std::vector<std::string> &files) {
     cdir.setFilter(QDir::Files | QDir::Dirs);
     QFileInfoList list = cdir.entryInfoList();
     int pos = 0;
+    QString platform;
+#if defined(__linux__) || defined(__APPLE__)
+    platform = ".so";
+#else
+    platform = ".dll";
+#endif
    	while(pos < list.size()) {
         QFileInfo info = list.at(pos);
         if(info.isDir() && info.fileName() != "." && info.fileName() != "..") {
@@ -15,7 +21,7 @@ void add_directory(QDir &cdir, std::vector<std::string> &files) {
             ++pos;
             continue;
         }
-        else if(info.isFile() && info.fileName() != "." && info.fileName() != ".." && info.fileName().contains(".so")) {
+        else if(info.isFile() && info.fileName() != "." && info.fileName() != ".." && info.fileName().contains(platform)) {
             files.push_back(info.filePath().toStdString());
         }
         ++pos;
@@ -35,8 +41,7 @@ void init_plugins() {
     }
 }
 
-
-void ac::plugin(cv::Mat &frame) {
+void draw_plugin(cv::Mat &frame, int filter) {
     for(int z = 0; z < frame.rows; ++z) {
         for(int i = 0; i < frame.cols; ++i) {
             unsigned char rgb[3];
@@ -44,13 +49,18 @@ void ac::plugin(cv::Mat &frame) {
             rgb[0] = cpixel[0];
             rgb[1] = cpixel[1];
             rgb[2] = cpixel[2];
-            //plugins.plugin_list[0]->call_Pixel(i, z, rgb);
+            plugins.plugin_list[filter]->call_Pixel(i, z, rgb);
             cpixel[0] = rgb[0];
             cpixel[1] = rgb[1];
             cpixel[2] = rgb[2];
         }
     }
-   //plugins.plugin_list[0]->call_Complete();
+    plugins.plugin_list[filter]->call_Complete();
+}
+
+
+void ac::plugin(cv::Mat &frame) {
+
 }
 
 Plugin::Plugin() {

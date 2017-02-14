@@ -34,5 +34,6 @@
 #include<utility>
 
 void init_plugins();
+void draw_plugin(cv::Mat &frame, int filter);
 
 #endif

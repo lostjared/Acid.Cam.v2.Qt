@@ -26,6 +26,12 @@ void generate_map() {
         filter_map[filter_n] = std::make_pair(1, index);
         ++index;
     }
+    
+    for(unsigned int j = 0; j < plugins.plugin_list.size(); ++j) {
+        std::string name = "plugin " + plugins.plugin_list[j]->name();
+        filter_map[name] = std::make_pair(2, j);
+    }
+    
 }
 
 void custom_filter(cv::Mat &) {
@@ -90,15 +96,16 @@ void Playback::run() {
         if(current.size()>0) {
             ac::in_custom = true;
             for(unsigned int i = 0; i < current.size(); ++i) {
-                
                 if(i == current.size()-1)
                     ac::in_custom = false;
                 
                 if(current[i].first == 0) {
                     ac::draw_func[current[i].second](frame);
-                } else {
+                } else if(current[i].first == 1) {
                     current_filterx = current[i].second;
                     ac::alphaFlame(frame);
+                } else if(current[i].first == 2) {
+                    draw_plugin(frame, current[i].second);
                 }
             }
         }
@@ -205,8 +212,8 @@ AC_MainWindow::~AC_MainWindow() {
     delete playback;
 }
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
-    generate_map();
     init_plugins();
+    generate_map();
     setGeometry(100, 100, 800, 600);
     setFixedSize(800, 600);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
@@ -251,6 +258,11 @@ void AC_MainWindow::createControls() {
         std::string filter_n = "AF_";
         filter_n += filter_names[i];
         filters->addItem(filter_n.c_str());
+    }
+    
+    for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
+    	std::string name = "plugin " + plugins.plugin_list[i]->name();
+        filters->addItem(name.c_str());
     }
     
     btn_add = new QPushButton(tr("Add"), this);
