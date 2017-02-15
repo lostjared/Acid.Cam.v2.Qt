@@ -35,6 +35,7 @@ public:
     void setStep();
 signals:
     void procImage(const QImage &image);
+    void stopRecording();
     void procCameraFrame(void *frame);
     
 };
@@ -84,6 +85,7 @@ public slots:
     void timer_Camera();
     void timer_Video();
     void updateFrame(QImage img);
+    void stopRecording();
     void chk_Clicked();
     void cb_SetIndex(int index);
 private:

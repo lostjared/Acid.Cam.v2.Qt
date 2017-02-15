@@ -90,6 +90,7 @@ void Playback::run() {
         if(!capture.read(frame)) {
             stop = true;
             mutex.unlock();
+            emit stopRecording();
             return;
         }
         ac::orig_frame = frame.clone();
@@ -233,6 +234,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     disp = new DisplayWindow(this);
     playback = new Playback();
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
+    QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
     
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
         QString text;
@@ -578,7 +580,6 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
     }
-    connect(timer_video, SIGNAL(timeout()), this, SLOT(timer_Video()));
     playback->setVideo(capture_video,writer,recording);
     playback->Play();
     disp->show();
@@ -839,7 +840,11 @@ void AC_MainWindow::updateFrame(QImage img) {
             Log(total);
             take_snapshot = false;
         }
-    }
+    } 
+}
+
+void AC_MainWindow::stopRecording() {
+    controls_Stop();
 }
 
 void AC_MainWindow::help_About() {
