@@ -83,9 +83,7 @@ void Playback::setOptions(bool n, int c) {
 }
 
 void Playback::run() {
-    
-    int delay = (1000/frame_rate);
-    while(!stop) {
+     while(!stop) {
         mutex.lock();
         if(!capture.read(frame)) {
             stop = true;
@@ -111,11 +109,11 @@ void Playback::run() {
             }
         }
         
-        if(stop == false && recording && writer.isOpened()) {
+        if(recording && writer.isOpened()) {
             writer.write(frame);
         }
-        mutex.unlock();
         
+        mutex.unlock();
         if(frame.channels()==3) {
             cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
             img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
@@ -123,9 +121,7 @@ void Playback::run() {
             img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
             
         }
-        
         emit procImage(img);
-        this->msleep(delay);
         if(isStep == true) {
             isStep = false;
             return;
