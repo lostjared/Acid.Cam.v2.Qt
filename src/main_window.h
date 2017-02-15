@@ -34,9 +34,8 @@ public:
     void setImage(const cv::Mat &image);
     void setStep();
 signals:
-    void procImage(const QImage &image);
+    void procImage(const QImage image);
     void stopRecording();
-    void procCameraFrame(void *frame);
     
 };
 
