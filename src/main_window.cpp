@@ -109,6 +109,10 @@ void Playback::run() {
                 }
             }
         }
+        
+        if(stop == false && recording && writer.isOpened()) {
+            writer.write(frame);
+        }
         mutex.unlock();
         
         if(frame.channels()==3) {
@@ -118,9 +122,7 @@ void Playback::run() {
             img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
             
         }
-        if(recording && writer.isOpened()) {
-            writer.write(frame);
-        }
+        
         emit procImage(img);
         this->msleep(delay);
         if(isStep == true) {
