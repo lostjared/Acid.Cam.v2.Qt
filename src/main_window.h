@@ -50,6 +50,8 @@ private:
     QLabel *img_label;
 };
 
+enum VideoMode { MODE_CAMERA = 0, MODE_VIDEO };
+
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
 public:
@@ -104,7 +106,7 @@ private:
     bool take_snapshot;
     unsigned long file_pos, frame_index;
     Playback *playback;
-    
+    VideoMode programMode;
     void buildVector(std::vector<std::pair<int,int>> &v);
 };
 

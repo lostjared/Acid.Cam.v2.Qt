@@ -211,6 +211,7 @@ AC_MainWindow::~AC_MainWindow() {
     delete playback;
 }
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
+    programMode = MODE_CAMERA;
     init_plugins();
     generate_map();
     setGeometry(100, 100, 800, 600);
@@ -448,6 +449,7 @@ void AC_MainWindow::Log(const QString &s) {
 }
 
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record) {
+    programMode = MODE_CAMERA;
     // setup device
     step_frame = false;
     video_file_name = "";
@@ -525,6 +527,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 }
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
+    programMode = MODE_VIDEO;
     video_file_name = "";
     step_frame = false;
     capture_video.open(filename.toStdString());
@@ -815,7 +818,17 @@ void AC_MainWindow::updateFrame(QImage img) {
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
+        
+        frame_stream.setRealNumberPrecision(4);
+        
         frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << ") ";
+        if(programMode == MODE_VIDEO) {
+            
+            float index = frame_index;
+            float max_frames = video_frames;
+            
+            frame_stream << " - " << (index/max_frames)*100 << "%";
+        }
         statusBar()->showMessage(frame_string);
         
         if(take_snapshot == true) {
