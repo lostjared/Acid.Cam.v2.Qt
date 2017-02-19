@@ -87,8 +87,6 @@ public slots:
     void controls_SetImage();
     void controls_ShowVideo();
     void help_About();
-    void timer_Camera();
-    void timer_Video();
     void updateFrame(QImage img);
     void stopRecording();
     void chk_Clicked();
@@ -104,7 +102,6 @@ private:
     cv::VideoWriter writer;
     unsigned long video_frames;
     double video_fps;
-    QTimer *timer_video, *timer_camera;
     bool paused, recording, step_frame;
     QString video_file_name;
     QString output_directory;

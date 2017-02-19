@@ -89,7 +89,7 @@ void Playback::setDisplayed(bool shown) {
 }
 
 void Playback::run() {
-     while(!stop) {
+    while(!stop) {
         mutex.lock();
         if(!capture.read(frame)) {
             stop = true;
@@ -119,38 +119,36 @@ void Playback::run() {
             writer.write(frame);
         }
         mutex.unlock();
-         
-         bool shown_var;
-         
-         mutex_shown.lock();
-         shown_var = video_shown;
-         mutex_shown.unlock();
-         
-         if(shown_var == true) {
-             if(frame.channels()==3) {
-                 cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
-                 img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
-             } else {
-                 img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
-             }
-             emit procImage(img);
-             if(isStep == true) {
-                 isStep = false;
-                 return;
-             }
-         } else {
-             emit frameIncrement();
-         }
+        bool shown_var;
+        mutex_shown.lock();
+        shown_var = video_shown;
+        mutex_shown.unlock();
+        
+        if(shown_var == true) {
+            if(frame.channels()==3) {
+                cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
+                img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
+            } else {
+                img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
+            }
+            emit procImage(img);
+            if(isStep == true) {
+                isStep = false;
+                return;
+            }
+        } else {
+            emit frameIncrement();
+        }
     }
 }
 
 Playback::~Playback() {
-	mutex.lock();
+    mutex.lock();
     stop = true;
 #if defined(__linux__) || defined(__APPLE__)
     condition.wakeOne();
 #endif
-        mutex.unlock();
+    mutex.unlock();
 #if defined(__linux__) || defined(__APPLE__)
     wait();
 #endif
@@ -278,7 +276,7 @@ void AC_MainWindow::createControls() {
     }
     
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
-    	std::string name = "plugin " + plugins.plugin_list[i]->name();
+        std::string name = "plugin " + plugins.plugin_list[i]->name();
         filters->addItem(name.c_str());
     }
     
@@ -389,8 +387,6 @@ void AC_MainWindow::createMenu() {
     help_about->setShortcut(tr("Ctrl+A"));
     help_menu->addAction(help_about);
     connect(help_about, SIGNAL(triggered()), this, SLOT(help_About()));
-    timer_video = new QTimer(this);
-    timer_camera = new QTimer(this);
 }
 
 void AC_MainWindow::chk_Clicked() {
@@ -440,21 +436,21 @@ void AC_MainWindow::upClicked() {
         std::vector<std::pair<int, int>> v;
         buildVector(v);
         playback->setVector(v);
-    
+        
     }
 }
 
 void AC_MainWindow::downClicked() {
     int item = custom_filters->currentRow();
     if(item >= 0 && item < custom_filters->count()-1) {
-    	QListWidgetItem *i = custom_filters->takeItem(item);
-    	custom_filters->insertItem(item+1, i->text());
-    	custom_filters->setCurrentRow(item+1);
+        QListWidgetItem *i = custom_filters->takeItem(item);
+        custom_filters->insertItem(item+1, i->text());
+        custom_filters->setCurrentRow(item+1);
         std::vector<std::pair<int, int>> v;
         buildVector(v);
         playback->setVector(v);
     }
-  
+    
 }
 
 void AC_MainWindow::Log(const QString &s) {
@@ -472,7 +468,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     
     controls_showvideo->setEnabled(false);
     playback->setDisplayed(true);
-
+    
     // setup device
     step_frame = false;
     video_file_name = "";
@@ -542,7 +538,6 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
-    connect(timer_camera, SIGNAL(timeout()), this, SLOT(timer_Camera()));
     playback->setVideo(capture_camera, writer, recording);
     playback->Play();
     disp->show();
@@ -588,7 +583,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
     stream_ << outdir << "/" << "Video." << time_stream.str().c_str() << "AC2.Output." << (++index) << ".avi";
-
+    
     
     if(recording) {
         video_file_name = output_name;
@@ -710,122 +705,6 @@ void AC_MainWindow::controls_Step() {
     step_frame = true;
 }
 
-void AC_MainWindow::timer_Camera() {
-    /*
-    if(step_frame == true  && paused == true) {
-        step_frame = false;
-    }
-    else if(paused == true) return;
-    ac::isNegative = chk_negate->isChecked();
-    ac::color_order = combo_rgb->currentIndex();
-    negate = ac::isNegative;
-    reverse = ac::color_order;
-    cv::Mat mat;
-    if(capture_camera.read(mat) == false) {
-        controls_Stop();
-        return;
-    }
-    ac::in_custom = true;
-    for(int i = 0; i < custom_filters->count(); ++i) {
-        if(i == custom_filters->count()-1)
-            ac::in_custom = false;
-        
-        QListWidgetItem *val = custom_filters->item(i);
-        QString name = val->text();
-        if(filter_map[name.toStdString()].first == 0)
-            ac::draw_func[filter_map[name.toStdString()].second](mat);
-        else {
-            red = green = blue = 0;
-            current_filterx = filter_map[name.toStdString()].second;
-            ac::alphaFlame(mat);
-        }
-    }
-    if(take_snapshot == true) {
-        static int index = 0;
-        QString text;
-        QTextStream stream(&text);
-        stream << output_directory << "/" << "AC.Snapshot." << ++index << ".png";
-        cv::imwrite(text.toStdString(), mat);
-        QString total;
-        QTextStream stream_total(&total);
-        stream_total << "Took Snapshot: " << text << "\n";
-        Log(total);
-        take_snapshot = false;
-    }
-    
-    if(recording) {
-        writer.write(mat);
-        file_size.seekg(0, std::ios::end);
-        file_pos = file_size.tellg();
-    }
-    
-    frame_index++;
-    QString frame_string;
-    QTextStream frame_stream(&frame_string);
-    
-    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
-     */
-    
-}
-
-void AC_MainWindow::timer_Video() {
-    
-    /*
-    if(step_frame == true  && paused == true)
-        step_frame = false;
-    else if(paused == true) return;
-
-    ac::isNegative = chk_negate->isChecked();
-    ac::color_order = combo_rgb->currentIndex();
-    negate = ac::isNegative;
-    reverse = ac::color_order;
-    cv::Mat mat;
-    if(capture_video.read(mat) == false) {
-        controls_Stop();
-        return;
-    }
-    ac::in_custom = true;
-    for(int i = 0; i < custom_filters->count(); ++i) {
-        if(i == custom_filters->count()-1)
-            ac::in_custom = false;
-        
-        QListWidgetItem *val = custom_filters->item(i);
-        QString name = val->text();
-        if(filter_map[name.toStdString()].first == 0)
-        	ac::draw_func[filter_map[name.toStdString()].second](mat);
-        else {
-            red = green = blue = 0;
-            current_filterx = filter_map[name.toStdString()].second;
-            ac::alphaFlame(mat);
-        }
-    }
-    if(take_snapshot == true) {
-    	static int index = 0;
-    	QString text;
-    	QTextStream stream(&text);
-    	stream << output_directory << "/" << "AC.Snapshot." << ++index << ".png";
-    	cv::imwrite(text.toStdString(), mat);
-    	QString total;
-    	QTextStream stream_total(&total);
-    	stream_total << "Took Snapshot: " << text << "\n";
-    	Log(total);
-        take_snapshot = false;
-    }
-    if(recording) {
-        writer.write(mat);
-        file_size.seekg(0, std::ios::end);
-        file_pos = file_size.tellg();
-    }
-    
-    frame_index++;
-    QString frame_string;
-    QTextStream frame_stream(&frame_string);
-    
-    frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << "/" << ((file_pos/1024)/1024) << " MB)";
-    
-    statusBar()->showMessage(frame_string); */
-}
-
 void AC_MainWindow::buildVector(std::vector<std::pair<int,int>> &v) {
     if(!v.empty()) v.erase(v.begin(), v.end());
     for(int i = 0; i < custom_filters->count(); ++i) {
@@ -856,7 +735,7 @@ QImage Mat2QImage(cv::Mat const& src)
 
 void AC_MainWindow::updateFrame(QImage img) {
     if(playback->isStopped() == false) {
-    	disp->displayImage(img);
+        disp->displayImage(img);
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
@@ -889,7 +768,7 @@ void AC_MainWindow::updateFrame(QImage img) {
             Log(total);
             take_snapshot = false;
         }
-    } 
+    }
 }
 
 void AC_MainWindow::stopRecording() {
@@ -907,7 +786,7 @@ void AC_MainWindow::frameInc() {
         float max_frames = video_frames;
         float value = (index/max_frames)*100;
         if(frame_index <= video_frames)
-        	frame_stream << " - " << static_cast<unsigned int>(value) << "%";
+            frame_stream << " - " << static_cast<unsigned int>(value) << "%";
     }
     statusBar()->showMessage(frame_string);
 }
@@ -916,7 +795,7 @@ void AC_MainWindow::help_About() {
     QString about_str;
     QTextStream stream(&about_str);
     stream << tr("<b>Acid Cam Qt version: ") << ac_version << "</b><br><br> ";
-    stream << tr("Written by <b>Jared Bruni</b><br><br><b>Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostjared\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">Facebook</a><br><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n");
+    stream << tr("Written by <b>Jared Bruni</b><br><br><b>My Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostjared\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">Facebook</a><br><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n");
     
     QMessageBox::information(this, tr("About Acid Cam"), about_str);
 }
