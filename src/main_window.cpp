@@ -860,15 +860,14 @@ void AC_MainWindow::updateFrame(QImage img) {
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
-        frame_stream.setRealNumberPrecision(2);
-        
-        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << ") ";
+        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << ") ";
         if(programMode == MODE_VIDEO) {
             
             float index = frame_index;
             float max_frames = video_frames;
+            float value = (index/max_frames)*100;
             
-            frame_stream << " - " << (index/max_frames)*100 << "%";
+            frame_stream << " - " << static_cast<unsigned int>(value) << "%";
         }
         statusBar()->showMessage(frame_string);
         
@@ -902,14 +901,13 @@ void AC_MainWindow::frameInc() {
     frame_index++;
     QString frame_string;
     QTextStream frame_stream(&frame_string);
-    frame_stream.setRealNumberPrecision(2);
-    frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << ") ";
+    frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << ") ";
     if(programMode == MODE_VIDEO) {
         float index = frame_index;
         float max_frames = video_frames;
-        
+        float value = (index/max_frames)*100;
         if(frame_index <= video_frames)
-        	frame_stream << " - " << (unsigned int)((index/max_frames)*100) << "%";
+        	frame_stream << " - " << static_cast<unsigned int>(value) << "%";
     }
     statusBar()->showMessage(frame_string);
 }
