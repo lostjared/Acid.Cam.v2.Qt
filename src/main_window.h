@@ -8,7 +8,7 @@ class Playback : public QThread {
 Q_OBJECT
 private:
     bool stop;
-    QMutex mutex;
+    QMutex mutex,mutex_shown;
     QWaitCondition condition;
     cv::Mat frame;
     int frame_rate;
@@ -19,6 +19,7 @@ private:
     QImage img;
     std::vector<std::pair<int, int>> current;
     bool isPaused, isStep;
+    bool video_shown;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -33,9 +34,11 @@ public:
     void setOptions(bool n, int c);
     void setImage(const cv::Mat &image);
     void setStep();
+    void setDisplayed(bool shown);
 signals:
     void procImage(const QImage image);
     void stopRecording();
+    void frameIncrement();
     
 };
 
@@ -67,7 +70,7 @@ public:
     QComboBox *combo_rgb;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
-    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage;
+    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage, *controls_showvideo;
     QAction *help_about;
 public slots:
     void addClicked();
@@ -82,6 +85,7 @@ public slots:
     void controls_Pause();
     void controls_Step();
     void controls_SetImage();
+    void controls_ShowVideo();
     void help_About();
     void timer_Camera();
     void timer_Video();
@@ -89,6 +93,7 @@ public slots:
     void stopRecording();
     void chk_Clicked();
     void cb_SetIndex(int index);
+    void frameInc();
 private:
     void createControls();
     void createMenu();

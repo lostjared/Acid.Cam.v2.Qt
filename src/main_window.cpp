@@ -82,6 +82,12 @@ void Playback::setOptions(bool n, int c) {
     mutex.unlock();
 }
 
+void Playback::setDisplayed(bool shown) {
+    mutex_shown.lock();
+    video_shown = shown;
+    mutex_shown.unlock();
+}
+
 void Playback::run() {
      while(!stop) {
         mutex.lock();
@@ -112,20 +118,29 @@ void Playback::run() {
         if(recording && writer.isOpened()) {
             writer.write(frame);
         }
-        
         mutex.unlock();
-        if(frame.channels()==3) {
-            cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
-            img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
-        } else {
-            img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
-            
-        }
-        emit procImage(img);
-        if(isStep == true) {
-            isStep = false;
-            return;
-        }
+         
+         bool shown_var;
+         
+         mutex_shown.lock();
+         shown_var = video_shown;
+         mutex_shown.unlock();
+         
+         if(shown_var == true) {
+             if(frame.channels()==3) {
+                 cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
+                 img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
+             } else {
+                 img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
+             }
+             emit procImage(img);
+             if(isStep == true) {
+                 isStep = false;
+                 return;
+             }
+         } else {
+             emit frameIncrement();
+         }
     }
 }
 
@@ -232,6 +247,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     playback = new Playback();
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
+    QObject::connect(playback, SIGNAL(frameIncrement()), this, SLOT(frameInc()));
     
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
         QString text;
@@ -353,22 +369,25 @@ void AC_MainWindow::createMenu() {
     controls_setimage->setShortcut(tr("Ctrl+I"));
     controls_menu->addAction(controls_setimage);
     
+    controls_showvideo = new QAction(tr("Hide Display Video"), this);
+    controls_showvideo->setShortcut(tr("Ctrl+V"));
+    controls_menu->addAction(controls_showvideo);
+    
+    controls_showvideo->setEnabled(false);
+    controls_showvideo->setCheckable(true);
+    
     connect(controls_snapshot, SIGNAL(triggered()), this, SLOT(controls_Snap()));
     connect(controls_pause, SIGNAL(triggered()), this, SLOT(controls_Pause()));
     connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
     connect(controls_stop, SIGNAL(triggered()), this, SLOT(controls_Stop()));
     connect(controls_setimage, SIGNAL(triggered()), this, SLOT(controls_SetImage()));
+    connect(controls_showvideo, SIGNAL(triggered()), this, SLOT(controls_ShowVideo()));
     
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
-    
-    controls_pause->setCheckable(true);
     controls_pause->setText(tr("Pause"));
-    controls_pause->setChecked(false);
-    
     help_about = new QAction(tr("About"), this);
     help_about->setShortcut(tr("Ctrl+A"));
     help_menu->addAction(help_about);
-    
     connect(help_about, SIGNAL(triggered()), this, SLOT(help_About()));
     timer_video = new QTimer(this);
     timer_camera = new QTimer(this);
@@ -450,6 +469,10 @@ void AC_MainWindow::Log(const QString &s) {
 
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record) {
     programMode = MODE_CAMERA;
+    
+    controls_showvideo->setEnabled(false);
+    playback->setDisplayed(true);
+
     // setup device
     step_frame = false;
     video_file_name = "";
@@ -528,6 +551,9 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
     programMode = MODE_VIDEO;
+    if(record == true) controls_showvideo->setEnabled(true);
+    playback->setDisplayed(true);
+    
     video_file_name = "";
     step_frame = false;
     capture_video.open(filename.toStdString());
@@ -587,6 +613,8 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 
 void AC_MainWindow::controls_Stop() {
     playback->Stop();
+    controls_showvideo->setEnabled(false);
+    
     if(capture_video.isOpened()) {
         capture_video.release();
         if(recording == true) writer.release();
@@ -618,6 +646,20 @@ void AC_MainWindow::controls_Stop() {
         playback->Release();
     }
     
+}
+
+void AC_MainWindow::controls_ShowVideo() {
+    QString st = controls_showvideo->text();
+    
+    if(st == "Hide Display Video") {
+        playback->setDisplayed(false);
+        disp->hide();
+        controls_showvideo->setText("Show Display Video");
+    } else {
+        controls_showvideo->setText("Hide Display Video");
+        playback->setDisplayed(true);
+        disp->show();
+    }
 }
 
 void AC_MainWindow::file_Exit() {
@@ -818,8 +860,7 @@ void AC_MainWindow::updateFrame(QImage img) {
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
-        
-        frame_stream.setRealNumberPrecision(4);
+        frame_stream.setRealNumberPrecision(2);
         
         frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << ") ";
         if(programMode == MODE_VIDEO) {
@@ -854,6 +895,20 @@ void AC_MainWindow::updateFrame(QImage img) {
 
 void AC_MainWindow::stopRecording() {
     controls_Stop();
+}
+
+void AC_MainWindow::frameInc() {
+    frame_index++;
+    QString frame_string;
+    QTextStream frame_stream(&frame_string);
+    frame_stream.setRealNumberPrecision(2);
+    frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (frame_index/video_fps) << ") ";
+    if(programMode == MODE_VIDEO) {
+        float index = frame_index;
+        float max_frames = video_frames;
+        frame_stream << " - " << (index/max_frames)*100 << "%";
+    }
+    statusBar()->showMessage(frame_string);
 }
 
 void AC_MainWindow::help_About() {
