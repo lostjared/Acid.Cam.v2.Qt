@@ -68,6 +68,7 @@ public:
     QTextEdit *log_text;
     QCheckBox *chk_negate;
     QComboBox *combo_rgb;
+    QProgressBar *progress_bar;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
     QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage, *controls_showvideo;

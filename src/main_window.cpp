@@ -321,6 +321,12 @@ void AC_MainWindow::createControls() {
     
     setWindowIcon(QPixmap(":/images/icon.png"));
     
+    progress_bar = new QProgressBar(this);
+    progress_bar->setGeometry(0, 560, 800, 20);
+    progress_bar->setMinimum(0);
+    progress_bar->setMaximum(100);
+    progress_bar->hide();
+    
 }
 
 void AC_MainWindow::createMenu() {
@@ -387,6 +393,10 @@ void AC_MainWindow::createMenu() {
     help_about->setShortcut(tr("Ctrl+A"));
     help_menu->addAction(help_about);
     connect(help_about, SIGNAL(triggered()), this, SLOT(help_About()));
+    controls_stop->setEnabled(false);
+    controls_pause->setEnabled(false);
+    controls_step->setEnabled(false);
+    controls_snapshot->setEnabled(false);
 }
 
 void AC_MainWindow::chk_Clicked() {
@@ -465,10 +475,13 @@ void AC_MainWindow::Log(const QString &s) {
 
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record) {
     programMode = MODE_CAMERA;
-    
+    progress_bar->hide();
     controls_showvideo->setEnabled(false);
     playback->setDisplayed(true);
-    
+    controls_stop->setEnabled(true);
+    controls_pause->setEnabled(true);
+    controls_step->setEnabled(false);
+    controls_snapshot->setEnabled(true);
     // setup device
     step_frame = false;
     video_file_name = "";
@@ -479,8 +492,10 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     }
     video_frames = 0;
     video_fps = 24;
-    int res_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
-    int res_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
+    int ores_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
+    int ores_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
+    int res_w = ores_w;
+    int res_h = ores_h;
     QString str;
     QTextStream stream(&str);
     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
@@ -513,8 +528,15 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
             res_h = 1080;
             break;
     }
-    capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
-    capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+    bool cw = capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
+    bool ch = capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+    
+    if(cw == false || ch == false) {
+        QMessageBox::information(this, tr("Info"), tr("Could not set resolution reverting to default .."));
+        res_w = ores_w;
+        res_h = ores_h;
+    }
+    
     QString res_str;
     QTextStream res_s(&res_str);
     res_s << "Resolution set to: " << res_w << "x" << res_h << "\n";
@@ -546,9 +568,15 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
     programMode = MODE_VIDEO;
-    if(record == true) controls_showvideo->setEnabled(true);
-    playback->setDisplayed(true);
+    controls_stop->setEnabled(true);
+    controls_pause->setEnabled(true);
+    controls_step->setEnabled(true);
+    controls_snapshot->setEnabled(true);
+    if(record == true)
+    	controls_showvideo->setEnabled(true);
     
+    progress_bar->show();
+    playback->setDisplayed(true);
     video_file_name = "";
     step_frame = false;
     capture_video.open(filename.toStdString());
@@ -609,7 +637,11 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 void AC_MainWindow::controls_Stop() {
     playback->Stop();
     controls_showvideo->setEnabled(false);
-    
+    controls_stop->setEnabled(false);
+    controls_pause->setEnabled(false);
+    controls_step->setEnabled(false);
+    controls_snapshot->setEnabled(false);
+
     if(capture_video.isOpened()) {
         capture_video.release();
         if(recording == true) writer.release();
@@ -745,8 +777,9 @@ void AC_MainWindow::updateFrame(QImage img) {
             float index = frame_index;
             float max_frames = video_frames;
             float value = (index/max_frames)*100;
-            
-            frame_stream << " - " << static_cast<unsigned int>(value) << "%";
+            unsigned int val = static_cast<unsigned int>(value);
+            progress_bar->setValue(val);
+            frame_stream << " - " << val << "%";
         }
         statusBar()->showMessage(frame_string);
         
@@ -774,6 +807,12 @@ void AC_MainWindow::updateFrame(QImage img) {
 void AC_MainWindow::stopRecording() {
     controls_Stop();
     frame_index = video_frames;
+    controls_stop->setEnabled(false);
+    controls_pause->setEnabled(false);
+    controls_step->setEnabled(false);
+    controls_snapshot->setEnabled(false);
+    progress_bar->hide();
+    
 }
 
 void AC_MainWindow::frameInc() {

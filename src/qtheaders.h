@@ -30,6 +30,7 @@
 #include<QLibrary>
 #include<QDir>
 #include<QFile>
+#include<QProgressBar>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>
