@@ -8,7 +8,7 @@ class Playback : public QThread {
 Q_OBJECT
 private:
     bool stop;
-    QMutex mutex,mutex_shown;
+    QMutex mutex,mutex_shown,mutex_add;
     QWaitCondition condition;
     cv::Mat frame;
     int frame_rate;

@@ -67,9 +67,9 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
 }
 
 void Playback::setVector(std::vector<std::pair<int, int>> v) {
-    mutex.lock();
+    mutex_add.lock();
     current = v;
-    mutex.unlock();
+    mutex_add.unlock();
 }
 
 void Playback::setOptions(bool n, int c) {
@@ -97,24 +97,30 @@ void Playback::run() {
             emit stopRecording();
             return;
         }
+        
+        static std::vector<std::pair<int, int>> cur;
+        mutex_shown.lock();
+        cur = current;
+        mutex_shown.unlock();
+        
+        
         ac::orig_frame = frame.clone();
-        if(current.size()>0) {
+        if(cur.size()>0) {
             ac::in_custom = true;
-            for(unsigned int i = 0; i < current.size(); ++i) {
-                if(i == current.size()-1)
+            for(unsigned int i = 0; i < cur.size(); ++i) {
+                if(i == cur.size()-1)
                     ac::in_custom = false;
                 
-                if(current[i].first == 0) {
-                    ac::draw_func[current[i].second](frame);
-                } else if(current[i].first == 1) {
-                    current_filterx = current[i].second;
+                if(cur[i].first == 0) {
+                    ac::draw_func[cur[i].second](frame);
+                } else if(cur[i].first == 1) {
+                    current_filterx = cur[i].second;
                     ac::alphaFlame(frame);
-                } else if(current[i].first == 2) {
-                    draw_plugin(frame, current[i].second);
+                } else if(cur[i].first == 2) {
+                    draw_plugin(frame, cur[i].second);
                 }
             }
         }
-        
         if(recording && writer.isOpened()) {
             writer.write(frame);
         }
@@ -161,7 +167,6 @@ void Playback::Stop() {
 }
 
 void Playback::Release() {
-    
     mutex.lock();
     stop = true;
     if(capture.isOpened()) capture.release();
@@ -824,8 +829,10 @@ void AC_MainWindow::frameInc() {
         float index = frame_index;
         float max_frames = video_frames;
         float value = (index/max_frames)*100;
+        unsigned int val = static_cast<unsigned int>(value);
         if(frame_index <= video_frames)
-            frame_stream << " - " << static_cast<unsigned int>(value) << "%";
+            frame_stream << " - " << val << "%";
+        progress_bar->setValue(val);
     }
     statusBar()->showMessage(frame_string);
 }
