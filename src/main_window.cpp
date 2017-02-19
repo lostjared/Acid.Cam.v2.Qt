@@ -895,6 +895,7 @@ void AC_MainWindow::updateFrame(QImage img) {
 
 void AC_MainWindow::stopRecording() {
     controls_Stop();
+    frame_index = video_frames;
 }
 
 void AC_MainWindow::frameInc() {
@@ -906,7 +907,9 @@ void AC_MainWindow::frameInc() {
     if(programMode == MODE_VIDEO) {
         float index = frame_index;
         float max_frames = video_frames;
-        frame_stream << " - " << (index/max_frames)*100 << "%";
+        
+        if(frame_index <= video_frames)
+        	frame_stream << " - " << (unsigned int)((index/max_frames)*100) << "%";
     }
     statusBar()->showMessage(frame_string);
 }
