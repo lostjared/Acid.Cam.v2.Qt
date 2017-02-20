@@ -3,55 +3,8 @@
 
 #include "qtheaders.h"
 #include "new_dialog.h"
-
-class Playback : public QThread {
-Q_OBJECT
-private:
-    bool stop;
-    QMutex mutex,mutex_shown,mutex_add;
-    QWaitCondition condition;
-    cv::Mat frame;
-    int frame_rate;
-    bool recording;
-    cv::VideoCapture capture;
-    cv::VideoWriter  writer;
-    cv::Mat rgb_frame;
-    QImage img;
-    std::vector<std::pair<int, int>> current;
-    bool isPaused, isStep;
-    bool video_shown;
-public:
-    Playback(QObject *parent = 0);
-    ~Playback();
-    void Play();
-    void Stop();
-    void Release();
-    void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record);
-    bool isStopped() const;
-    void run();
-    void msleep(int ms);
-    void setVector(std::vector<std::pair<int, int>> s);
-    void setOptions(bool n, int c);
-    void setImage(const cv::Mat &image);
-    void setStep();
-    void setDisplayed(bool shown);
-signals:
-    void procImage(const QImage image);
-    void stopRecording();
-    void frameIncrement();
-    
-};
-
-class DisplayWindow : public QDialog {
-    Q_OBJECT
-public:
-    DisplayWindow(QWidget *parent = 0);
-    void createControls();
-    void displayImage(const QImage &img);
-    void paintEvent(QPaintEvent *paint);
-private:
-    QLabel *img_label;
-};
+#include "display_window.h"
+#include "playback_window.h"
 
 enum VideoMode { MODE_CAMERA = 0, MODE_VIDEO };
 

@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-TARGET = Acid.Cam.v2.Qt
+TARGET = Acid_Cam_v2_Qt
 QT += core gui widgets
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/ /usr/local/include
@@ -13,5 +13,5 @@ QMAKE_CXXFLAGS += -std=c++11
 RESOURCES += qresource.qrc
 
 # Input
-HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h ac.h fractal.h
-SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp ac.cpp fractal.cpp
+HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h ac.h fractal.h display_window.h playback_window.h
+SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp ac.cpp fractal.cpp display_window.cpp playback_window.cpp
