@@ -10,6 +10,8 @@ public:
     void createControls();
     void displayImage(const QImage &img);
     void paintEvent(QPaintEvent *paint);
+    void keyPressEvent(QKeyEvent *ke);
+    void keyReleaseEvent(QKeyEvent *ke);
 private:
     QLabel *img_label;
 };
