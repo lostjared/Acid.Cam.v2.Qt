@@ -12,7 +12,8 @@ void Playback::Play() {
             stop = false;
         }
     }
-    start(LowPriority);
+    //start(LowPriority);
+    start(TimeCriticalPriority);
 }
 
 void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
