@@ -4,7 +4,7 @@
 #include "qtheaders.h"
 #include "new_dialog.h"
 #include "display_window.h"
-#include "playback_window.h"
+#include "playback_thread.h"
 
 enum VideoMode { MODE_CAMERA = 0, MODE_VIDEO };
 
