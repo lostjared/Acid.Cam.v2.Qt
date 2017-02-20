@@ -1,4 +1,4 @@
-#include"playback_window.h"
+#include"playback_thread.h"
 
 Playback::Playback(QObject *parent) : QThread(parent) {
     stop = true;
