@@ -456,12 +456,12 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 
 void AC_MainWindow::controls_Stop() {
     playback->Stop();
+    progress_bar->hide();
     controls_showvideo->setEnabled(false);
     controls_stop->setEnabled(false);
     controls_pause->setEnabled(false);
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
-
     if(capture_video.isOpened()) {
         capture_video.release();
         if(recording == true) writer.release();
@@ -492,7 +492,6 @@ void AC_MainWindow::controls_Stop() {
         disp->hide();
         playback->Release();
     }
-    
 }
 
 void AC_MainWindow::controls_ShowVideo() {

@@ -12,6 +12,7 @@ void Playback::Play() {
             stop = false;
         }
     }
+    //start(LowPriority);
     start(HighPriority);
 }
 
@@ -58,13 +59,11 @@ void Playback::run() {
             emit stopRecording();
             return;
         }
-        
+        mutex.unlock();
         static std::vector<std::pair<int, int>> cur;
         mutex_shown.lock();
         cur = current;
         mutex_shown.unlock();
-        
-        
         ac::orig_frame = frame.clone();
         if(cur.size()>0) {
             ac::in_custom = true;
@@ -82,6 +81,7 @@ void Playback::run() {
                 }
             }
         }
+        mutex.lock();
         if(recording && writer.isOpened()) {
             writer.write(frame);
         }
@@ -122,9 +122,7 @@ Playback::~Playback() {
 }
 
 void Playback::Stop() {
-    mutex.lock();
     stop = true;
-    mutex.unlock();
 }
 
 void Playback::Release() {

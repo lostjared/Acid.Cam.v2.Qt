@@ -3,11 +3,13 @@
 
 #include "qtheaders.h"
 
+#include<atomic>
+
 class Playback : public QThread {
     Q_OBJECT
 private:
-    bool stop;
-    QMutex mutex,mutex_shown,mutex_add;
+    std::atomic<bool> stop;
+    QMutex mutex,mutex_shown,mutex_add, mutex_start;
     QWaitCondition condition;
     cv::Mat frame;
     int frame_rate;
