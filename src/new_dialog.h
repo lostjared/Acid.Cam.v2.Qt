@@ -16,8 +16,7 @@ public:
     QLineEdit *output_dir;
     QCheckBox *chk_record;
     QPushButton *btn_start, *btn_select;
-    
-    
+    QComboBox *video_type;
 public slots:
     void btn_Select();
     void btn_Start();
@@ -36,6 +35,8 @@ public:
     QLineEdit *edit_src, *edit_outdir;
     QPushButton *btn_setedit, *btn_setout, *btn_start;
     QCheckBox *chk_record;
+    QComboBox *video_type;
+    
 public slots:
     void btn_SetSourceFile();
     void btn_SetOutputDir();

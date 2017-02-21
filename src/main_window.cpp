@@ -293,7 +293,7 @@ void AC_MainWindow::Log(const QString &s) {
     log_text->setTextCursor(tmpCursor);
 }
 
-bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record) {
+bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record, int type) {
     programMode = MODE_CAMERA;
     progress_bar->hide();
     controls_showvideo->setEnabled(false);
@@ -333,7 +333,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     m = localtime(&t);
     QString ext;
 #if defined(__APPLE__) || defined(__linux__)
-    ext = ".mov";
+    ext = (type == 0) ? ".mov" : ".avi";
 #else
     ext = ".avi";
 #endif
@@ -362,6 +362,8 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         QMessageBox::information(this, tr("Info"), tr("Could not set resolution reverting to default .."));
         res_w = ores_w;
         res_h = ores_h;
+        capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
+        capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
     }
     
     QString res_str;
@@ -371,8 +373,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     if(recording) {
         video_file_name = output_name;
 #if defined(__linux__) || defined(__APPLE__)
-        writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('M', 'P', '4', 'V')
-        /*CV_FOURCC('X','V','I','D')*/, video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('M', 'P', '4', 'V') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
 #else
         writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
 #endif
@@ -394,7 +395,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     return true;
 }
 
-bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record) {
+bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record, int type) {
     programMode = MODE_VIDEO;
     controls_stop->setEnabled(true);
     controls_pause->setEnabled(true);
@@ -439,7 +440,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     
     QString ext;
 #if defined(__APPLE__) || defined(__linux__)
-    ext = ".mov";
+    ext = (type == 0) ? ".mov" : ".avi";
 #else
     ext = ".avi";
 #endif
@@ -452,7 +453,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     if(recording) {
         video_file_name = output_name;
 #if defined(__linux__) || defined(__APPLE__)
-        writer = cv::VideoWriter(output_name.toStdString(), /*CV_FOURCC('X','V','I','D')*/ CV_FOURCC('M', 'P', '4', 'V'), video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('M', 'P', '4', 'V') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
 #else
         writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
 #endif
