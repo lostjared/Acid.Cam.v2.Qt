@@ -9,7 +9,8 @@ class Playback : public QThread {
     Q_OBJECT
 private:
     std::atomic<bool> stop;
-    QMutex mutex,mutex_shown,mutex_add, mutex_start;
+    std::atomic<bool> video_shown;
+    QMutex mutex, mutex_shown, mutex_add;
     QWaitCondition condition;
     cv::Mat frame;
     int frame_rate;
@@ -20,7 +21,6 @@ private:
     QImage img;
     std::vector<std::pair<int, int>> current;
     bool isPaused, isStep;
-    bool video_shown;
 public:
     Playback(QObject *parent = 0);
     ~Playback();

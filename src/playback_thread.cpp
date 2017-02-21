@@ -45,9 +45,7 @@ void Playback::setOptions(bool n, int c) {
 }
 
 void Playback::setDisplayed(bool shown) {
-    mutex_shown.lock();
     video_shown = shown;
-    mutex_shown.unlock();
 }
 
 void Playback::run() {
@@ -86,12 +84,7 @@ void Playback::run() {
             writer.write(frame);
         }
         mutex.unlock();
-        bool shown_var;
-        mutex_shown.lock();
-        shown_var = video_shown;
-        mutex_shown.unlock();
-        
-        if(shown_var == true) {
+        if(video_shown == true) {
             if(frame.channels()==3) {
                 cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
                 img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
