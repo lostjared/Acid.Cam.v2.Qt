@@ -8,9 +8,13 @@ To develop C++ filters that the program will load dynamically see the example
 filter in the plugins directory. The program will look for two functions:
 
 void pixel(int x, int y, unsigned char *buffer);
-
 void complete();
 
 pixel is called once for every pixel in the frame and complete is called
 when every pixel has been drawn. 
+
+Currently program works best when ran in Video mode, I have not been able to test
+on host os of windows or linux, just a guest virtual machine.  But in the VM webcam 
+resolution is maximum of 640x480.
+
 
