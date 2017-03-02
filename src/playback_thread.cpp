@@ -49,6 +49,9 @@ void Playback::setDisplayed(bool shown) {
 }
 
 void Playback::run() {
+    
+    int duration = 1000/ac::fps;
+    
     while(!stop) {
         mutex.lock();
         if(!capture.read(frame)) {
@@ -78,6 +81,8 @@ void Playback::run() {
                     draw_plugin(frame, cur[i].second);
                 }
             }
+        } else {
+            msleep(duration);
         }
         mutex.lock();
         if(recording && writer.isOpened()) {

@@ -26,7 +26,6 @@ void generate_map() {
         filter_map[filter_n] = std::make_pair(1, index);
         ++index;
     }
-    
     for(unsigned int j = 0; j < plugins.plugin_list.size(); ++j) {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
         filter_map[name] = std::make_pair(2, j);
@@ -227,7 +226,6 @@ void AC_MainWindow::cb_SetIndex(int index) {
     
 }
 void AC_MainWindow::addClicked() {
-    
     int row = filters->currentRow();
     if(row != -1) {
         QListWidgetItem *item = filters->item(row);
@@ -253,7 +251,6 @@ void AC_MainWindow::rmvClicked() {
         std::vector<std::pair<int, int>> v;
         buildVector(v);
         playback->setVector(v);
-        
     }
 }
 
@@ -266,7 +263,6 @@ void AC_MainWindow::upClicked() {
         std::vector<std::pair<int, int>> v;
         buildVector(v);
         playback->setVector(v);
-        
     }
 }
 
