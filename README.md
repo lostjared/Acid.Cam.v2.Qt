@@ -17,4 +17,10 @@ Currently program works best when ran in Video mode, I have not been able to tes
 on host os of windows or linux, just a guest virtual machine.  But in the VM webcam 
 resolution is maximum of 640x480.
 
+I believe there is a bug in current version of OpenCV where on OS X if you open
+a webcam capture device, close it then reopen a another it will cause the program to crash
+so I will have to wait until this is resolved before I can upload a complete working macOS 
+version.
+
+
 
