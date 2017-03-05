@@ -370,7 +370,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     if(recording) {
         video_file_name = output_name;
 #if defined(__linux__) || defined(__APPLE__)
-        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('M', 'P', '4', 'V') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
 #else
         writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
 #endif
@@ -450,7 +450,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     if(recording) {
         video_file_name = output_name;
 #if defined(__linux__) || defined(__APPLE__)
-        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('M', 'P', '4', 'V') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
 #else
         writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
 #endif
