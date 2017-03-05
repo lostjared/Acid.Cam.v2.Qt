@@ -2,8 +2,9 @@
 #define __PLAYBACK_WINDOW_H__
 
 #include "qtheaders.h"
-
 #include<atomic>
+
+enum VideoMode { MODE_CAMERA = 0, MODE_VIDEO };
 
 class Playback : public QThread {
     Q_OBJECT
@@ -21,6 +22,7 @@ private:
     QImage img;
     std::vector<std::pair<int, int>> current;
     bool isPaused, isStep;
+    VideoMode mode;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -28,6 +30,7 @@ public:
     void Stop();
     void Release();
     void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record);
+    void setVideoCamera(int device, int res, cv::VideoWriter writer, bool record);
     bool isStopped() const;
     void run();
     void msleep(int ms);

@@ -302,23 +302,25 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     step_frame = false;
     video_file_name = "";
     frame_index = 0;
+    /*
     capture_camera.open(dev);
     if(!capture_camera.isOpened()) {
         return false;
-    }
+    }*/
     video_frames = 0;
-    video_fps = 24;
+    video_fps = 24; /*
     int ores_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
     int ores_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
-    int res_w = ores_w;
-    int res_h = ores_h;
-    QString str;
+     */
+    int res_w = 0;
+    int res_h = 0;
+    /*QString str;
     QTextStream stream(&str);
     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
-    stream << "FPS: " << video_fps << "\n";
+    stream << "FPS: " << video_fps << "\n";*/
     output_directory = outdir;
     frame_index = 0;
-    Log(str);
+    //Log(str);
     paused = false;
     recording = record;
     QString output_name;
@@ -349,8 +351,11 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         case 2:
             res_w = 1920;
             res_h = 1080;
-            break;
+      
+     break;
     }
+    
+    /*
     bool cw = capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
     bool ch = capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
     
@@ -360,12 +365,8 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         res_h = ores_h;
         capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
         capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
-    }
+    } */
     
-    QString res_str;
-    QTextStream res_s(&res_str);
-    res_s << "Resolution set to: " << res_w << "x" << res_h << "\n";
-    Log(res_str);
     if(recording) {
         video_file_name = output_name;
 #if defined(__linux__) || defined(__APPLE__)
@@ -385,7 +386,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
-    playback->setVideo(capture_camera, writer, recording);
+    playback->setVideoCamera(dev, res, writer, recording);
     playback->Play();
     disp->show();
     return true;
@@ -478,7 +479,6 @@ void AC_MainWindow::controls_Stop() {
     if(capture_video.isOpened()) {
         capture_video.release();
         if(recording == true) writer.release();
-        cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
         if(recording) {
@@ -490,10 +490,9 @@ void AC_MainWindow::controls_Stop() {
         disp->hide();
         playback->Release();
     }
-    if(capture_camera.isOpened()) {
-        capture_camera.release();
+    if(programMode == MODE_CAMERA) {
+        //capture_camera.release();
         if(recording == true) writer.release();
-        cv::destroyWindow("Acid Cam v2");
         file_new_capture->setEnabled(true);
         file_new_video->setEnabled(true);
         if(recording) {

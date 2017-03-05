@@ -17,6 +17,7 @@ void Playback::Play() {
 }
 
 void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
+    mode = MODE_VIDEO;
     mutex.lock();
     capture = cap;
     writer = wr;
@@ -24,6 +25,42 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
     if(capture.isOpened()) {
         frame_rate = (int) capture.get(CV_CAP_PROP_FPS);
         if(frame_rate <= 0) frame_rate = 24;
+    }
+    mutex.unlock();
+}
+
+void Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool record) {
+    mode = MODE_CAMERA;
+    mutex.lock();
+    if(capture.isOpened()) {
+        
+    } else {
+        capture.open(device);
+    }
+    recording = record;
+    writer = wr;
+    int res_w = 0, res_h = 0, ores_w = 640, ores_h = 480;
+    switch(res) {
+        case 0:
+            res_w = 640;
+            res_h = 480;
+            break;
+        case 1:
+            res_w = 1280;
+            res_h = 720;
+            break;
+        case 2:
+            res_w = 1920;
+            res_h = 1080;
+            break;
+    }
+    bool cw = capture.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
+    bool ch = capture.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+    if(cw == false || ch == false) {
+        res_w = ores_w;
+        res_h = ores_h;
+        capture.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
+        capture.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
     }
     mutex.unlock();
 }
@@ -126,7 +163,7 @@ void Playback::Stop() {
 void Playback::Release() {
     mutex.lock();
     stop = true;
-    if(capture.isOpened()) capture.release();
+    if(capture.isOpened() && mode == MODE_VIDEO) capture.release();
     if(writer.isOpened()) writer.release();
     mutex.unlock();
 }
