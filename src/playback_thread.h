@@ -30,7 +30,7 @@ public:
     void Stop();
     void Release();
     void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record);
-    void setVideoCamera(int device, int res, cv::VideoWriter writer, bool record);
+    bool setVideoCamera(int device, int res, cv::VideoWriter writer, bool record);
     bool isStopped() const;
     void run();
     void msleep(int ms);

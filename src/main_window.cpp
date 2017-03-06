@@ -386,7 +386,8 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
-    playback->setVideoCamera(dev, res, writer, recording);
+    bool rt_val = playback->setVideoCamera(dev, res, writer, recording);
+    if(rt_val == false) return false;
     playback->Play();
     disp->show();
     return true;

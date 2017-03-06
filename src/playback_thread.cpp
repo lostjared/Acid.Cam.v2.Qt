@@ -29,13 +29,17 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
     mutex.unlock();
 }
 
-void Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool record) {
+bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool record) {
     mode = MODE_CAMERA;
     mutex.lock();
     if(capture.isOpened()) {
         
     } else {
         capture.open(device);
+        if(!capture.isOpened()) {
+            mutex.unlock();
+            return false;
+        }
     }
     recording = record;
     writer = wr;
@@ -63,6 +67,7 @@ void Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
         capture.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
     }
     mutex.unlock();
+    return true;
 }
 
 void Playback::setVector(std::vector<std::pair<int, int>> v) {
