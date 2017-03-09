@@ -7,8 +7,10 @@ void add_directory(QDir &cdir, std::vector<std::string> &files) {
     QFileInfoList list = cdir.entryInfoList();
     int pos = 0;
     QString platform;
-#if defined(__linux__) || defined(__APPLE__)
+#if defined(__linux__) 
     platform = ".so";
+#elif defined(__APPLE__)
+    platform = ".dylib";
 #else
     platform = ".dll";
 #endif
