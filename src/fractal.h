@@ -1,8 +1,8 @@
 /*
- * Acid Cam v2 - OpenCV Edition
+ * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
- * (C) 2016 GPL
- */
+ * (C) 2017 GPL
+*/
 
 #ifndef __FRACTAL__H_
 #define __FRACTAL__H_

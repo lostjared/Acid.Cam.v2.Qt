@@ -1,3 +1,11 @@
+
+/*
+ * Acid Cam v2 - Qt/OpenCV Edition
+ * written by Jared Bruni ( http://lostsidedead.com )
+ * (C) 2017 GPL
+*/
+
+
 #include "new_dialog.h"
 #include "main_window.h"
 

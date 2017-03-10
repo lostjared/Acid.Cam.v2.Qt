@@ -1,3 +1,10 @@
+
+/*
+ * Acid Cam v2 - Qt/OpenCV Edition
+ * written by Jared Bruni ( http://lostsidedead.com )
+ * (C) 2017 GPL
+*/
+
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
 

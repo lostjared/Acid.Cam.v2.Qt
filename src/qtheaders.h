@@ -1,3 +1,9 @@
+/*
+ * Acid Cam v2 - Qt/OpenCV Edition
+ * written by Jared Bruni ( http://lostsidedead.com )
+ * (C) 2017 GPL
+*/
+
 #ifndef _QT_HEADERS__
 #define _QT_HEADERS__
 
