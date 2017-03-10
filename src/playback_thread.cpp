@@ -40,7 +40,13 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
     mode = MODE_CAMERA;
     mutex.lock();
     if(capture.isOpened()) {
-        
+#if defined(__linux__) || defined(_WIN32)
+        capture.open(device);
+        if(!capture.isOpened()) {
+            mutex.unlock();
+            return false;
+        }
+#endif
     } else {
         capture.open(device);
         if(!capture.isOpened()) {

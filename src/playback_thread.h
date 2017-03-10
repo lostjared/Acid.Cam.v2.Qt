@@ -30,6 +30,7 @@ private:
     std::vector<std::pair<int, int>> current;
     bool isPaused, isStep;
     VideoMode mode;
+    int device_num;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
