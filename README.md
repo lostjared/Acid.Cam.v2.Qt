@@ -30,3 +30,12 @@ version.
 Screenshot from Windows
 
 ![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.1.win.jpg?raw=true "screenshot 1")
+
+Screenshot for Linux
+
+![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.2.lin.jpg?raw=true "screenshot 2")
+
+Screenshot for macOS
+
+![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.3.osx.jpg?raw=true "screenshot 3")
+
