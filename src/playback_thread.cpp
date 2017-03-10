@@ -38,6 +38,7 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
 
 bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool record) {
     mode = MODE_CAMERA;
+    device_num = device;
     mutex.lock();
     if(capture.isOpened()) {
 #if defined(__linux__) || defined(_WIN32)
