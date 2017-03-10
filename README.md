@@ -27,3 +27,6 @@ version.
 
 
 
+Screenshot from Windows
+
+![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.1.win.jpg?raw=true "screenshot 1")
