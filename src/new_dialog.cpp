@@ -63,7 +63,16 @@ void CaptureCamera::setParent(AC_MainWindow *p) {
 
 void CaptureCamera::btn_Select() {
  
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString def_path = "";
+#if defined(__linux__)
+    def_path = "/home";
+#elif defined(__APPLE__)
+    def_path = "/Users";
+#elif defined(_WIN32)
+    def_path = "C:\\";
+#endif
+    
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),def_path,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     
     if(dir != "") {
         output_dir->setText(dir);
@@ -132,13 +141,32 @@ void CaptureVideo::setParent(AC_MainWindow *p) {
 }
 
 void CaptureVideo::btn_SetSourceFile() {
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Video"), "/home", tr("Video Files (*.avi *.mov *.mp4 *.mkv)"));
+    
+    QString def_path = "";
+#if defined(__linux__)
+    def_path = "/home";
+#elif defined(__APPLE__)
+    def_path = "/Users";
+#elif defined(_WIN32)
+    def_path = "C:\\";
+#endif
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Video"), def_path, tr("Video Files (*.avi *.mov *.mp4 *.mkv)"));
     if(fileName != "")
         edit_src->setText(fileName);
 }
 
 void CaptureVideo::btn_SetOutputDir() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Set Output Directory"), "/home",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    
+    QString def_path = "";
+#if defined(__linux__)
+    def_path = "/home";
+#elif defined(__APPLE__)
+    def_path = "/Users";
+#elif defined(_WIN32)
+    def_path = "C:\\";
+#endif
+    
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Set Output Directory"),def_path,QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if(dir != "")
         edit_outdir->setText(dir);
 }
