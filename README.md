@@ -2,7 +2,7 @@
 
 ![AnimatedImage](http://lostsidedead.biz/gif/jaredpeace.gif "screenshot")
 
-Cross platform version of Acid Cam written in C++11
+Cross platform version of Acid Cam written in C++11 
 
 To compile on Linux watch this video: https://youtu.be/ntsoGTglWzY
 
@@ -25,9 +25,9 @@ a webcam capture device, close it then reopen a another it will cause the progra
 so I will have to wait until this is resolved before I can upload a complete working macOS 
 version.
 
+Screen shots of program on different Operating Systems:
 
-
-Screenshot from Window:s
+Screenshot from Windows:
 
 ![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.1.win.jpg?raw=true "screenshot 1")
 
