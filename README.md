@@ -2,6 +2,10 @@
 
 ![AnimatedImage](http://lostsidedead.biz/gif/jaredpeace.gif "screenshot")
 
+This is an application that will allow you to generate video files/images with live video or video files. This is accomplished by mixing different 'filters' 
+in different orders to produce different results. This program could be useful to you for generating basic artwork to be manipulated further. Also I have seen 
+it used to create video for music videos or just for fun. 
+
 Cross platform version of Acid Cam written in C++11 
 
 To compile on Linux watch this video: https://youtu.be/ntsoGTglWzY
@@ -19,6 +23,7 @@ when every pixel has been drawn.
 Currently program works best when ran in Video mode, I have not been able to test
 on host os of windows or linux, just a guest virtual machine.  But in the VM webcam 
 resolution is maximum of 640x480.
+
 
 I believe there is a bug in current version of OpenCV where on OS X if you open
 a webcam capture device, close it then reopen a another it will cause the program to crash
