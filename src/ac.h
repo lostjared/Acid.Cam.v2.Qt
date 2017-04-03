@@ -41,7 +41,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.1.5";
+    static const std::string version="2.1.6";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -133,6 +133,7 @@ namespace ac {
     void CombinePixels(cv::Mat &frame);
     void FlipTrip(cv::Mat &frame);
     void Canny(cv::Mat &frame);
+    void Boxes(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
     // draw functions / strings

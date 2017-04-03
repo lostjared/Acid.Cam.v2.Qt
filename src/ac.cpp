@@ -30,14 +30,14 @@ namespace ac {
     int snapshot_Type = 0;
     bool in_custom = false;
     // draw strings (function names)
-    std::string draw_strings[] = { "Self AlphaBlend", "Self Scale", "StrobeEffect", "Blend #3", "Negative Paradox", "ThoughtMode", "RandTriBlend", "Blank", "Tri", "Distort", "CDraw", "Type", "NewOne", "Blend Fractal","Blend Fractal Mood", "CosSinMultiply", "Color Accumlate1", "Color Accumulate2", "Color Accumulate3", "filter8","filter3","Rainbow Blend","Rand Blend","New Blend", "Alpha Flame Filters", "Pixel Scale", "PixelSort", "GlitchSort","Random Filter", "Random Flash", "Blend with Image", "Blend with Image #2", "Blend with Image #3", "Blend with Image #4", "GaussianBlur", "Median Blur", "Blur Distortion", "Diamond Pattern", "MirrorBlend","Pulse","Sideways Mirror","Mirror No Blend","Sort Fuzz","Fuzz","Double Vision","RGB Shift","RGB Sep","Graident Rainbow","Gradient Rainbow Flash", "Reverse", "Scanlines", "TV Static", "Mirror Average", "Mirror Average Mix", "Mean", "Laplacian", "Bitwise_XOR", "Bitwise_AND", "Bitwise_OR", "Equalize", "Channel Sort", "Reverse_XOR", "Combine Pixels", "FlipTrip", "Canny", "Blend with Source", "Plugin", "Custom","Blend With Image #1",  "TriBlend with Image", "Image Strobe", "Image distraction" };
+    std::string draw_strings[] = { "Self AlphaBlend", "Self Scale", "StrobeEffect", "Blend #3", "Negative Paradox", "ThoughtMode", "RandTriBlend", "Blank", "Tri", "Distort", "CDraw", "Type", "NewOne", "Blend Fractal","Blend Fractal Mood", "CosSinMultiply", "Color Accumlate1", "Color Accumulate2", "Color Accumulate3", "filter8","filter3","Rainbow Blend","Rand Blend","New Blend", "Alpha Flame Filters", "Pixel Scale", "PixelSort", "GlitchSort","Random Filter", "Random Flash", "Blend with Image", "Blend with Image #2", "Blend with Image #3", "Blend with Image #4", "GaussianBlur", "Median Blur", "Blur Distortion", "Diamond Pattern", "MirrorBlend","Pulse","Sideways Mirror","Mirror No Blend","Sort Fuzz","Fuzz","Double Vision","RGB Shift","RGB Sep","Graident Rainbow","Gradient Rainbow Flash", "Reverse", "Scanlines", "TV Static", "Mirror Average", "Mirror Average Mix", "Mean", "Laplacian", "Bitwise_XOR", "Bitwise_AND", "Bitwise_OR", "Equalize", "Channel Sort", "Reverse_XOR", "Combine Pixels", "FlipTrip", "Canny","Boxes", "Blend with Source", "Plugin", "Custom","Blend With Image #1",  "TriBlend with Image", "Image Strobe", "Image distraction" };
 
     // filter callback functions
     DrawFunction draw_func[] = { SelfAlphaBlend, SelfScale, StrobeEffect, Blend3, NegParadox, ThoughtMode, RandTriBlend, Blank, Tri, Distort, CDraw,Type,NewOne,blendFractal,blendFractalMood,cossinMultiply, colorAccumulate1, colorAccumulate2, colorAccumulate3,filter8,filter3,rainbowBlend,randBlend,newBlend,
-        alphaFlame, pixelScale,pixelSort, glitchSort,randomFilter,randomFlash, imageBlend,imageBlendTwo,imageBlendThree,imageBlendFour, GaussianBlur, MedianBlur, BlurDistortion,DiamondPattern,MirrorBlend,Pulse,SidewaysMirror,MirrorNoBlend,SortFuzz,Fuzz,DoubleVision,RGBShift,RGBSep,GradientRainbow,GradientRainbowFlash,Reverse,Scanlines,TVStatic,MirrorAverage,MirrorAverageMix,Mean,Laplacian,Bitwise_XOR,Bitwise_AND,Bitwise_OR,Equalize,ChannelSort,Reverse_XOR,CombinePixels,FlipTrip,Canny,BlendWithSource,plugin,custom,blendWithImage, triBlendWithImage,imageStrobe, imageDistraction,0};
+        alphaFlame, pixelScale,pixelSort, glitchSort,randomFilter,randomFlash, imageBlend,imageBlendTwo,imageBlendThree,imageBlendFour, GaussianBlur, MedianBlur, BlurDistortion,DiamondPattern,MirrorBlend,Pulse,SidewaysMirror,MirrorNoBlend,SortFuzz,Fuzz,DoubleVision,RGBShift,RGBSep,GradientRainbow,GradientRainbowFlash,Reverse,Scanlines,TVStatic,MirrorAverage,MirrorAverageMix,Mean,Laplacian,Bitwise_XOR,Bitwise_AND,Bitwise_OR,Equalize,ChannelSort,Reverse_XOR,CombinePixels,FlipTrip,Canny,Boxes,BlendWithSource,plugin,custom,blendWithImage, triBlendWithImage,imageStrobe, imageDistraction,0};
     // number of filters
     
-    int draw_max = 71;
+    int draw_max = 72;
     // variables
     double translation_variable = 0.001f, pass2_alpha = 0.75f;
     // swap colors inline function
@@ -1210,7 +1210,7 @@ void changePixel(cv::Mat &full_buffer, int i, int z, cv::Vec3b &buffer, double p
             cola[0] = buffer[2];
             cola[1] = buffer[1];
             cola[2] = buffer[0];
-            int alpha = (int)pos;
+            unsigned int alpha = (int)pos;
             int red_values[] = { colv[0]+cola[2], colv[1]+cola[1], colv[2]+cola[0], 0 };
             int green_values[] = { colv[2]+cola[0], colv[1]+cola[1], colv[0]+cola[2], 0 };
             int blue_values[] = { colv[1]+cola[1], colv[0]+cola[2], colv[2]+cola[0], 0 };
@@ -1240,7 +1240,7 @@ void changePixel(cv::Mat &full_buffer, int i, int z, cv::Vec3b &buffer, double p
             cola[0] = t[0];
             cola[1] = t[1];
             cola[2] = t[2];
-            int alpha = (int)pos;
+            unsigned int alpha = (int)pos;
             int red_values[] = { colv[0]+cola[2], colv[1]+cola[1], colv[2]+cola[0], 0 };
             int green_values[] = { colv[2]+cola[0], colv[1]+cola[1], colv[0]+cola[2], 0 };
             int blue_values[] = { colv[1]+cola[1], colv[0]+cola[2], colv[2]+cola[0], 0 };
@@ -1546,15 +1546,12 @@ void changePixel(cv::Mat &full_buffer, int i, int z, cv::Vec3b &buffer, double p
             break;
         case 36:
         {
-            buffer[0] += sinf(M_PI+pos)*pos;
-            buffer[1] += cosf(M_PI+pos)*pos;
-            buffer[2] += tanf(M_PI+pos)*pos;
+            buffer[0] += sinf(3.14+pos)*pos;
+            buffer[1] += cosf(3.14+pos)*pos;
+            buffer[2] += tanf(3.14+pos)*pos;
         }
             break;
     }
-    
-    if(ac::in_custom == true) return;
-    
     buffer[0] += red;
     buffer[1] += green;
     buffer[2] += blue;
@@ -2026,7 +2023,7 @@ void ac::SortFuzz(cv::Mat &frame) {
             cv[3] = 0;
             v.push_back(vv); // push back
         }
-        std::sort(v.begin(), v.end(), std::greater<int>());// sort greater
+        std::sort(v.begin(), v.end());// sort greater
         for(int i = 0; i < w; ++i) { // left to right
             unsigned char *value = (unsigned char*)&v[i];
             cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);// pixel at i,z
@@ -2543,6 +2540,38 @@ void ac::FlipTrip(cv::Mat &frame) {
             // do nothing
             _flip = 0; // index equals zero
             break;
+    }
+}
+
+void ac::Boxes(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int pixel_size = 8;
+    for(unsigned int z = 0; z < h; z += pixel_size) {
+        for(unsigned int i = 0; i < w; i += pixel_size) {
+            unsigned char rgb[3];
+            rgb[0] = rand()%255;
+            rgb[1] = rand()%255;
+            rgb[2] = rand()%255;
+            for(unsigned int y = z; y < z+pixel_size; ++y) {
+                for(unsigned int x = i; x < i+pixel_size; ++x) {
+                    if(x < w && y < h) {
+                    	cv::Vec3b &pixel = frame.at<cv::Vec3b>(y, x);
+                        pixel[0] += rgb[0];
+                        pixel[1] += rgb[1];
+                        pixel[2] += rgb[2];
+                    }
+                }
+            }
+        }
+    }
+    static int direction = 1;
+    if(direction == 1) {
+    	++pixel_size;
+        if(pixel_size > (w/6)) direction = 0;
+    } else if(direction == 0) {
+        --pixel_size;
+        if(pixel_size < 24) direction = 1;
     }
 }
 
