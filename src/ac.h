@@ -5,7 +5,9 @@
  */
 #ifndef __AC_H__
 #define __AC_H__
-#include<opencv2/opencv.hpp>
+#include<opencv2/videoio.hpp>
+#include<opencv2/imgproc.hpp>
+#include<opencv2/highgui.hpp>
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -134,6 +136,7 @@ namespace ac {
     void FlipTrip(cv::Mat &frame);
     void Canny(cv::Mat &frame);
     void Boxes(cv::Mat &frame);
+    void BoxesFade(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
     // draw functions / strings
