@@ -2,6 +2,9 @@
 
 ![AnimatedImage](http://lostsidedead.biz/gif/jaredpeace.gif "screenshot")
 
+
+For sample videos and updates about this software view the Facebook page: http://facebook.com/AcidCam
+
 This is an application that will allow you to generate video files/images with live video or video files. This is accomplished by mixing different 'filters' 
 in different orders to produce different results. This program could be useful to you for generating basic artwork to be manipulated further. Also I have seen 
 it used to create video for music videos or just for fun. 
