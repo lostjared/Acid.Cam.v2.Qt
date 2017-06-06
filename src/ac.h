@@ -41,14 +41,14 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.1.7";
+    static const std::string version="2.1.8";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
     extern int color_order;
     extern double fps;
     extern int draw_offset;
-    static std::string fileName ="VideoFile.avi";
+    extern std::string fileName;
     extern cv::Mat orig_frame;
     extern cv::Mat blendW_frame;
     extern cv::Mat image_files[4];
@@ -135,13 +135,16 @@ namespace ac {
     void Canny(cv::Mat &frame);
     void Boxes(cv::Mat &frame);
     void BoxesFade(cv::Mat &frame);
-    void BlendWithSource(cv::Mat &frame);
     void FlashBlack(cv::Mat &frame);
     void SlideRGB(cv::Mat &frame);
     void Side2Side(cv::Mat &frame);
     void Top2Bottom(cv::Mat &frame);
     void StrobeRedGreenBlue(cv::Mat &frame);
+    void Outward(cv::Mat &frame);
+    void OutwardSquare(cv::Mat &frame);
     void Blend_Angle(cv::Mat &frame);
+    void ShiftPixels(cv::Mat &frame);
+    void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
     // draw functions / strings
     extern std::string draw_strings[];
