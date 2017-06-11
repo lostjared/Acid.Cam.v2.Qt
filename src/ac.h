@@ -41,7 +41,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.1.8";
+    static const std::string version="2.1.9";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -55,6 +55,7 @@ namespace ac {
     extern bool images_Enabled,fps_force;
     extern int snapshot_Type;
     extern bool in_custom;
+    extern unsigned int swapColor_r, swapColor_g, swapColor_b;
     inline int GetFX(cv::Mat &frame, int x, int nw);
     inline int GetFY(cv::Mat &frame, int y, int nh);
     inline void invert(cv::Mat &frame, int x, int y);
@@ -144,6 +145,7 @@ namespace ac {
     void OutwardSquare(cv::Mat &frame);
     void Blend_Angle(cv::Mat &frame);
     void ShiftPixels(cv::Mat &frame);
+    void ShiftPixelsDown(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
     // draw functions / strings
