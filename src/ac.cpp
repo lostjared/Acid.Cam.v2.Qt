@@ -1,7 +1,7 @@
 /*
  *
  * Acid Cam functions for OpenCV
- * written by Jared Bruni
+ * written by Jared Bruni https://github.com/lostjared
  * http://lostsidedead.com
  * (C) 2017 under GPL
  * One quick note, most of the time when writing programs using x,y variables x goes first
@@ -32,19 +32,29 @@ namespace ac {
     bool in_custom = false;
     std::string fileName ="VideoFile.avi";
     // draw strings (function names)
-    std::string draw_strings[] = { "Self AlphaBlend", "Self Scale", "StrobeEffect", "Blend #3", "Negative Paradox", "ThoughtMode", "RandTriBlend", "Blank", "Tri", "Distort", "CDraw", "Type", "NewOne", "Blend Fractal","Blend Fractal Mood", "CosSinMultiply", "Color Accumlate1", "Color Accumulate2", "Color Accumulate3", "filter8","filter3","Rainbow Blend","Rand Blend","New Blend", "Alpha Flame Filters", "Pixel Scale", "PixelSort", "GlitchSort","Random Filter", "Random Flash", "Blend with Image", "Blend with Image #2", "Blend with Image #3", "Blend with Image #4", "GaussianBlur", "Median Blur", "Blur Distortion", "Diamond Pattern", "MirrorBlend","Pulse","Sideways Mirror","Mirror No Blend","Sort Fuzz","Fuzz","Double Vision","RGB Shift","RGB Sep","Graident Rainbow","Gradient Rainbow Flash", "Reverse", "Scanlines", "TV Static", "Mirror Average", "Mirror Average Mix", "Mean", "Laplacian", "Bitwise_XOR", "Bitwise_AND", "Bitwise_OR", "Equalize", "Channel Sort", "Reverse_XOR", "Combine Pixels", "FlipTrip", "Canny","Boxes","Boxes Fade", "Flash Black", "SlideRGB", "Side2Side","Top2Bottom","Strobe Red Then Green Then Blue","Blend_Angle", "Outward", "Outward Square", "ShiftPixels", "ShiftPixelsDown", "XorMultiBlend", "Blend with Source", "Plugin", "Custom","Blend With Image #1",  "TriBlend with Image", "Image Strobe", "Image distraction" };
+    std::string draw_strings[] = { "Self AlphaBlend", "Self Scale", "StrobeEffect", "Blend #3", "Negative Paradox", "ThoughtMode", "RandTriBlend", "Blank", "Tri", "Distort", "CDraw", "Type", "NewOne", "Blend Fractal","Blend Fractal Mood", "CosSinMultiply", "Color Accumlate1", "Color Accumulate2", "Color Accumulate3", "filter8","filter3","Rainbow Blend","Rand Blend","New Blend", "Alpha Flame Filters", "Pixel Scale", "PixelSort", "GlitchSort","Random Filter", "Random Flash", "Blend with Image", "Blend with Image #2", "Blend with Image #3", "Blend with Image #4", "GaussianBlur", "Median Blur", "Blur Distortion", "Diamond Pattern", "MirrorBlend","Pulse","Sideways Mirror","Mirror No Blend","Sort Fuzz","Fuzz","Double Vision","RGB Shift","RGB Sep","Graident Rainbow","Gradient Rainbow Flash", "Reverse", "Scanlines", "TV Static", "Mirror Average", "Mirror Average Mix", "Mean", "Laplacian", "Bitwise_XOR", "Bitwise_AND", "Bitwise_OR", "Equalize", "Channel Sort", "Reverse_XOR", "Combine Pixels", "FlipTrip", "Canny","Boxes","Boxes Fade", "Flash Black", "SlideRGB", "Side2Side","Top2Bottom","Strobe Red Then Green Then Blue","Blend_Angle", "Outward", "Outward Square", "ShiftPixels", "ShiftPixelsDown", "XorMultiBlend", "Bitwise_Rotate", "Bitwise_Rotate Diff", "HPPD", "FuzzyLines","GradientLines","GradientSelf","GradientSelfVertical", "GradientDown", "GraidentHorizontal", "GradientRGB","Inter", "UpDown","LeftRight","StrobeScan","BlendedScanLines","GradientStripes","XorSine",
+        "Blend with Source", "Plugin", "Custom","Blend With Image #1",  "TriBlend with Image", "Image Strobe", "Image distraction" };
 
     // filter callback functions
     DrawFunction draw_func[] = { SelfAlphaBlend, SelfScale, StrobeEffect, Blend3, NegParadox, ThoughtMode, RandTriBlend, Blank, Tri, Distort, CDraw,Type,NewOne,blendFractal,blendFractalMood,cossinMultiply, colorAccumulate1, colorAccumulate2, colorAccumulate3,filter8,filter3,rainbowBlend,randBlend,newBlend,
-        alphaFlame, pixelScale,pixelSort, glitchSort,randomFilter,randomFlash, imageBlend,imageBlendTwo,imageBlendThree,imageBlendFour, GaussianBlur, MedianBlur, BlurDistortion,DiamondPattern,MirrorBlend,Pulse,SidewaysMirror,MirrorNoBlend,SortFuzz,Fuzz,DoubleVision,RGBShift,RGBSep,GradientRainbow,GradientRainbowFlash,Reverse,Scanlines,TVStatic,MirrorAverage,MirrorAverageMix,Mean,Laplacian,Bitwise_XOR,Bitwise_AND,Bitwise_OR,Equalize,ChannelSort,Reverse_XOR,CombinePixels,FlipTrip,Canny,Boxes,BoxesFade,FlashBlack,SlideRGB,Side2Side,Top2Bottom, StrobeRedGreenBlue,Blend_Angle,Outward,OutwardSquare,ShiftPixels,ShiftPixelsDown,XorMultiBlend,BlendWithSource,plugin,custom,blendWithImage, triBlendWithImage,imageStrobe, imageDistraction,0};
+        alphaFlame, pixelScale,pixelSort, glitchSort,randomFilter,randomFlash, imageBlend,imageBlendTwo,imageBlendThree,imageBlendFour, GaussianBlur, MedianBlur, BlurDistortion,DiamondPattern,MirrorBlend,Pulse,SidewaysMirror,MirrorNoBlend,SortFuzz,Fuzz,DoubleVision,RGBShift,RGBSep,GradientRainbow,GradientRainbowFlash,Reverse,Scanlines,TVStatic,MirrorAverage,MirrorAverageMix,Mean,Laplacian,Bitwise_XOR,Bitwise_AND,Bitwise_OR,Equalize,ChannelSort,Reverse_XOR,CombinePixels,FlipTrip,Canny,Boxes,BoxesFade,FlashBlack,SlideRGB,Side2Side,Top2Bottom, StrobeRedGreenBlue,Blend_Angle,Outward,OutwardSquare,ShiftPixels,ShiftPixelsDown,XorMultiBlend,BitwiseRotate,BitwiseRotateDiff,HPPD,FuzzyLines,GradientLines,GradientSelf,GradientSelfVertical,GradientDown,GraidentHorizontal,GradientRGB,Inter,UpDown,LeftRight,StrobeScan,BlendedScanLines,GradientStripes,XorSine,
+        BlendWithSource,plugin,custom,blendWithImage, triBlendWithImage,imageStrobe, imageDistraction,0};
     // number of filters
     
-    int draw_max = 84;
+    int draw_max = 101;
     // variables
     double translation_variable = 0.001f, pass2_alpha = 0.75f;
     // swap colors inline function
     inline void swapColors(cv::Mat &frame, int x, int y);
     inline void procPos(int &direction, double &pos, double &pos_max, const double max_size = 15);
+    
+    std::unordered_map<std::string, int> filter_map;
+}
+
+void ac::fill_filter_map() {
+    for(int i = 0; i < ac::draw_max; ++i) {
+        filter_map[draw_strings[i]] = i;
+    }
 }
 
 // swapColors inline function takes frame and x, y position
@@ -3027,6 +3037,484 @@ void ac::XorMultiBlend(cv::Mat &frame) {
     }
     static int direction = 1;
     procPos(direction, pos, pos_max, 4.0);
+}
+
+void ac::BitwiseRotate(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int offset = 0;
+    static int direction = 1;
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            
+            if(direction == 1) {
+            	pixel[0] = ror(pixel[0], offset);
+            	pixel[1] = rol(pixel[1], offset);
+            	pixel[2] = ror(pixel[2], offset);
+            } else {
+                pixel[0] = rol(pixel[0], offset);
+                pixel[1] = ror(pixel[1], offset);
+                pixel[2] = rol(pixel[2], offset);
+            }
+            
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+    }
+    if(direction == 1) {
+        offset++;
+        if(offset >= 7) {
+            direction = 0;
+        }
+    } else {
+        offset--;
+        if(offset <= 1) {
+            direction = 1;
+        }
+    }
+}
+
+void ac::BitwiseRotateDiff(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int offset = 1;
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            for(unsigned int q = 0; q < 3; ++q)
+                pixel[q] += (pixel[q]-ror(pixel[q], offset));
+            
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+    }
+    ++offset;
+    if(offset > 7) offset = 1;
+}
+
+void ac::HPPD(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 4.0;
+    for(unsigned int z = 0; z < h; ++z) {
+        cv::Scalar total;
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            total[0] += pixel[0];
+            total[1] += pixel[1];
+            total[2] += pixel[2];
+            pixel[0] = pixel[0]-total[0]*pos;
+            pixel[1] = pixel[1]-total[1]*pos;
+            pixel[2] = pixel[2]-total[2]*pos;
+      		swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+    }
+    
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::FuzzyLines(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 4.0;
+    cv::Scalar prev_pixel;
+    double value[3] = { 0 };
+    
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            cv::Vec3b temp = pixel;
+    
+            value[0] += temp[0]+temp[1]+temp[2];
+            value[1] -= temp[0]+temp[1]+temp[2];
+            value[2] += temp[0]+temp[1]+temp[2];
+            pixel[0] += (value[0]*pos)*0.001;
+            pixel[1] += (value[1]*pos)*0.001;
+            pixel[2] += (value[2]*pos)*0.001;
+            
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+            prev_pixel[0] = pixel[0];
+            prev_pixel[1] = pixel[1];
+            prev_pixel[2] = pixel[2];
+        }
+    }
+    
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+
+    
+}
+
+void ac::GradientLines(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int count = 0, index = 0;
+    
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[index] += count;
+            ++count;
+            if(count >= 255) {
+                count = 0;
+                ++index;
+                if(index > 2) index = 0;
+            }
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+    }
+}
+
+void ac::GradientSelf(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 7.0;
+    static unsigned int count = 0, index = 0;
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[index] = (pixel[index]*pos)+count;
+            ++count;
+            if(count >= 255) {
+                count = 0;
+            }
+            
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+        ++index;
+        if(index > 2) index = 0;
+    }
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::GradientSelfVertical(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 7.0;
+    static unsigned int count = 0, index = 0;
+    for(unsigned int i = 0; i < w; ++i) {
+        for(unsigned int z = 0; z < h; ++z) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[index] = (pixel[index]*pos)+count;
+            ++count;
+            if(count >= 255) {
+                count = 0;
+            }
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+        ++index;
+        if(index > 2) index = 0;
+    }
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::GradientDown(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 7.0;
+    static unsigned int count = 0, index = 0;
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[index] = (pixel[index]*pos)+count;
+            ++index;
+            if(index > 2) index = 0;
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+        ++count;
+        if(count >= 255) {
+            count = 0;
+        }
+    }
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::GraidentHorizontal(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 7.0;
+    static unsigned int count = 0, index = 0;
+    for(unsigned int i = 0; i < w; ++i) {
+        for(unsigned int z = 0; z < h; ++z) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[index] = (pixel[index]*pos)+count;
+            ++index;
+            if(index > 2) index = 0;
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+        ++count;
+        if(count >= 255) {
+            count = 0;
+        }
+    }
+    int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::GradientRGB(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int count = 0, index = 0;
+    static unsigned int direction = 1;
+    if(direction == 1) {
+    for(unsigned int z = 0; z < h; ++z) {
+    	for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[index] = pixel[index]*count;
+            ++count;
+            if(count >= 255) {
+                ++index;
+                if(index > 2) {
+                    index = 0;
+                }
+            }
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+    	}
+    }
+    } else {
+        for(unsigned int i = 0; i < w; ++i) {
+        for(unsigned int z = 0; z < h; ++z) {
+                cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                pixel[index] = pixel[index]*count;
+                ++count;
+                if(count >= 255) {
+                    ++index;
+                    if(index > 2) {
+                        index = 0;
+                    }
+                }
+                swapColors(frame, z, i);
+                if(isNegative) invert(frame, z, i);
+            }
+        }
+    }
+    if(direction == 1) direction = 0; else direction = 1;
+}
+
+
+void ac::Inter(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int start_x = 0;
+    for(unsigned int z = start_x; z < h; z += 2) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[0] = pixel[1] = pixel[2] = 0;
+        }
+    }
+    if(start_x == 0) start_x = 1; else start_x = 0;
+}
+
+
+void ac::UpDown(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 7.0;
+    double alpha = 1.0;
+    bool order = true;
+    
+    for(unsigned int i = 0; i < w; ++i) {
+        if(order == true) {
+            order = false;
+        	for(unsigned int z = 0; z < h; ++z) {
+                cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                for(unsigned int q = 0; q < 3; ++q)
+                	pixel[q] = alpha+(pixel[q]*pos);
+                
+                swapColors(frame, z, i);
+                if(isNegative) invert(frame, z, i);
+        	}
+            alpha += 0.1;
+        } else {
+            order = true;
+            for(unsigned int z = h-1; z > 1; --z) {
+                cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                for(unsigned int q = 0; q < 3; ++q)
+                    pixel[q] = alpha-(pixel[q]*pos);
+                
+                swapColors(frame, z, i);
+                if(isNegative) invert(frame, z, i);
+            }
+            
+            alpha += 0.1;
+        }
+ 
+    }
+    
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::LeftRight(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 7.0;
+    double alpha = 1.0;
+    bool order = true;
+    for(unsigned int z = 0; z < h; ++z) {
+        if(order == true) {
+            order = false;
+            for(unsigned int i = 0; i < w; ++i) {
+                cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                for(unsigned int q = 0; q < 3; ++q)
+                    pixel[q] = alpha+(pixel[q]*pos);
+                
+                swapColors(frame, z, i);
+                if(isNegative) invert(frame, z, i);
+            }
+            alpha += 0.1;
+        } else {
+            order = true;
+            for(unsigned int i = w-1; i > 1; --i) {
+                cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                for(unsigned int q = 0; q < 3; ++q)
+                    pixel[q] = alpha-(pixel[q]*pos);
+              
+                swapColors(frame, z, i);
+                if(isNegative) invert(frame, z, i);
+            }
+            
+            alpha += 0.1;
+        }
+    }
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::StrobeScan(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static double pos = 1.0, pos_max = 7.0;
+    static int color_mode = 0;
+    unsigned int over = rand()%255;
+    static unsigned int cdirection = 1;
+    
+    for(unsigned int z = 0; z < h; ++z) {
+                switch(color_mode) {
+                case 0: {
+                    for(unsigned int i = 0; i < w; ++i) {
+                        cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                        pixel[color_mode] = over+(pixel[color_mode]*pos);
+                        swapColors(frame, z, i);
+                        if(isNegative) invert(frame, z, i);
+                    }
+                }
+                    break;
+                case 1: {
+                    for(unsigned int i = w-1; i > 1; --i) {
+                        cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                        pixel[color_mode] -= over+(pixel[1]*pos);
+                        swapColors(frame, z, i);
+                        if(isNegative) invert(frame, z, i);
+
+                    }
+                }
+                    break;
+                case 2: {
+                    for(unsigned int i = 0; i < w; ++i) {
+                        cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                        pixel[color_mode] ^= static_cast<unsigned char>(over+(pixel[color_mode]*pos));
+                        swapColors(frame, z, i);
+                        if(isNegative) invert(frame, z, i);
+
+                    }
+                }
+                    break;
+            }
+        
+        if(cdirection == 1) {
+            ++color_mode;
+            if(color_mode > 2) {
+                cdirection = 0;
+            }
+        } else if(cdirection == 0) {
+            --color_mode;
+            if(color_mode < 0) {
+                cdirection = 1;
+            }
+        }
+    }
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::BlendedScanLines(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int cnt = 0;
+    for(unsigned int z = 0; z < h; ++z) {
+        int r = rand()%255;
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[cnt] += r;
+            ++r;
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+            ++cnt;
+            if(cnt > 2) {
+                cnt = 0;
+            }
+        }
+    }
+}
+
+void ac::GradientStripes(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static unsigned int offset = 0, count = 0;
+    unsigned int count_i = (rand()%0xFF)+(rand()%0xFFFFFF);//color offset
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[offset] += count;
+            pixel[2-offset] -= count_i;
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+        ++count;
+        ++count_i;
+    }
+    ++offset;
+    if(offset > 2)
+        offset = 0;
+}
+// this one pixelates the image very heavily.
+void ac::XorSine(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame height
+    static cv::Scalar val(rand()%10, rand()%10, rand()%10);
+    static double pos = 1.0, pos_max = 7.0;
+    for(unsigned int i = 0; i < w; ++i) {
+        for(unsigned int z = 0; z < h; ++z) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[0] ^= static_cast<unsigned char>(sin(pixel[0])*val[0]);
+            pixel[1] ^= static_cast<unsigned char>(sin(pixel[1])*val[1]);
+            pixel[2] ^= static_cast<unsigned char>(sin(pixel[2])*val[2]);
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+    }
+    static int direction = 1;
+    for(unsigned int q = 0; q < 3; ++q) {
+        if(direction == 1)
+            val[q] += pos;
+        else
+            val[q] -= pos;
+    }
+    procPos(direction, pos, pos_max);
 }
 
 // Alpha Blend with Original Frame

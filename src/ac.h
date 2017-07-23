@@ -1,5 +1,5 @@
 /* Acid Cam Functions for OpenCV
- * written by Jared Bruni
+ * written by Jared Bruni https://github.com/lostjared
  * http://lostsidedead.com
  * (C) 2017 - GPL
  */
@@ -15,6 +15,7 @@
 #include<ctime>
 #include<cmath>
 #include<algorithm>
+#include<unordered_map>
 
 /*
  * to use set appropriate variables, call the function
@@ -41,7 +42,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.1.9";
+    static const std::string version="2.2.3";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -61,6 +62,17 @@ namespace ac {
     inline void invert(cv::Mat &frame, int x, int y);
     /* filter functions */
     typedef void (*DrawFunction)(cv::Mat &frame);
+    
+    template<typename T>
+    inline T ror(T x, unsigned int m)
+    {
+        return (x >> m) | (x << (sizeof(T)*8 - m));
+    }
+    
+    template<typename T>
+    inline T rol(T x, unsigned int m) {
+        return (x << m) | (x >> (sizeof(T)*8 -m));
+    }
     
     // Acid Cam Filter Function prototypes
     void SelfAlphaBlend(cv::Mat &frame);
@@ -147,6 +159,23 @@ namespace ac {
     void ShiftPixels(cv::Mat &frame);
     void ShiftPixelsDown(cv::Mat &frame);
     void XorMultiBlend(cv::Mat &frame);
+    void BitwiseRotate(cv::Mat &frame);
+    void BitwiseRotateDiff(cv::Mat &frame);
+    void HPPD(cv::Mat &frame);
+    void FuzzyLines(cv::Mat &frame);
+    void GradientLines(cv::Mat &frame);
+    void GradientSelf(cv::Mat &frame);
+    void GradientDown(cv::Mat &frame);
+    void GraidentHorizontal(cv::Mat &frame);
+    void GradientSelfVertical(cv::Mat &frame);
+    void GradientRGB(cv::Mat &frame);
+    void Inter(cv::Mat &frame);
+    void UpDown(cv::Mat &frame);
+    void LeftRight(cv::Mat &frame);
+    void StrobeScan(cv::Mat &frame);
+    void BlendedScanLines(cv::Mat &frame);
+    void GradientStripes(cv::Mat &frame);
+    void XorSine(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
     // draw functions / strings
@@ -154,6 +183,8 @@ namespace ac {
     extern DrawFunction draw_func[];
     extern int draw_max;
     extern bool snapShot;
+    extern std::unordered_map<std::string, int> filter_map;
+    void fill_filter_map();
 }
 // custom filter function, must be defined in program so it will link
 extern void custom_filter(cv::Mat &frame);
