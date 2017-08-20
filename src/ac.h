@@ -42,7 +42,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.2.3";
+    static const std::string version="2.2.5";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -176,6 +176,21 @@ namespace ac {
     void BlendedScanLines(cv::Mat &frame);
     void GradientStripes(cv::Mat &frame);
     void XorSine(cv::Mat &frame);
+    void SquareSwap(cv::Mat &frame);
+    void SquareSwap4x2(cv::Mat &frame);
+    void SquareSwap8x4(cv::Mat &frame);
+    void SquareSwap16x8(cv::Mat &frame);
+    void SquareSwap64x32(cv::Mat &frame);
+    void SquareBars(cv::Mat &frame);
+    void SquareBars8(cv::Mat &frame);
+    void SquareVertical8(cv::Mat &frame);
+    void SquareVertical16(cv::Mat &frame);
+    void SquareVertical_Roll(cv::Mat &frame);
+    void SquareSwapRand16x8(cv::Mat &frame);
+    void SquareSwapSort_Roll(cv::Mat &frame);
+    void SquareVertical_RollReverse(cv::Mat &frame);
+    void SquareSwapSort_RollReverse(cv::Mat &frame);
+    void NoFilter(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
     // draw functions / strings
