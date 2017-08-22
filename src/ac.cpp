@@ -3707,7 +3707,7 @@ void ShiftSquares(std::vector<Square *> &s, int pos, bool direction=true) {
     if(direction == true) {
         for(unsigned int i = 0; i < s.size(); ++i) {
             int p = s[i]->getPos();
-            if(p+1 > s.size()-1) {
+            if(p+1 > (int)s.size()-1) {
                 s[i]->setPos(0);
             } else {
                 ++p;
@@ -3715,7 +3715,7 @@ void ShiftSquares(std::vector<Square *> &s, int pos, bool direction=true) {
             }
         }
     } else {
-        for(unsigned int i = 0; i < pos; ++i) {
+        for(int i = 0; i < pos; ++i) {
             int p = s[i]->getPos();
             --p;
             s[i]->setPos(p);
@@ -3727,14 +3727,14 @@ void ShiftSquares(std::vector<Square *> &s, int pos, bool direction=true) {
 }
 
 void SquareVertical(const unsigned int num_w, const unsigned int num_h, Square *squares, cv::Mat &frame, bool direction=true) {
-    unsigned int w = frame.cols;// frame width
-    unsigned int h = frame.rows;// frame height
-    unsigned int square_w=(w/num_w), square_h=(h/num_h);
+    int w = frame.cols;// frame width
+    int h = frame.rows;// frame height
+    int square_w=(w/num_w), square_h=(h/num_h);
     int pos = 0;
     Point points[num_w*num_h];
     std::vector<Square *> square_vec;
-    for(int rx = 0; rx < num_w; ++rx) {
-        for(int ry = 0; ry < num_h; ++ry) {
+    for(int rx = 0; rx < (int)num_w; ++rx) {
+        for(int ry = 0; ry < (int)num_h; ++ry) {
             int cx = rx*square_w;
             int cy = ry*square_h;
             points[pos].x = cx;
@@ -3753,7 +3753,7 @@ void SquareVertical(const unsigned int num_w, const unsigned int num_h, Square *
 }
 
 void ac::SquareVertical_Roll(cv::Mat &frame) {
-    const unsigned int num_w = 1, num_h = 20;
+    const int num_w = 1, num_h = 20;
     static Square squares[num_w*num_h];
     static int lazy = 0;
     if(lazy == 0) {
@@ -3769,7 +3769,7 @@ void ac::SquareVertical_Roll(cv::Mat &frame) {
 }
 
 void ac::SquareSwapSort_Roll(cv::Mat &frame) {
-    const unsigned int num_w = 16, num_h = 8;
+    const int num_w = 16, num_h = 8;
     static Square squares[num_w*num_h];
     static int lazy = 0;
     if(lazy == 0) {
@@ -3785,7 +3785,7 @@ void ac::SquareSwapSort_Roll(cv::Mat &frame) {
 }
 
 void ac::SquareVertical_RollReverse(cv::Mat &frame) {
-    const unsigned int num_w = 1, num_h = 20;
+    const int num_w = 1, num_h = 20;
     static Square squares[num_w*num_h];
     static int lazy = 0;
     if(lazy == 0) {
@@ -3802,7 +3802,7 @@ void ac::SquareVertical_RollReverse(cv::Mat &frame) {
 }
 
 void ac::SquareSwapSort_RollReverse(cv::Mat &frame) {
-    const unsigned int num_w = 16, num_h = 8;
+    const int num_w = 16, num_h = 8;
     static Square squares[num_w*num_h];
     static int lazy = 0;
     if(lazy == 0) {
