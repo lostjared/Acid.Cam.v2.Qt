@@ -37,13 +37,13 @@ Screen shots of program on different Operating Systems:
 
 Screenshot from Windows:
 
-![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.1.win.jpg?raw=true "screenshot 1")
+![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.1.win.jpg?raw=true "screenshot 1")
 
 Screenshot from Linux:
 
-![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.2.lin.jpg?raw=true "screenshot 2")
+![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.2.lin.jpg?raw=true "screenshot 2")
 
 Screenshot from macOS:
 
-![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/acidcam.3.osx.jpg?raw=true "screenshot 3")
+![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.3.osx.jpg?raw=true "screenshot 3")
 
