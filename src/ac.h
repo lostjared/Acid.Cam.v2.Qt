@@ -1,7 +1,16 @@
 /* Acid Cam Functions for OpenCV
  * written by Jared Bruni https://github.com/lostjared
- * http://lostsidedead.com
-
+ 
+ Website: http://lostsidedead.com
+ YouTube: http://youtube.com/LostSideDead
+ Instagram: http://instagram.com/jaredbruni
+ Twitter: http://twitter.com/jaredbruni
+ Facebook: http://facebook.com/LostSideDead0x
+ 
+ You can use this program free of charge and redistrubute as long
+ as you do not charge anything for this program. This program is 100%
+ Free.
+ 
  BSD 2-Clause License
  
  Copyright (c) 2017, Jared Bruni
@@ -68,7 +77,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.2.5";
+    static const std::string version="2.2.6";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -216,6 +225,15 @@ namespace ac {
     void SquareSwapSort_Roll(cv::Mat &frame);
     void SquareVertical_RollReverse(cv::Mat &frame);
     void SquareSwapSort_RollReverse(cv::Mat &frame);
+    void Circular(cv::Mat &frame);
+    void WhitePixel(cv::Mat &frame);
+    void FrameBlend(cv::Mat &frame);
+    void FrameBlendRGB(cv::Mat &frame);
+    void TrailsFilter(cv::Mat &frame);
+    void TrailsFilterIntense(cv::Mat &frame);
+    void TrailsFilterSelfAlpha(cv::Mat &frame);
+    void TrailsFilterXor(cv::Mat &frame);
+    void ColorTrails(cv::Mat &frame);
     void NoFilter(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
