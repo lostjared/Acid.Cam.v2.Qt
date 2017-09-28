@@ -1,7 +1,6 @@
 # Acid.Cam.v2.Qt
 
-![AnimatedImage](http://lostsidedead.biz/gif/jaredpeace.gif "screenshot")
-
+![AnimatedImage](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/jaredpeace.gif "screenshot")
 
 For sample videos and updates about this software view the Facebook page: http://facebook.com/AcidCam
 
