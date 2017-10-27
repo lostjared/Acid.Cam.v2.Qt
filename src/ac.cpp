@@ -66,11 +66,11 @@ namespace ac {
     bool in_custom = false;
     std::string fileName ="VideoFile.avi";
     // draw strings (function names)
-    std::string draw_strings[] = { "Self AlphaBlend", "Self Scale", "StrobeEffect", "Blend #3", "Negative Paradox", "ThoughtMode", "RandTriBlend", "Blank", "Tri", "Distort", "CDraw", "Type", "NewOne", "Blend Fractal","Blend Fractal Mood", "CosSinMultiply", "Color Accumlate1", "Color Accumulate2", "Color Accumulate3", "filter8","filter3","Rainbow Blend","Rand Blend","New Blend", "Alpha Flame Filters", "Pixel Scale", "PixelSort", "GlitchSort","Random Filter", "Random Flash", "Blend with Image", "Blend with Image #2", "Blend with Image #3", "Blend with Image #4", "GaussianBlur", "Median Blur", "Blur Distortion", "Diamond Pattern", "MirrorBlend","Pulse","Sideways Mirror","Mirror No Blend","Sort Fuzz","Fuzz","Double Vision","RGB Shift","RGB Sep","Graident Rainbow","Gradient Rainbow Flash", "Reverse", "Scanlines", "TV Static", "Mirror Average", "Mirror Average Mix", "Mean", "Laplacian", "Bitwise_XOR", "Bitwise_AND", "Bitwise_OR", "Equalize", "Channel Sort", "Reverse_XOR", "Combine Pixels", "FlipTrip", "Canny","Boxes","Boxes Fade", "Flash Black", "SlideRGB", "Side2Side","Top2Bottom","Strobe Red Then Green Then Blue","Blend_Angle", "Outward", "Outward Square", "ShiftPixels", "ShiftPixelsDown", "XorMultiBlend", "Bitwise_Rotate", "Bitwise_Rotate Diff", "HPPD", "FuzzyLines","GradientLines","GradientSelf","GradientSelfVertical", "GradientDown", "GraidentHorizontal", "GradientRGB","Inter", "UpDown","LeftRight","StrobeScan","BlendedScanLines","GradientStripes","XorSine","SquareSwap",
+    std::string draw_strings[] = { "Self AlphaBlend", "Self Scale", "StrobeEffect", "Blend #3", "Negative Paradox", "ThoughtMode", "RandTriBlend", "Blank", "Tri", "Distort", "CDraw", "Type", "NewOne", "Blend Fractal","Blend Fractal Mood", "CosSinMultiply", "Color Accumlate1", "Color Accumulate2", "Color Accumulate3", "Filter8","Filter3","Rainbow Blend","Rand Blend","New Blend", "Alpha Flame Filters", "Pixel Scale", "PixelSort", "GlitchSort","Random Filter", "Random Flash", "Blend with Image", "Blend with Image #2", "Blend with Image #3", "Blend with Image #4", "GaussianBlur", "Median Blur", "Blur Distortion", "Diamond Pattern", "MirrorBlend","Pulse","Sideways Mirror","Mirror No Blend","Sort Fuzz","Fuzz","Double Vision","RGB Shift","RGB Sep","Graident Rainbow","Gradient Rainbow Flash", "Reverse", "Scanlines", "TV Static", "Mirror Average", "Mirror Average Mix", "Mean", "Laplacian", "Bitwise_XOR", "Bitwise_AND", "Bitwise_OR", "Equalize", "Channel Sort", "Reverse_XOR", "Combine Pixels", "FlipTrip", "Canny","Boxes","Boxes Fade", "Flash Black", "SlideRGB", "Side2Side","Top2Bottom","Strobe Red Then Green Then Blue","Blend_Angle", "Outward", "Outward Square", "ShiftPixels", "ShiftPixelsDown", "XorMultiBlend", "Bitwise_Rotate", "Bitwise_Rotate Diff", "HPPD", "FuzzyLines","GradientLines","GradientSelf","GradientSelfVertical", "GradientDown", "GraidentHorizontal", "GradientRGB","Inter", "UpDown","LeftRight","StrobeScan","BlendedScanLines","GradientStripes","XorSine","SquareSwap",
         "SquareSwap4x2","SquareSwap8x4", "SquareSwap16x8","SquareSwap64x32","SquareBars","SquareBars8","SquareSwapRand16x8",
         "SquareVertical8", "SquareVertical16","SquareVertical_Roll","SquareSwapSort_Roll","SquareVertical_RollReverse","SquareSwapSort_RollReverse","Circular","WhitePixel","FrameBlend", "FrameBlendRGB",
         "TrailsFilter",
-        "TrailsFilterIntense","TrailsFilterSelfAlpha","TrailsFilterXor","ColorTrails", "No Filter",
+        "TrailsFilterIntense","TrailsFilterSelfAlpha","TrailsFilterXor","ColorTrails","MoveRed","MoveRGB","MoveRedGreenBlue","BlurSim", "Block","BlockXor","BlockScale","BlockStrobe", "No Filter",
         "Blend with Source", "Plugin", "Custom","Blend With Image #1",  "TriBlend with Image", "Image Strobe", "Image distraction" };
     
     // filter callback functions
@@ -78,11 +78,11 @@ namespace ac {
         alphaFlame, pixelScale,pixelSort, glitchSort,randomFilter,randomFlash, imageBlend,imageBlendTwo,imageBlendThree,imageBlendFour, GaussianBlur, MedianBlur, BlurDistortion,DiamondPattern,MirrorBlend,Pulse,SidewaysMirror,MirrorNoBlend,SortFuzz,Fuzz,DoubleVision,RGBShift,RGBSep,GradientRainbow,GradientRainbowFlash,Reverse,Scanlines,TVStatic,MirrorAverage,MirrorAverageMix,Mean,Laplacian,Bitwise_XOR,Bitwise_AND,Bitwise_OR,Equalize,ChannelSort,Reverse_XOR,CombinePixels,FlipTrip,Canny,Boxes,BoxesFade,FlashBlack,SlideRGB,Side2Side,Top2Bottom, StrobeRedGreenBlue,Blend_Angle,Outward,OutwardSquare,ShiftPixels,ShiftPixelsDown,XorMultiBlend,BitwiseRotate,BitwiseRotateDiff,HPPD,FuzzyLines,GradientLines,GradientSelf,GradientSelfVertical,GradientDown,GraidentHorizontal,GradientRGB,Inter,UpDown,LeftRight,StrobeScan,BlendedScanLines,GradientStripes,XorSine,SquareSwap,
         SquareSwap4x2, SquareSwap8x4, SquareSwap16x8,SquareSwap64x32,SquareBars,SquareBars8,SquareSwapRand16x8,
         SquareVertical8,SquareVertical16,SquareVertical_Roll,SquareSwapSort_Roll,SquareVertical_RollReverse,SquareSwapSort_RollReverse,Circular,WhitePixel,FrameBlend,FrameBlendRGB,
-        TrailsFilter,TrailsFilterIntense,TrailsFilterSelfAlpha,TrailsFilterXor,ColorTrails,
+        TrailsFilter,TrailsFilterIntense,TrailsFilterSelfAlpha,TrailsFilterXor,ColorTrails,MoveRed,MoveRGB,MoveRedGreenBlue,BlurSim,Block,BlockXor,BlockScale,BlockStrobe,
         NoFilter,BlendWithSource,plugin,custom,blendWithImage, triBlendWithImage,imageStrobe, imageDistraction,0};
     // number of filters
     
-    int draw_max = 125;
+    int draw_max = 133;
     // variables
     double translation_variable = 0.001f, pass2_alpha = 0.75f;
     // swap colors inline function
@@ -4095,6 +4095,269 @@ void ac::ColorTrails(cv::Mat &frame) {
             swapColors(frame, z, i);
             if(isNegative) invert(frame, z, i);
         }
+    }
+}
+
+void ac::MoveRed(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+    static double pos = 1.0, pos_max = 7.0;
+    static int movement = 0;
+    cv::Mat frame_copy = frame.clone();
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            if(i+movement < (w-1)) {
+                cv::Vec3b add = frame_copy.at<cv::Vec3b>(z, (i+movement));
+                pixel[2] += (add[2]*pos);
+            } else if((i-movement) > 1) {
+                cv::Vec3b add = frame_copy.at<cv::Vec3b>(z, (i-movement));
+                pixel[2] += (add[2]*pos);
+            }
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+    }
+    ++movement;
+    if(movement > (w-1)) movement = 0;
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::MoveRGB(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+    static double pos = 1.0, pos_max = 7.0;
+    static unsigned int rgb = 0;
+    static int movement = 0;
+    cv::Mat frame_copy = frame.clone();
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            if(i+movement < (w-1)) {
+                cv::Vec3b add = frame_copy.at<cv::Vec3b>(z, (i+movement));
+                pixel[rgb] += (add[rgb]*pos);
+            } else if((i-movement) > 1) {
+                cv::Vec3b add = frame_copy.at<cv::Vec3b>(z, (i-movement));
+                pixel[rgb] += (add[rgb]*pos);
+            }
+            swapColors(frame, z, i);
+            if(isNegative) invert(frame, z, i);
+        }
+    }
+    ++rgb;
+    if(rgb > 2) rgb = 0;
+    ++movement;
+    if(movement > (w-1)) movement = 0;
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::MoveRedGreenBlue(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+    static double pos = 1.0, pos_max = 7.0; // position in transition, maximum value
+    static int movement[4] = {0, static_cast<int>(w), 0}; // movement variable array
+    static unsigned int stored_w = w; // stored_w in case the frame size changes
+    if(stored_w != w) {
+        movement[1] = w-1; // set movement[1] to width
+        stored_w = w; // stored_w set to new width
+    }
+    cv::Mat frame_copy = frame.clone(); // make a copy of the frame
+    for(unsigned int z = 0; z < h; ++z) { // loop from top to bottom
+        for(unsigned int i = 0; i < w; ++i) { // loop from left to right
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i); // reference to current pixel
+            for(unsigned int q = 0; q <= 2; ++q) { // loop from 0 to 2
+                unsigned int pos_x = i+movement[q];// pixel position
+                unsigned int pos_y = i-movement[q];// pixel position
+                if(pos_x < (w-1) && pos_x > 0) { // if within the screen
+                    cv::Vec3b add = frame_copy.at<cv::Vec3b>(z, pos_x); // grab pixel
+                    pixel[q] += (add[q]*pos); // add to current index multiplied by position
+                } else if(pos_y > 0 && pos_y < (w-1)) {// if pos y within the screen
+                    cv::Vec3b add = frame_copy.at<cv::Vec3b>(z, pos_y); // grab pixel
+                    pixel[q] += (add[q]*pos);// add to current index multiplied by position
+                }
+            }
+            swapColors(frame, z, i);// swap colors for rgb sliders
+            if(isNegative) invert(frame, z, i); // if is negative
+        }
+    }
+    movement[0] += 4; // movement position increase by 4
+    if(movement[0] > (w-1)) movement[0] = 0;
+    movement[1] -= 4;// movement position decrease by 4
+    if(movement[1] < 1) movement[1] = w-1; // set to width -1
+    movement[2] += 8;// movement position increase by 8
+    if(movement[2] > (w-1)) movement[2] = 0;// if greater than widthset to zero
+    static int direction = 1;// direction of transition animation
+    procPos(direction, pos, pos_max);// proc the position by increasing/decreasing
+}
+
+void ac::BlurSim(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+    static double pos = 1.0, pos_max = 7.0;
+    
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b pixels[2][2];
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            bool grabbed = true;
+            for(unsigned int a = 0; a < 2; a++) {
+                for(unsigned int b = 0; b < 2; b++) {
+                    if((a+i) < (w-1) && (b+z) < (h-1)) {
+                        pixels[a][b] = frame.at<cv::Vec3b>(z+b, i+a);
+                    } else {
+                        grabbed = false;
+                        break;
+                    }
+                }
+            }
+            if(grabbed == false) continue;
+            unsigned char rgb[3] = {0};
+            for(unsigned int q = 0; q < 3; ++q)
+                for(unsigned int a = 0; a < 2; ++a) {
+                    for(unsigned int b = 0; b < 2; ++b) {
+                        rgb[q] += pixels[a][b][q];
+                    }
+                }
+            pixel[0] ^= static_cast<unsigned char>((rgb[0]/4)*pos);
+            pixel[1] ^= static_cast<unsigned char>((rgb[1]/4)*pos);
+            pixel[2] ^= static_cast<unsigned char>((rgb[2]/4)*pos);
+            swapColors(frame, z, i);// swap colors for rgb sliders
+            if(isNegative) invert(frame, z, i); // if is negative
+        }
+    }
+    static int direction = 1;
+    procPos(direction, pos, pos_max);
+}
+
+void ac::Block(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+	static unsigned int square = 2;
+    for(unsigned int z = 0; z < h; z += square) {
+        for(unsigned int i = 0; i < w; i += square) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            for(unsigned int x = 0; x < square; ++x) {
+                for(unsigned int y = 0; y < square; ++y) {
+                    if(y+z < h && i+x < w) {
+                    	cv::Vec3b &pix = frame.at<cv::Vec3b>(y+z, i+x);
+                    	pix = pixel;
+                    }
+                }
+            }
+            swapColors(frame, z, i);// swap colors for rgb sliders
+            if(isNegative) invert(frame, z, i); // if is negative
+        }
+    }
+    static int direction = 1;
+    if(direction == 1) {
+        square += 2;
+        if(square >= 32) direction = 0;
+    } else {
+        square -= 2;
+        if(square <= 2) direction = 1;
+    }
+}
+
+void ac::BlockXor(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+    static double pos = 1.0, pos_max = 3.0;
+    static unsigned int square = 2;
+    for(unsigned int z = 0; z < h; z += square) {
+        for(unsigned int i = 0; i < w; i += square) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            for(unsigned int x = 0; x < square; ++x) {
+                for(unsigned int y = 0; y < square; ++y) {
+                    if(y+z < h && i+x < w) {
+                        cv::Vec3b &pix = frame.at<cv::Vec3b>(y+z, i+x);
+                        pix[0] ^= static_cast<unsigned char>(pixel[0]*pos);
+                        pix[1] ^= static_cast<unsigned char>(pixel[1]*pos);
+                        pix[2] ^= static_cast<unsigned char>(pixel[2]*pos);
+                        
+                    }
+                }
+            }
+            swapColors(frame, z, i);// swap colors for rgb sliders
+            if(isNegative) invert(frame, z, i); // if is negative
+            
+        }
+    }
+    static int direction = 1;
+    if(direction == 1) {
+        square += 2;
+        if(square >= 8) direction = 0;
+    } else {
+        square -= 2;
+        if(square <= 2) direction = 1;
+    }
+    static int posDirection = 1;
+    procPos(posDirection, pos, pos_max);
+}
+
+void ac::BlockScale(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+    static double pos = 1.0, pos_max = 3.0;
+    static unsigned int square = 2;
+    for(unsigned int z = 0; z < h; z += square) {
+        for(unsigned int i = 0; i < w; i += square) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            for(unsigned int x = 0; x < square; ++x) {
+                for(unsigned int y = 0; y < square; ++y) {
+                    if(y+z < h && i+x < w) {
+                        cv::Vec3b &pix = frame.at<cv::Vec3b>(y+z, i+x);
+                        pix[0] = static_cast<unsigned char>(pixel[0]*pos);
+                        pix[1] = static_cast<unsigned char>(pixel[1]*pos);
+                        pix[2] = static_cast<unsigned char>(pixel[2]*pos);
+                    }
+                }
+            }
+            swapColors(frame, z, i);// swap colors for rgb sliders
+            if(isNegative) invert(frame, z, i); // if is negative
+        }
+    }
+    static int direction = 1;
+    if(direction == 1) {
+        square += 2;
+        if(square >= 8) direction = 0;
+    } else {
+        square -= 2;
+        if(square <= 2) direction = 1;
+    }
+    static int posDirection = 1;
+    procPos(posDirection, pos, pos_max);
+}
+
+void ac::BlockStrobe(cv::Mat &frame) {
+    unsigned int w = frame.cols;// frame width
+    unsigned int h = frame.rows;// frame heigh
+    static unsigned int square = 2;
+    for(unsigned int z = 0; z < h; z += square) {
+        for(unsigned int i = 0; i < w; i += square) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            for(unsigned int x = 0; x < square; ++x) {
+                for(unsigned int y = 0; y < square; ++y) {
+                    if(y+z < h && i+x < w) {
+                        cv::Vec3b &pix = frame.at<cv::Vec3b>(y+z, i+x);
+                        pix[0] += static_cast<unsigned char>(pixel[0]*(x*y));
+                        pix[1] += static_cast<unsigned char>(pixel[1]*(x*y));
+                        pix[2] += static_cast<unsigned char>(pixel[2]*(x*y));
+                    }
+                }
+            }
+            swapColors(frame, z, i);// swap colors for rgb sliders
+            if(isNegative) invert(frame, z, i); // if is negative
+        }
+    }
+    static int direction = 1;
+    if(direction == 1) {
+        square += 2;
+        if(square >= 8) direction = 0;
+    } else {
+        square -= 2;
+        if(square <= 2) direction = 1;
     }
 }
 

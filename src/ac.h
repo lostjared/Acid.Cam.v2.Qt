@@ -77,7 +77,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.2.6";
+    static const std::string version="2.2.8";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -234,6 +234,14 @@ namespace ac {
     void TrailsFilterSelfAlpha(cv::Mat &frame);
     void TrailsFilterXor(cv::Mat &frame);
     void ColorTrails(cv::Mat &frame);
+    void MoveRed(cv::Mat &frame);
+    void MoveRGB(cv::Mat &frame);
+    void MoveRedGreenBlue(cv::Mat &frame);
+    void BlurSim(cv::Mat &frame);
+    void Block(cv::Mat &frame);
+    void BlockXor(cv::Mat &frame);
+    void BlockScale(cv::Mat &frame);
+    void BlockStrobe(cv::Mat &frame);
     void NoFilter(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
