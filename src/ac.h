@@ -13,7 +13,7 @@
  
  BSD 2-Clause License
  
- Copyright (c) 2017, Jared Bruni
+ Copyright (c) 2018, Jared Bruni
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without
@@ -77,7 +77,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.2.8";
+    static const std::string version="2.2.9";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -243,6 +243,10 @@ namespace ac {
     void BlockScale(cv::Mat &frame);
     void BlockStrobe(cv::Mat &frame);
     void PrevFrameBlend(cv::Mat &frame);
+    void Wave(cv::Mat &frame);
+    void HighWave(cv::Mat &frame);
+    void VerticalSort(cv::Mat &frame);
+    void VerticalChannelSort(cv::Mat &frame);
     void NoFilter(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
