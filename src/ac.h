@@ -77,7 +77,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.2.9";
+    static const std::string version="2.3.0";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -247,6 +247,15 @@ namespace ac {
     void HighWave(cv::Mat &frame);
     void VerticalSort(cv::Mat &frame);
     void VerticalChannelSort(cv::Mat &frame);
+    void HorizontalBlend(cv::Mat &frame);
+    void VerticalBlend(cv::Mat &frame);
+    void OppositeBlend(cv::Mat &frame);
+    void DiagonalLines(cv::Mat &frame);
+    void HorizontalLines(cv::Mat &frame);
+    void InvertedScanlines(cv::Mat &frame);
+    void Soft_Mirror(cv::Mat &frame);
+    void KanapaTrip(cv::Mat &frame);
+    void ColorMorphing(cv::Mat &frame);
     void NoFilter(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
