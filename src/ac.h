@@ -77,7 +77,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.3.0";
+    static const std::string version="2.3.1";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -256,6 +256,9 @@ namespace ac {
     void Soft_Mirror(cv::Mat &frame);
     void KanapaTrip(cv::Mat &frame);
     void ColorMorphing(cv::Mat &frame);
+    void ScanSwitch(cv::Mat &frame);
+    void ScanAlphaSwitch(cv::Mat &frame);
+    void NegativeStrobe(cv::Mat &frame);
     void NoFilter(cv::Mat &frame);
     void BlendWithSource(cv::Mat &frame);
     void plugin(cv::Mat &frame);
