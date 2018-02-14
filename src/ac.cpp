@@ -4946,7 +4946,7 @@ public:
 
 class ParticleEmiter {
 public:
-    ParticleEmiter() : w(0), h(0), part(0) {}
+    ParticleEmiter() : part(0), w(0), h(0) {}
     
     ~ParticleEmiter() {
         if(part != 0) {
@@ -4958,7 +4958,10 @@ public:
     }
     
     void set(cv::Mat &frame) {
-        if(frame.cols != w || frame.rows != h) {
+        
+        
+        
+        if(static_cast<unsigned int>(frame.cols) != w || static_cast<unsigned int>(frame.rows) != h) {
             if(part != 0) {
                 for(unsigned int i = 0; i < w; ++i)
                     delete [] part[i];
@@ -5060,7 +5063,7 @@ void ac::ParticleRelease(cv::Mat &frame) {
 }
 
 // No Filter
-void ac::NoFilter(cv::Mat &frame) {}
+void ac::NoFilter(cv::Mat &) {}
 
 // Alpha Blend with Original Frame
 void ac::BlendWithSource(cv::Mat &frame) {
