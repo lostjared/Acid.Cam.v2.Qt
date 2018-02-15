@@ -105,35 +105,31 @@ inline void ac::swapColors(cv::Mat &frame, int x, int y) {
     if(in_custom == true) return;
     if(color_order == 0 && swapColor_r == 0 && swapColor_g == 0 && swapColor_b == 0) return; // if no swap needed return
     cv::Vec3b &cur = frame.at<cv::Vec3b>(x,y);
-    
     cur[0] += swapColor_b;
     cur[1] += swapColor_g;
     cur[2] += swapColor_r;
-    
     cv::Vec3b temp;// temp
     temp = cur;// temp = cur
-    
+    // Default color order is BGR
     // swap RGB orders
     switch(color_order) {
-        case 1:
+        case 1: // RGB
             cur[0] = temp[2];
             cur[1] = temp[1];
             cur[2] = temp[0];
             break;
-        case 2:
+        case 2:// GBR
+            cur[0] = temp[1];
+            cur[1] = temp[0];
+            break;
+        case 3:// BRG
+            cur[1] = temp[2];
+            cur[2] = temp[1];
+            break;
+        case 4: // GRB
             cur[0] = temp[1];
             cur[1] = temp[2];
             cur[2] = temp[0];
-            break;
-        case 3:
-            cur[0] = temp[2];
-            cur[1] = temp[0];
-            cur[2] = temp[1];
-            break;
-        case 4:
-            cur[0] = temp[1];
-            cur[1] = temp[0];
-            cur[2] = temp[2];
             break;
     }
 }
@@ -4958,9 +4954,7 @@ public:
     }
     
     void set(cv::Mat &frame) {
-        
-        
-        
+
         if(static_cast<unsigned int>(frame.cols) != w || static_cast<unsigned int>(frame.rows) != h) {
             if(part != 0) {
                 for(unsigned int i = 0; i < w; ++i)
