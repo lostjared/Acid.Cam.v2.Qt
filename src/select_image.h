@@ -3,6 +3,4 @@
 
 #include "qtheaders.h"
 
-
-
 #endif

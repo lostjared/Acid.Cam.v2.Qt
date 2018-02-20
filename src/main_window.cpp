@@ -8,7 +8,7 @@
 #include "main_window.h"
 #include<mutex>
 #include"plugin.h"
-
+#include<sys/stat.h>
 
 std::unordered_map<std::string, std::pair<int, int>> filter_map;
 
@@ -610,7 +610,13 @@ void AC_MainWindow::updateFrame(QImage img) {
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
+        if(!recording) {
         frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << ") ";
+        } else {
+            struct stat buf;
+            stat(video_file_name.toStdString().c_str(), &buf);
+            frame_stream << "(Current/Total Frames/Seconds,Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1024)/1024) <<  " MB) ";
+        }
         if(programMode == MODE_VIDEO) {
             
             float index = frame_index;
@@ -651,14 +657,21 @@ void AC_MainWindow::stopRecording() {
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
     progress_bar->hide();
-    
 }
 
 void AC_MainWindow::frameInc() {
     frame_index++;
     QString frame_string;
     QTextStream frame_stream(&frame_string);
-    frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << ") ";
+    
+    if(!recording) {
+    	frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << ") ";
+    } else {
+        struct stat buf;
+        stat(video_file_name.toStdString().c_str(), &buf);
+        frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1024)/1024)  <<  " MB) ";
+
+    }
     if(programMode == MODE_VIDEO) {
         float index = frame_index;
         float max_frames = video_frames;
