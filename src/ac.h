@@ -77,7 +77,7 @@ extern cv::Mat blend_image;
 // acid cam namespace
 namespace ac {
     // version string
-    static const std::string version="2.3.1";
+    static const std::string version="2.3.2";
     extern double translation_variable, pass2_alpha;
     extern double alpha, tr;
     extern bool isNegative, noRecord,iRev;
@@ -95,7 +95,8 @@ namespace ac {
     inline int GetFX(cv::Mat &frame, int x, int nw);
     inline int GetFY(cv::Mat &frame, int y, int nh);
     inline void invert(cv::Mat &frame, int x, int y);
-    /* filter functions */
+    
+    /* filter typedef */
     typedef void (*DrawFunction)(cv::Mat &frame);
     
     template<typename T>
@@ -272,8 +273,63 @@ namespace ac {
     extern bool snapShot;
     extern std::unordered_map<std::string, int> filter_map;
     void fill_filter_map();
+    
+    // classes to be used by the filers
+    
+    // Square class to hold broken up cv::Mat
+    class Square {
+    public:
+        Square() : pos(0), width(0), height(0), x(0), y(0) {}
+        void setSize(const int &xx, const int &yy, const int &w, const int &h);
+        void setPos(const int &p);
+        void copyImage(const cv::Mat &f);
+        void copyImageToTarget(int xx, int yy, cv::Mat &f);
+        int getPos() const { return pos; }
+        int getWidth() const { return width; }
+        int getHeight() const { return height; }
+    protected:
+        int pos,width,height,x,y;
+        cv::Mat image;
+    };
+    
+    // Point screen location
+    struct Point {
+        int x, y;
+    };
+    
+    // contains info for each pixel
+    class Particle {
+    public:
+        Particle() : x(0), y(0), dir(0), m_count(0) {}
+        cv::Vec3b pixel;// color
+        unsigned int x, y, dir; // position/direction
+        unsigned int m_count; // counter
+    };
+    
+    // class to process the pixel
+    class ParticleEmiter {
+    public:
+        // initalize to null
+        ParticleEmiter();
+        // clean up after done
+        ~ParticleEmiter();
+        // set frame pixel values
+        void set(cv::Mat &frame);
+        // draw pixel values to frame
+        void draw(cv::Mat &frame);
+        // move pixel coordinates around
+        void movePixels();
+        // reset
+        void reset();
+        
+    private:
+        Particle **part; // array of pointers for Particles
+        unsigned int w, h; // frame width/height
+        
+    };
 }
 // custom filter function, must be defined in program so it will link
+extern ac::ParticleEmiter emiter;
 extern void custom_filter(cv::Mat &frame);
 
 #endif
