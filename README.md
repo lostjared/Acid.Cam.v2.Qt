@@ -2,6 +2,22 @@
 
 ![AnimatedImage](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/jaredpeace.gif "screenshot")
 
+
+To compile on Debian first install libqt4-dev and libopencv-dev via Terminal with
+
+	$ sudo apt-get install libqt4-dev libopencv-dev
+
+Next download this project via git clone or zip enter the src directory
+
+	$ qmake
+
+Then to build project
+
+	$ make 
+
+Then Run the program
+
+
 For sample videos and updates about this software view the Facebook page: http://facebook.com/AcidCam
 
 This is an application that will allow you to generate video files/images with live video or video files. This is accomplished by mixing different 'filters' 
