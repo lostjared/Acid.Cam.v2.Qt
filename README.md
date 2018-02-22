@@ -2,8 +2,7 @@
 
 ![AnimatedImage](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/jaredpeace.gif "screenshot")
 
-
-To compile on Debian first install libqt4-dev and libopencv-dev via Terminal with
+First download GCC with g++ compiler and make then compile on Debian install libqt4-dev and libopencv-dev via Terminal with
 
 	$ sudo apt-get install libqt4-dev libopencv-dev
 
