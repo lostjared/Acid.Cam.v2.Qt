@@ -47,13 +47,17 @@
 #include "ac.h"
 #include "fractal.h"
 
+
+
 // Acid Cam namespace
 namespace ac {
+    const std::string version="2.3.3";
     // variables
     unsigned int swapColor_r = 0, swapColor_g = 0, swapColor_b = 0;
     bool isNegative = false, noRecord = false, pass2_enabled = false, blendW = false, slide_Show = false, slide_Rand = false, strobe_It = false, switch_Back = false, blur_First = false;
     bool images_Enabled = false, fps_force = false,iRev = false;
     bool blur_Second = false;
+    int set_color_map = 0;
     cv::Mat orig_frame;
     cv::Mat blendW_frame;
     cv::Mat image_files[4];
@@ -93,8 +97,10 @@ namespace ac {
     double translation_variable = 0.001f, pass2_alpha = 0.75f;
     // swap colors inline function
     inline void swapColors(cv::Mat &frame, int x, int y);
+    inline void swapColors_(cv::Mat &frame, int x, int y);
     inline void procPos(int &direction, double &pos, double &pos_max, const double max_size = 15);
     std::unordered_map<std::string, int> filter_map;
+    bool color_map_set = false;
 }
 
 void ac::fill_filter_map() {
@@ -104,10 +110,17 @@ void ac::fill_filter_map() {
 }
 
 // swapColors inline function takes frame and x, y position
-inline void ac::swapColors(cv::Mat &frame, int x, int y) {
+inline void ac::swapColors(cv::Mat &frame, int y, int x) {
     if(in_custom == true) return;
     if(color_order == 0 && swapColor_r == 0 && swapColor_g == 0 && swapColor_b == 0) return; // if no swap needed return
-    cv::Vec3b &cur = frame.at<cv::Vec3b>(x,y);
+    if(set_color_map > 0 && color_map_set == false) {
+        return;
+    }
+    swapColors_(frame, y, x);
+}
+
+inline void ac::swapColors_(cv::Mat &frame, int y, int x) {
+    cv::Vec3b &cur = frame.at<cv::Vec3b>(y,x);
     cur[0] += swapColor_b;
     cur[1] += swapColor_g;
     cur[2] += swapColor_r;
@@ -137,9 +150,9 @@ inline void ac::swapColors(cv::Mat &frame, int x, int y) {
     }
 }
 // invert pixel in frame at x,y
-inline void ac::invert(cv::Mat &frame, int x, int y) {
+inline void ac::invert(cv::Mat &frame, int y, int x) {
     if(in_custom == true) return;
-    cv::Vec3b &cur = frame.at<cv::Vec3b>(x,y);// cur pixel
+    cv::Vec3b &cur = frame.at<cv::Vec3b>(y,x);// cur pixel
     cur[0] = ~cur[0]; // bit manipulation sets opposite
     cur[1] = ~cur[1];
     cur[2] = ~cur[2];
@@ -5262,6 +5275,22 @@ void ac::IncreaseBlendHorizontal(cv::Mat &frame) {
     Pass2Blend(frame);
 }
 
+void ac::ApplyColorMap(cv::Mat &frame) {
+    if(set_color_map > 0 && set_color_map < 13) {
+        cv::Mat output_f1 = frame.clone();
+        cv::applyColorMap(output_f1, frame, (int)set_color_map-1);
+        unsigned int w = frame.cols;
+        unsigned int h = frame.rows;
+        color_map_set = true;
+        for(unsigned int z = 0; z < h; ++z) {
+            for(unsigned int i = 0; i < w; ++i) {
+                ac::swapColors(frame, z, i);
+                if(isNegative) ac::invert(frame, z, i);
+            }
+        }
+        color_map_set = false;
+    }
+}
 // No Filter
 void ac::NoFilter(cv::Mat &) {}
 
@@ -5273,4 +5302,11 @@ void ac::BlendWithSource(cv::Mat &frame) {
 // call custom fitler defined elsewhere
 void ac::custom(cv::Mat &frame) {
     custom_filter(frame);
+    
 }
+
+
+
+
+
+
