@@ -13,9 +13,6 @@
 #include<unistd.h>
 #endif
 
-bool blend_set = false;
-cv::Mat blend_image;
-
 int main(int argc, char **argv) {
     
 #ifdef LINUX_RELEASE
