@@ -11,6 +11,7 @@
 #include<sys/stat.h>
 
 std::unordered_map<std::string, std::pair<int, int>> filter_map;
+void custom_filter(cv::Mat &);
 
 const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
     "Opposite Self AlphaBlend", "AC2 Distort", "Reverse Distort", "Opposite Distort",
