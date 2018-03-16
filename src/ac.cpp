@@ -70,7 +70,8 @@ namespace ac {
         "TrailsFilter",
         "TrailsFilterIntense","TrailsFilterSelfAlpha","TrailsFilterXor","ColorTrails","MoveRed","MoveRGB","MoveRedGreenBlue","BlurSim", "Block","BlockXor","BlockScale","BlockStrobe", "PrevFrameBlend","Wave","HighWave", "VerticalSort","VerticalChannelSort","HorizontalBlend","VerticalBlend","OppositeBlend","DiagonalLines", "HorizontalLines","InvertedScanlines","Soft_Mirror",
         "KanapaTrip", "ColorMorphing", "ScanSwitch", "ScanAlphaSwitch","NegativeStrobe", "XorAddMul","ParticleRelease", "BlendSwitch",
-        "All Red", "All Green", "All Blue", "LineRGB","PixelRGB","BoxedRGB","KruegerSweater","RGBFlash","IncreaseBlendHorizontal",
+        "All Red", "All Green", "All Blue","LineRGB","PixelRGB","BoxedRGB","KruegerSweater","RGBFlash","IncreaseBlendHorizontal",
+        "BlendIncrease",
         "No Filter",
         "Blend with Source", "Plugin", "Custom","Blend With Image #1",  "TriBlend with Image", "Image Strobe", "Image distraction" };
     
@@ -82,11 +83,11 @@ namespace ac {
         TrailsFilter,TrailsFilterIntense,TrailsFilterSelfAlpha,TrailsFilterXor,ColorTrails,MoveRed,MoveRGB,MoveRedGreenBlue,BlurSim,Block,BlockXor,BlockScale,BlockStrobe,PrevFrameBlend,Wave,HighWave,
         VerticalSort,VerticalChannelSort,HorizontalBlend,VerticalBlend,OppositeBlend,DiagonalLines,HorizontalLines,InvertedScanlines,Soft_Mirror,KanapaTrip,ColorMorphing,ScanSwitch,ScanAlphaSwitch,
         NegativeStrobe,XorAddMul,ParticleRelease,BlendSwitch,
-        AllRed,AllGreen,AllBlue,LineRGB,PixelRGB,BoxedRGB,KruegerSweater,RGBFlash,IncreaseBlendHorizontal,
+        AllRed,AllGreen,AllBlue,LineRGB,PixelRGB,BoxedRGB,KruegerSweater,RGBFlash,IncreaseBlendHorizontal,BlendIncrease,
         NoFilter,BlendWithSource,plugin,custom,blendWithImage, triBlendWithImage,imageStrobe, imageDistraction,0};
     // number of filters
     
-    int draw_max = 162;
+    int draw_max = 163;
     // variables
     double translation_variable = 0.001f, pass2_alpha = 0.75f;
     // swap colors inline function
@@ -3678,7 +3679,7 @@ void ac::SquareSwap16x8(cv::Mat &frame) {
     Square_Swap(squares, num_w, num_h, frame);
 }
 
-void ac::SquareSwap64x32(cv::Mat &frame) {
+void ac::SquareSwap64x32(cv::Mat &) {
     //const unsigned int num_w = 64, num_h = 32;
     //static Square squares[num_w*num_h];
     //Square_Swap(squares, num_w, num_h, frame);
@@ -5273,7 +5274,67 @@ void ac::IncreaseBlendHorizontal(cv::Mat &frame) {
     ac::pass2_alpha = 0.75;
     Pass2Blend(frame);
 }
-
+// blend increase
+void ac::BlendIncrease(cv::Mat &frame) {
+    static int blend_r = rand()%255, blend_g = rand()%255, blend_b = rand()%255;
+    static bool cblend_r = true, cblend_g = true, cblend_b = true;
+    static unsigned int increase_value_r = 2, increase_value_g = 2, increase_value_b = 2;
+    unsigned int w = frame.cols;
+    unsigned int h = frame.rows;
+    if(blend_r > 255) {
+        blend_r = rand()%255;
+        if(cblend_r == true) {
+            blend_r = -blend_r;
+            cblend_r = false;
+        } else {
+            cblend_r = true;
+        }
+    }
+    if(blend_g > 255) {
+        blend_g = rand()%255;
+        if(cblend_g == true) {
+            blend_g = -blend_g;
+            cblend_g = false;
+        } else {
+            cblend_g = true;
+        }
+    }
+    if(blend_b > 255) {
+        blend_b = rand()%255;
+        if(cblend_b == true) {
+            blend_b = -blend_b;
+            cblend_b = false;
+        } else {
+            cblend_b = true;
+        }
+    }
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+            pixel[2] += blend_r;
+            pixel[1] += blend_g;
+            pixel[0] += blend_b;
+            swapColors(frame, z, i);// swap colors for rgb sliders
+            if(isNegative) invert(frame, z, i); // if is negative
+        }
+    }
+    blend_r += increase_value_r;
+    blend_g += increase_value_g;
+    blend_b += increase_value_b;
+    increase_value_r += rand()%5;
+    increase_value_g += rand()%5;
+    increase_value_b += rand()%5;
+    if(increase_value_r > 20) {
+        increase_value_r = 2;
+    }
+    if(increase_value_g  > 20) {
+        increase_value_g = 2;
+    }
+    if(increase_value_b > 20) {
+        increase_value_b = 2;
+    }
+}
+// Apply color map to cv::Mat
 void ac::ApplyColorMap(cv::Mat &frame) {
     if(set_color_map > 0 && set_color_map < 13) {
         cv::Mat output_f1 = frame.clone();
@@ -5299,6 +5360,61 @@ void ac::BlendWithSource(cv::Mat &frame) {
     Pass2Blend(frame);// call Pass2 function
 }
 
+// set cv::Mat brightness
+void ac::setBrightness(cv::Mat &frame, double alpha, int beta) {
+    cv::Mat c = frame.clone();
+    c.convertTo(frame, -1, alpha, beta);
+}
+
+// set cv::Mat gamma
+void ac::setGamma(cv::Mat &frame, cv::Mat &outframe, const double gamma) {
+    cv::Mat lookUpTable(1, 256, CV_8U);
+    uchar* p = lookUpTable.ptr();
+    for(int i = 0; i < 256; ++i) {
+        p[i] = cv::saturate_cast<uchar>(pow(i / 255.0, gamma) * 255.0);
+    }
+    cv::Mat res = frame.clone();
+    LUT(frame, lookUpTable, outframe);
+}
+
+// set cv::Mat saturation
+void ac::setSaturation(cv::Mat &frame, int saturation) {
+    cv::Mat image;
+    cv::cvtColor(frame, image, CV_BGR2HSV);
+    unsigned int w = frame.cols;
+    unsigned int h = frame.rows;
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = image.at<cv::Vec3b>(z, i);
+            pixel[1] = saturation;
+        }
+    }
+    cv::cvtColor(image, frame, CV_HSV2BGR);
+}
+
+// Make two copies of the current frame, apply filter1 to one, filter2 to the other
+// then Alpha Blend them together
+void ac::filterFade(cv::Mat &frame, int filter1, int filter2, double alpha) {
+    unsigned int h = frame.rows; // frame height
+    unsigned int w = frame.cols;// framew idth
+    // make copies of original frame
+    cv::Mat frame1 = frame.clone(), frame2 = frame.clone();
+    // apply filters on two copies of original frame
+    ac::draw_func[filter1](frame1);
+    ac::draw_func[filter2](frame2);
+    // loop through image setting each pixel with alphablended pixel
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i); // target pixel
+            cv::Vec3b frame1_pix = frame1.at<cv::Vec3b>(z, i); // frame1 pixel
+            cv::Vec3b frame2_pix = frame2.at<cv::Vec3b>(z, i); // frame2 pixel
+            // loop through pixel components and set target pixel to alpha blended pixel of two frames
+            for(unsigned int q = 0; q < 3; ++q)
+                pixel[q] = frame2_pix[q]+(frame1_pix[q]*alpha);
+        }
+    }
+}
+// set custom callback
 void ac::setCustom(DrawFunction f) {
     custom_callback = f;
 }
@@ -5309,9 +5425,3 @@ void ac::custom(cv::Mat &frame) {
         custom_callback(frame);
     
 }
-
-
-
-
-
-

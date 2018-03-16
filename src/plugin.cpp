@@ -68,7 +68,7 @@ void draw_plugin(cv::Mat &frame, int filter) {
 }
 
 
-void ac::plugin(cv::Mat &frame) {
+void ac::plugin(cv::Mat &) {
 
 }
 
