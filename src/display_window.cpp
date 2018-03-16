@@ -33,10 +33,10 @@ void DisplayWindow::paintEvent(QPaintEvent *) {
     painter.fillRect(QRect(QPoint(0, 0), size()), QColor(0,0,0));
 }
 
-void DisplayWindow::keyPressEvent(QKeyEvent *key) {
+void DisplayWindow::keyPressEvent(QKeyEvent *) {
     
 }
 
-void DisplayWindow::keyReleaseEvent(QKeyEvent *key) {
+void DisplayWindow::keyReleaseEvent(QKeyEvent *) {
     
 }
