@@ -26,6 +26,7 @@ public:
     QTextEdit *log_text;
     QCheckBox *chk_negate;
     QComboBox *combo_rgb;
+    QSlider *slide_r, *slide_g, *slide_b, *slide_bright, *slide_gamma, *slide_saturation;
     QProgressBar *progress_bar;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
@@ -51,6 +52,7 @@ public slots:
     void chk_Clicked();
     void cb_SetIndex(int index);
     void frameInc();
+    void slideChanged(int pos);
 private:
     void createControls();
     void createMenu();

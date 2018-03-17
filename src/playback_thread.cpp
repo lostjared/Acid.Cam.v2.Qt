@@ -100,6 +100,14 @@ void Playback::setOptions(bool n, int c) {
     mutex.unlock();
 }
 
+void Playback::setRGB(int r, int g, int b) {
+    mutex.lock();
+    ac::swapColor_r = r;
+    ac::swapColor_g = g;
+    ac::swapColor_b = b;
+    mutex.unlock();
+}
+
 void Playback::setDisplayed(bool shown) {
     video_shown = shown;
 }
@@ -127,6 +135,8 @@ void Playback::run() {
             for(unsigned int i = 0; i < cur.size(); ++i) {
                 if(i == cur.size()-1)
                     ac::in_custom = false;
+                
+             
                 
                 if(cur[i].first == 0) {
                     ac::draw_func[cur[i].second](frame);

@@ -31,9 +31,11 @@ private:
     bool isPaused, isStep;
     VideoMode mode;
     int device_num;
+    unsigned int red, green, blue;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
+    void setRGB(int r, int g, int b);
     void Play();
     void Stop();
     void Release();

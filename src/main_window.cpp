@@ -54,8 +54,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     programMode = MODE_CAMERA;
     init_plugins();
     generate_map();
-    setGeometry(100, 100, 800, 600);
-    setFixedSize(800, 600);
+    setGeometry(100, 100, 800, 800);
+    setFixedSize(800, 800);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
@@ -122,9 +122,38 @@ void AC_MainWindow::createControls() {
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(btn_movedown, SIGNAL(clicked()), this, SLOT(downClicked()));
     
+    QLabel *r_label = new QLabel("Red: ", this);
+    r_label->setGeometry(10, 255, 50, 20);
+    slide_r = new QSlider(Qt::Horizontal,this);
+    slide_r->setGeometry(40, 250, 100, 30);
+    slide_r->setMaximum(255);
+    slide_r->setMinimum(0);
+    slide_r->setTickInterval(0);
+    
+    QLabel *g_label = new QLabel("Green: ", this);
+    g_label->setGeometry(150, 255, 50, 20);
+    slide_g = new QSlider(Qt::Horizontal, this);
+    slide_g->setGeometry(190, 250, 100, 30);
+    slide_g->setMaximum(255);
+    slide_g->setMinimum(0);
+    slide_g->setTickInterval(0);
+    
+    QLabel *b_label = new QLabel("Blue: ", this);
+    b_label->setGeometry(300, 255, 50, 20);
+    slide_b = new QSlider(Qt::Horizontal, this);
+    slide_b->setGeometry(330, 250, 100, 30);
+    slide_b->setMaximum(255);
+    slide_b->setMinimum(0);
+    slide_b->setTickInterval(0);
+    
+    connect(slide_r, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
+    connect(slide_g, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
+    connect(slide_b, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
+    
     log_text = new QTextEdit(this);
-    log_text->setGeometry(10, 250, 780,310);
+    log_text->setGeometry(10, 450, 780,310);
     log_text->setReadOnly(true);
+    
     
     QString text = tr("Acid Cam Filters v");
     text += ac::version.c_str();
@@ -149,11 +178,10 @@ void AC_MainWindow::createControls() {
     setWindowIcon(QPixmap(":/images/icon.png"));
     
     progress_bar = new QProgressBar(this);
-    progress_bar->setGeometry(0, 560, 800, 20);
+    progress_bar->setGeometry(0, 760, 800, 20);
     progress_bar->setMinimum(0);
     progress_bar->setMaximum(100);
     progress_bar->hide();
-    
 }
 
 void AC_MainWindow::createMenu() {
@@ -233,6 +261,11 @@ void AC_MainWindow::cb_SetIndex(int index) {
     playback->setOptions(chk_negate->isChecked(), index);
     
 }
+
+void AC_MainWindow::slideChanged(int) {
+    playback->setRGB(slide_r->sliderPosition(), slide_g->sliderPosition(), slide_b->sliderPosition());
+}
+
 void AC_MainWindow::addClicked() {
     int row = filters->currentRow();
     if(row != -1) {
