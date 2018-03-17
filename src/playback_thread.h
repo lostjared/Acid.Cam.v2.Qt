@@ -32,10 +32,12 @@ private:
     VideoMode mode;
     int device_num;
     unsigned int red, green, blue;
+    unsigned int bright_, gamma_, saturation_;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
     void setRGB(int r, int g, int b);
+    void setColorOptions(int b, int g, int s);
     void Play();
     void Stop();
     void Release();

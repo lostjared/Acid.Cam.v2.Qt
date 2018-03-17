@@ -53,6 +53,7 @@ public slots:
     void cb_SetIndex(int index);
     void frameInc();
     void slideChanged(int pos);
+    void colorChanged(int pos);
 private:
     void createControls();
     void createMenu();

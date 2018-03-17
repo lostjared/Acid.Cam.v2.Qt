@@ -11,6 +11,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     stop = true;
     isStep = false;
     isPaused = false;
+    bright_ = gamma_ = saturation_ = 0;
 }
 
 void Playback::Play() {
@@ -100,6 +101,14 @@ void Playback::setOptions(bool n, int c) {
     mutex.unlock();
 }
 
+void Playback::setColorOptions(int b, int g, int s) {
+    mutex.lock();
+    bright_ = b;
+    gamma_ = g;
+    saturation_ = s;
+    mutex.unlock();
+}
+
 void Playback::setRGB(int r, int g, int b) {
     mutex.lock();
     ac::swapColor_r = r;
@@ -145,6 +154,16 @@ void Playback::run() {
                     ac::alphaFlame(frame);
                 } else if(cur[i].first == 2) {
                     draw_plugin(frame, cur[i].second);
+                }
+                if(bright_ > 0) {
+                    ac::setBrightness(frame, 1.0, bright_);
+                }
+                if(gamma_ > 0) {
+                    cv::Mat gam = frame.clone();
+                    ac::setGamma(gam, frame, gamma_);
+                }
+                if(saturation_ > 0) {
+                    ac::setSaturation(frame, saturation_);
                 }
             }
         } else {

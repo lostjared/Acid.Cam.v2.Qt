@@ -150,6 +150,35 @@ void AC_MainWindow::createControls() {
     connect(slide_g, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
     connect(slide_b, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
     
+    QLabel *label_slide_bright = new QLabel("Brightness: ", this);
+    label_slide_bright->setGeometry(10, 280, 75, 20);
+    slide_bright = new QSlider(Qt::Horizontal, this);
+    slide_bright->setGeometry(80, 275, 100, 30);
+    slide_bright->setMaximum(255);
+    slide_bright->setMinimum(0);
+    slide_bright->setTickInterval(0);
+
+    
+    QLabel *label_slide_gamma = new QLabel("Gamma: ", this);
+    label_slide_gamma->setGeometry(190, 280, 65, 20);
+    slide_gamma = new QSlider(Qt::Horizontal, this);
+    slide_gamma->setGeometry(245, 275, 100, 30);
+    slide_gamma->setMaximum(255);
+    slide_gamma->setMinimum(0);
+    slide_gamma->setTickInterval(0);
+   
+    QLabel *label_sat = new QLabel("Saturation: ", this);
+    label_sat->setGeometry(350, 280, 100, 20);
+    slide_saturation = new QSlider(Qt::Horizontal, this);
+    slide_saturation->setGeometry(420, 275, 100, 30);
+    slide_saturation->setMaximum(255);
+    slide_saturation->setMinimum(0);
+    slide_saturation->setTickInterval(0);
+    
+    connect(slide_bright, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
+    connect(slide_gamma, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
+    connect(slide_saturation, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
+    
     log_text = new QTextEdit(this);
     log_text->setGeometry(10, 450, 780,310);
     log_text->setReadOnly(true);
@@ -264,6 +293,10 @@ void AC_MainWindow::cb_SetIndex(int index) {
 
 void AC_MainWindow::slideChanged(int) {
     playback->setRGB(slide_r->sliderPosition(), slide_g->sliderPosition(), slide_b->sliderPosition());
+}
+
+void AC_MainWindow::colorChanged(int) {
+    playback->setColorOptions(slide_bright->sliderPosition(), slide_gamma->sliderPosition(), slide_saturation->sliderPosition());
 }
 
 void AC_MainWindow::addClicked() {
