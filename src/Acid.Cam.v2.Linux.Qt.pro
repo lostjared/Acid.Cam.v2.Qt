@@ -8,7 +8,7 @@ QT += core gui widgets
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/ /usr/local/include
 LIBS += -lopencv_contrib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
-
+#LIBS += -L/usr/local/lib -lopencv_world
 QMAKE_CXXFLAGS += -std=c++11
 RESOURCES += qresource.qrc
 
