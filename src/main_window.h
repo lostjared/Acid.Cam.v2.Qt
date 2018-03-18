@@ -21,18 +21,19 @@ public:
     void Log(const QString &s);
     bool startCamera(int res, int dev, const QString &outdir, bool record, int type);
     bool startVideo(const QString &filename, const QString &outdir, bool record, int type);
-    QListWidget *filters, *custom_filters;
+    QListWidget /**filters,*/ *custom_filters;
     QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown;
     QTextEdit *log_text;
     QCheckBox *chk_negate;
     QComboBox *combo_rgb;
     QSlider *slide_r, *slide_g, *slide_b, *slide_bright, *slide_gamma, *slide_saturation;
     QProgressBar *progress_bar;
-    QComboBox *color_maps;
+    QComboBox *color_maps, *filters;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
     QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage, *controls_showvideo;
     QAction *help_about;
+    QRadioButton *filter_single, *filter_custom;
 public slots:
     void addClicked();
     void rmvClicked();
@@ -56,6 +57,7 @@ public slots:
     void slideChanged(int pos);
     void colorChanged(int pos);
     void colorMapChanged(int pos);
+    void comboFilterChanged(int pos);
 private:
     void createControls();
     void createMenu();

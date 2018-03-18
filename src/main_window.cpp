@@ -54,8 +54,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     programMode = MODE_CAMERA;
     init_plugins();
     generate_map();
-    setGeometry(100, 100, 800, 800);
-    setFixedSize(800, 800);
+    setGeometry(100, 100, 800, 700);
+    setFixedSize(800, 700);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
@@ -84,13 +84,17 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 void AC_MainWindow::createControls() {
     
+    /*
     filters = new QListWidget(this);
     filters->setGeometry(10, 30, 390, 180);
     filters->show();
-    
+    */
     custom_filters = new QListWidget(this);
     custom_filters->setGeometry(400, 30, 390, 180);
     custom_filters->show();
+    
+    filters = new QComboBox(this);
+    filters->setGeometry(10, 105, 380, 30);
     
     for(int i = 0; i < ac::draw_max-4; ++i) {
         filters->addItem(ac::draw_strings[i].c_str());
@@ -106,6 +110,16 @@ void AC_MainWindow::createControls() {
         std::string name = "plugin " + plugins.plugin_list[i]->name();
         filters->addItem(name.c_str());
     }
+    
+    connect(filters, SIGNAL(currentIndexChanged(int)), this, SLOT(comboFilterChanged(int)));
+    
+    filter_single = new QRadioButton(tr("Single Filter"), this);
+    filter_single->setGeometry(30, 40, 100, 15);
+    
+    filter_custom = new QRadioButton(tr("Custom Filter"), this);
+    filter_custom->setGeometry(30, 65, 100, 15);
+    
+    filter_single->setChecked(true);
     
     btn_add = new QPushButton(tr("Add"), this);
     btn_remove = new QPushButton(tr("Remove"), this);
@@ -199,9 +213,9 @@ void AC_MainWindow::createControls() {
     color_maps->addItem(tr("Parula"));
     
     connect(color_maps, SIGNAL(currentIndexChanged(int)), this, SLOT(colorMapChanged(int)));
-    
+
     log_text = new QTextEdit(this);
-    log_text->setGeometry(10, 450, 780,310);
+    log_text->setGeometry(10, 325, 780,310);
     log_text->setReadOnly(true);
     
     
@@ -210,7 +224,7 @@ void AC_MainWindow::createControls() {
     text += " loaded.\n";
     log_text->setText(text);
     
-    filters->setCurrentRow(0);
+    filters->setCurrentIndex(0);
     
     chk_negate = new QCheckBox(tr("Negate"), this);
     chk_negate->setGeometry(120,215,100, 20);
@@ -228,7 +242,7 @@ void AC_MainWindow::createControls() {
     setWindowIcon(QPixmap(":/images/icon.png"));
     
     progress_bar = new QProgressBar(this);
-    progress_bar->setGeometry(0, 760, 800, 20);
+    progress_bar->setGeometry(0, 640, 800, 20);
     progress_bar->setMinimum(0);
     progress_bar->setMaximum(100);
     progress_bar->hide();
@@ -323,14 +337,19 @@ void AC_MainWindow::colorMapChanged(int pos) {
     playback->setColorMap(pos);
 }
 
+void AC_MainWindow::comboFilterChanged(int pos) {
+    
+}
+
+
 void AC_MainWindow::addClicked() {
-    int row = filters->currentRow();
+    int row = filters->currentIndex();
     if(row != -1) {
-        QListWidgetItem *item = filters->item(row);
-        custom_filters->addItem(item->text());
+        //QListWidgetItem *item = filters->item(row);
+        custom_filters->addItem(filters->currentText());
         QString qs;
         QTextStream stream(&qs);
-        stream << "Added Filter: " << item->text() << "\n";
+        stream << "Added Filter: " << filters->currentText() << "\n";
         Log(qs);
         std::vector<std::pair<int, int>> v;
         buildVector(v);

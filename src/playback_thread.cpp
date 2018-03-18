@@ -12,6 +12,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     isStep = false;
     isPaused = false;
     bright_ = gamma_ = saturation_ = 0;
+    single_mode = true;
 }
 
 void Playback::Play() {
@@ -20,8 +21,8 @@ void Playback::Play() {
             stop = false;
         }
     }
-    //start(LowPriority);
-    start(HighPriority);
+    start(LowPriority);
+    //start(HighPriority);
 }
 
 void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
@@ -107,6 +108,10 @@ void Playback::setColorOptions(int b, int g, int s) {
     gamma_ = g;
     saturation_ = s;
     mutex.unlock();
+}
+
+void Playback::setIndexChanged(int pos) {
+    
 }
 
 void Playback::setRGB(int r, int g, int b) {

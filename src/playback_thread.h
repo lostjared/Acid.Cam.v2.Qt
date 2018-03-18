@@ -33,6 +33,7 @@ private:
     int device_num;
     unsigned int red, green, blue;
     unsigned int bright_, gamma_, saturation_;
+    bool single_mode;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -52,6 +53,7 @@ public:
     void setImage(const cv::Mat &image);
     void setStep();
     void setDisplayed(bool shown);
+    void setIndexChanged(int pos);
 signals:
     void procImage(const QImage image);
     void stopRecording();
