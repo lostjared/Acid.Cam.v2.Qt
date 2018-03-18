@@ -159,7 +159,7 @@ void Playback::run() {
                 } else if(cur[i].first == 2) {
                     draw_plugin(frame, cur[i].second);
                 }
-                ac::ApplyColorMap(frame);
+                if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
                 if(bright_ > 0) {
                     ac::setBrightness(frame, 1.0, bright_);
                 }
@@ -172,7 +172,6 @@ void Playback::run() {
                 }
             }
         } else {
-            if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
             msleep(duration);
         }
         mutex.lock();

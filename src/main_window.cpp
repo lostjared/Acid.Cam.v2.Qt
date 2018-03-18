@@ -184,19 +184,19 @@ void AC_MainWindow::createControls() {
     
    	color_maps = new QComboBox(this);
     color_maps->setGeometry(540, 275, 250, 30);
-    color_maps->addItem("None");
-    color_maps->addItem("Autum");
-    color_maps->addItem("Bone");
-    color_maps->addItem("Jet");
-    color_maps->addItem("Winter");
-    color_maps->addItem("Rainbow");
-    color_maps->addItem("Ocean");
-    color_maps->addItem("Summer");
-    color_maps->addItem("Cool");
-    color_maps->addItem("HSV");
-    color_maps->addItem("Pink");
-    color_maps->addItem("Hot");
-    color_maps->addItem("Parula");
+    color_maps->addItem(tr("None"));
+    color_maps->addItem(tr("Autum"));
+    color_maps->addItem(tr("Bone"));
+    color_maps->addItem(tr("Jet"));
+    color_maps->addItem(tr("Winter"));
+    color_maps->addItem(tr("Rainbow"));
+    color_maps->addItem(tr("Ocean"));
+    color_maps->addItem(tr("Summer"));
+    color_maps->addItem(tr("Cool"));
+    color_maps->addItem(tr("HSV"));
+    color_maps->addItem(tr("Pink"));
+    color_maps->addItem(tr("Hot"));
+    color_maps->addItem(tr("Parula"));
     
     connect(color_maps, SIGNAL(currentIndexChanged(int)), this, SLOT(colorMapChanged(int)));
     
