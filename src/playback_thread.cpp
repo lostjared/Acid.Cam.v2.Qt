@@ -13,6 +13,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     isPaused = false;
     bright_ = gamma_ = saturation_ = 0;
     single_mode = true;
+    current_filter = 0;
 }
 
 void Playback::Play() {
@@ -111,7 +112,11 @@ void Playback::setColorOptions(int b, int g, int s) {
 }
 
 void Playback::setIndexChanged(int pos) {
-    
+    current_filter = pos;
+}
+
+void Playback::setSingleMode(bool val) {
+    single_mode = val;
 }
 
 void Playback::setRGB(int r, int g, int b) {
