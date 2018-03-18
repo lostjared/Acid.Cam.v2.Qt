@@ -163,6 +163,7 @@ void Playback::run() {
                 } else if(cur[i].first == 2) {
                     draw_plugin(frame, cur[i].second);
                 }
+                msleep(duration/2);
             }
             mutex.lock();
             if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
