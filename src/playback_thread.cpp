@@ -150,7 +150,6 @@ void Playback::run() {
             for(unsigned int i = 0; i < cur.size(); ++i) {
                 if(i == cur.size()-1)
                     ac::in_custom = false;
-                
                 if(cur[i].first == 0) {
                     ac::draw_func[cur[i].second](frame);
                 } else if(cur[i].first == 1) {
@@ -159,18 +158,20 @@ void Playback::run() {
                 } else if(cur[i].first == 2) {
                     draw_plugin(frame, cur[i].second);
                 }
-                if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
-                if(bright_ > 0) {
-                    ac::setBrightness(frame, 1.0, bright_);
-                }
-                if(gamma_ > 0) {
-                    cv::Mat gam = frame.clone();
-                    ac::setGamma(gam, frame, gamma_);
-                }
-                if(saturation_ > 0) {
-                    ac::setSaturation(frame, saturation_);
-                }
             }
+            mutex.lock();
+            if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
+            if(bright_ > 0) {
+                ac::setBrightness(frame, 1.0, bright_);
+            }
+            if(gamma_ > 0) {
+                cv::Mat gam = frame.clone();
+                ac::setGamma(gam, frame, gamma_);
+            }
+            if(saturation_ > 0) {
+                ac::setSaturation(frame, saturation_);
+            }
+            mutex.unlock();
         } else {
             msleep(duration);
         }
