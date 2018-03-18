@@ -122,7 +122,7 @@ void AC_MainWindow::createControls() {
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(btn_movedown, SIGNAL(clicked()), this, SLOT(downClicked()));
     
-    QLabel *r_label = new QLabel("Red: ", this);
+    QLabel *r_label = new QLabel(tr("Red: "), this);
     r_label->setGeometry(10, 255, 50, 20);
     slide_r = new QSlider(Qt::Horizontal,this);
     slide_r->setGeometry(40, 250, 100, 30);
@@ -130,7 +130,7 @@ void AC_MainWindow::createControls() {
     slide_r->setMinimum(0);
     slide_r->setTickInterval(0);
     
-    QLabel *g_label = new QLabel("Green: ", this);
+    QLabel *g_label = new QLabel(tr("Green: "), this);
     g_label->setGeometry(150, 255, 50, 20);
     slide_g = new QSlider(Qt::Horizontal, this);
     slide_g->setGeometry(190, 250, 100, 30);
@@ -138,7 +138,7 @@ void AC_MainWindow::createControls() {
     slide_g->setMinimum(0);
     slide_g->setTickInterval(0);
     
-    QLabel *b_label = new QLabel("Blue: ", this);
+    QLabel *b_label = new QLabel(tr("Blue: "), this);
     b_label->setGeometry(300, 255, 50, 20);
     slide_b = new QSlider(Qt::Horizontal, this);
     slide_b->setGeometry(330, 250, 100, 30);
@@ -150,7 +150,7 @@ void AC_MainWindow::createControls() {
     connect(slide_g, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
     connect(slide_b, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
     
-    QLabel *label_slide_bright = new QLabel("Brightness: ", this);
+    QLabel *label_slide_bright = new QLabel(tr("Brightness: "), this);
     label_slide_bright->setGeometry(10, 280, 75, 20);
     slide_bright = new QSlider(Qt::Horizontal, this);
     slide_bright->setGeometry(80, 275, 100, 30);
@@ -159,7 +159,7 @@ void AC_MainWindow::createControls() {
     slide_bright->setTickInterval(0);
 
     
-    QLabel *label_slide_gamma = new QLabel("Gamma: ", this);
+    QLabel *label_slide_gamma = new QLabel(tr("Gamma: "), this);
     label_slide_gamma->setGeometry(190, 280, 65, 20);
     slide_gamma = new QSlider(Qt::Horizontal, this);
     slide_gamma->setGeometry(245, 275, 100, 30);
@@ -167,7 +167,7 @@ void AC_MainWindow::createControls() {
     slide_gamma->setMinimum(0);
     slide_gamma->setTickInterval(0);
    
-    QLabel *label_sat = new QLabel("Saturation: ", this);
+    QLabel *label_sat = new QLabel(tr("Saturation: "), this);
     label_sat->setGeometry(350, 280, 100, 20);
     slide_saturation = new QSlider(Qt::Horizontal, this);
     slide_saturation->setGeometry(420, 275, 100, 30);
@@ -178,6 +178,27 @@ void AC_MainWindow::createControls() {
     connect(slide_bright, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
     connect(slide_gamma, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
     connect(slide_saturation, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
+    
+    QLabel *color_maps_label = new QLabel("<b>Color Maps</b>", this);
+    color_maps_label->setGeometry(545, 260, 75, 20);
+    
+   	color_maps = new QComboBox(this);
+    color_maps->setGeometry(540, 275, 250, 30);
+    color_maps->addItem("None");
+    color_maps->addItem("Autum");
+    color_maps->addItem("Bone");
+    color_maps->addItem("Jet");
+    color_maps->addItem("Winter");
+    color_maps->addItem("Rainbow");
+    color_maps->addItem("Ocean");
+    color_maps->addItem("Summer");
+    color_maps->addItem("Cool");
+    color_maps->addItem("HSV");
+    color_maps->addItem("Pink");
+    color_maps->addItem("Hot");
+    color_maps->addItem("Parula");
+    
+    connect(color_maps, SIGNAL(currentIndexChanged(int)), this, SLOT(colorMapChanged(int)));
     
     log_text = new QTextEdit(this);
     log_text->setGeometry(10, 450, 780,310);
@@ -288,7 +309,6 @@ void AC_MainWindow::chk_Clicked() {
 }
 void AC_MainWindow::cb_SetIndex(int index) {
     playback->setOptions(chk_negate->isChecked(), index);
-    
 }
 
 void AC_MainWindow::slideChanged(int) {
@@ -297,6 +317,10 @@ void AC_MainWindow::slideChanged(int) {
 
 void AC_MainWindow::colorChanged(int) {
     playback->setColorOptions(slide_bright->sliderPosition(), slide_gamma->sliderPosition(), slide_saturation->sliderPosition());
+}
+
+void AC_MainWindow::colorMapChanged(int pos) {
+    playback->setColorMap(pos);
 }
 
 void AC_MainWindow::addClicked() {

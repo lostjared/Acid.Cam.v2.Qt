@@ -38,6 +38,7 @@ public:
     ~Playback();
     void setRGB(int r, int g, int b);
     void setColorOptions(int b, int g, int s);
+    void setColorMap(int c);
     void Play();
     void Stop();
     void Release();

@@ -28,6 +28,7 @@ public:
     QComboBox *combo_rgb;
     QSlider *slide_r, *slide_g, *slide_b, *slide_bright, *slide_gamma, *slide_saturation;
     QProgressBar *progress_bar;
+    QComboBox *color_maps;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
     QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage, *controls_showvideo;
@@ -54,6 +55,7 @@ public slots:
     void frameInc();
     void slideChanged(int pos);
     void colorChanged(int pos);
+    void colorMapChanged(int pos);
 private:
     void createControls();
     void createMenu();

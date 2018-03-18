@@ -117,6 +117,12 @@ void Playback::setRGB(int r, int g, int b) {
     mutex.unlock();
 }
 
+void Playback::setColorMap(int c) {
+    mutex.lock();
+    ac::set_color_map = c;
+    mutex.unlock();
+}
+
 void Playback::setDisplayed(bool shown) {
     video_shown = shown;
 }
@@ -145,8 +151,6 @@ void Playback::run() {
                 if(i == cur.size()-1)
                     ac::in_custom = false;
                 
-             
-                
                 if(cur[i].first == 0) {
                     ac::draw_func[cur[i].second](frame);
                 } else if(cur[i].first == 1) {
@@ -155,6 +159,7 @@ void Playback::run() {
                 } else if(cur[i].first == 2) {
                     draw_plugin(frame, cur[i].second);
                 }
+                ac::ApplyColorMap(frame);
                 if(bright_ > 0) {
                     ac::setBrightness(frame, 1.0, bright_);
                 }
@@ -167,6 +172,7 @@ void Playback::run() {
                 }
             }
         } else {
+            if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
             msleep(duration);
         }
         mutex.lock();
