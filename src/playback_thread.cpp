@@ -13,6 +13,8 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     isPaused = false;
     bright_ = gamma_ = saturation_ = 0;
     single_mode = true;
+    alpha = 0;
+    prev_filter = std::pair<int, int>(0, 0);
 }
 
 void Playback::Play() {
@@ -111,7 +113,9 @@ void Playback::setColorOptions(int b, int g, int s) {
 }
 
 void Playback::setIndexChanged(std::string value) {
+    prev_filter = current_filter;
     current_filter = filter_map[value];
+    alpha = 1.0;
 }
 
 void Playback::setSingleMode(bool val) {
@@ -180,7 +184,11 @@ void Playback::run() {
         cur = current;
         mutex_shown.unlock();
         ac::orig_frame = frame.clone();
-        if(single_mode == true) {
+        
+        if(single_mode == true && alpha > 0) {
+            filterFade(frame, current_filter, prev_filter, alpha);
+            alpha -= 0.08;
+        } else if(single_mode == true) {
             mutex.lock();
             ac::in_custom = false;
             drawFilter(frame, current_filter);
@@ -238,6 +246,8 @@ Playback::~Playback() {
 
 void Playback::Stop() {
     stop = true;
+    alpha = 0;
+    prev_filter = std::pair<int, int>(0, 0);
 }
 
 void Playback::Release() {
@@ -268,3 +278,25 @@ void Playback::setImage(const cv::Mat &frame) {
     blend_image = frame;
     mutex.unlock();
 }
+
+void Playback::filterFade(cv::Mat &frame, std::pair<int, int> &filter1, std::pair<int, int> &filter2, double alpha) {
+    unsigned int h = frame.rows; // frame height
+    unsigned int w = frame.cols;// framew idth
+    // make copies of original frame
+    cv::Mat frame1 = frame.clone(), frame2 = frame.clone();
+    // apply filters on two copies of original frame
+    drawFilter(frame1,filter1);
+    drawFilter(frame2,filter2);
+    // loop through image setting each pixel with alphablended pixel
+    for(unsigned int z = 0; z < h; ++z) {
+        for(unsigned int i = 0; i < w; ++i) {
+            cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i); // target pixel
+            cv::Vec3b frame1_pix = frame1.at<cv::Vec3b>(z, i); // frame1 pixel
+            cv::Vec3b frame2_pix = frame2.at<cv::Vec3b>(z, i); // frame2 pixel
+            // loop through pixel components and set target pixel to alpha blended pixel of two frames
+            for(unsigned int q = 0; q < 3; ++q)
+                pixel[q] = frame2_pix[q]+(frame1_pix[q]*alpha);
+        }
+    }
+}
+
