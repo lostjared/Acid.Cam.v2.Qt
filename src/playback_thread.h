@@ -56,6 +56,8 @@ public:
     void setDisplayed(bool shown);
     void setIndexChanged(std::string name);
     void setSingleMode(bool val);
+    void drawFilter(cv::Mat &frame, std::pair<int, int> &filter);
+    void drawEffects(cv::Mat &frame);
 signals:
     void procImage(const QImage image);
     void stopRecording();

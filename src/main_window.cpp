@@ -467,7 +467,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 #else
     ext = ".avi";
 #endif
-    
+    Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
     stream_ << outdir << "/" << "Video." << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
@@ -549,7 +549,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     int res_h = capture_video.get(CV_CAP_PROP_FRAME_HEIGHT);
     QString str;
     QTextStream stream(&str);
-    stream << "Opened capture device " << res_w << "x" << res_h << "\n";
+    stream << "Opened capture device [Video] " << res_w << "x" << res_h << "\n";
     stream << "Video File: " << filename << "\n";
     stream << "FPS: " << video_fps << "\n";
     stream << "Frame Count: " << video_frames << "\n";
@@ -636,6 +636,7 @@ void AC_MainWindow::controls_Stop() {
         disp->hide();
         playback->Release();
     }
+    Log(tr("Capture device [Closed]\n"));;
 }
 
 void AC_MainWindow::controls_ShowVideo() {

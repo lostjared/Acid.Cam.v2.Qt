@@ -136,6 +136,32 @@ void Playback::setDisplayed(bool shown) {
     video_shown = shown;
 }
 
+void Playback::drawEffects(cv::Mat &frame) {
+    if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
+    if(bright_ > 0) {
+        ac::setBrightness(frame, 1.0, bright_);
+    }
+    if(gamma_ > 0) {
+        cv::Mat gam = frame.clone();
+        ac::setGamma(gam, frame, gamma_);
+    }
+    if(saturation_ > 0) {
+        ac::setSaturation(frame, saturation_);
+    }
+
+}
+
+void Playback::drawFilter(cv::Mat &frame, std::pair<int, int> &filter) {
+    if(filter.first == 0) {
+        ac::draw_func[filter.second](frame);
+    } else if(current_filter.first == 1) {
+        current_filterx = filter.second;
+        ac::alphaFlame(frame);
+    } else if(filter.first == 2) {
+        draw_plugin(frame, filter.second);
+    }
+}
+
 void Playback::run() {
     
     int duration = 1000/ac::fps;
@@ -155,56 +181,22 @@ void Playback::run() {
         mutex_shown.unlock();
         ac::orig_frame = frame.clone();
         if(single_mode == true) {
-            ac::in_custom = false;
-            if(current_filter.first == 0) {
-                ac::draw_func[current_filter.second](frame);
-            } else if(current_filter.first == 1) {
-                current_filterx = current_filter.second;
-                ac::alphaFlame(frame);
-            } else if(current_filter.first == 2) {
-                draw_plugin(frame, current_filter.second);
-            }
-            msleep(duration/2);
             mutex.lock();
-            if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
-            if(bright_ > 0) {
-                ac::setBrightness(frame, 1.0, bright_);
-            }
-            if(gamma_ > 0) {
-                cv::Mat gam = frame.clone();
-                ac::setGamma(gam, frame, gamma_);
-            }
-            if(saturation_ > 0) {
-                ac::setSaturation(frame, saturation_);
-            }
+            ac::in_custom = false;
+            drawFilter(frame, current_filter);
+            msleep(duration/2);
+            drawEffects(frame);
             mutex.unlock();
         } else if(cur.size()>0) {
+             mutex.lock();
             ac::in_custom = true;
             for(unsigned int i = 0; i < cur.size(); ++i) {
                 if(i == cur.size()-1)
                     ac::in_custom = false;
-                if(cur[i].first == 0) {
-                    ac::draw_func[cur[i].second](frame);
-                } else if(cur[i].first == 1) {
-                    current_filterx = cur[i].second;
-                    ac::alphaFlame(frame);
-                } else if(cur[i].first == 2) {
-                    draw_plugin(frame, cur[i].second);
-                }
+                drawFilter(frame, cur[i]);
                 msleep(duration/2);
             }
-            mutex.lock();
-            if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
-            if(bright_ > 0) {
-                ac::setBrightness(frame, 1.0, bright_);
-            }
-            if(gamma_ > 0) {
-                cv::Mat gam = frame.clone();
-                ac::setGamma(gam, frame, gamma_);
-            }
-            if(saturation_ > 0) {
-                ac::setSaturation(frame, saturation_);
-            }
+            drawEffects(frame);
             mutex.unlock();
         } else {
             msleep(duration);
