@@ -187,13 +187,14 @@ void Playback::run() {
         
         if(single_mode == true && alpha > 0) {
             filterFade(frame, current_filter, prev_filter, alpha);
+            drawEffects(frame);
             alpha -= 0.08;
         } else if(single_mode == true) {
             mutex.lock();
             ac::in_custom = false;
             drawFilter(frame, current_filter);
-            msleep(duration/2);
             drawEffects(frame);
+            msleep(duration/2);
             mutex.unlock();
         } else if(cur.size()>0) {
              mutex.lock();
