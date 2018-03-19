@@ -45,5 +45,5 @@
 
 void init_plugins();
 void draw_plugin(cv::Mat &frame, int filter);
-
+extern std::unordered_map<std::string, std::pair<int, int>> filter_map;
 #endif

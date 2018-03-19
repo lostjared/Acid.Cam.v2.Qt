@@ -34,7 +34,7 @@ private:
     unsigned int red, green, blue;
     unsigned int bright_, gamma_, saturation_;
     bool single_mode;
-    int current_filter;
+    std::pair<int, int> current_filter;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -54,7 +54,7 @@ public:
     void setImage(const cv::Mat &image);
     void setStep();
     void setDisplayed(bool shown);
-    void setIndexChanged(int pos);
+    void setIndexChanged(std::string name);
     void setSingleMode(bool val);
 signals:
     void procImage(const QImage image);

@@ -96,7 +96,7 @@ void AC_MainWindow::createControls() {
     filters = new QComboBox(this);
     filters->setGeometry(10, 105, 380, 30);
     
-    for(int i = 0; i < ac::draw_max-4; ++i) {
+    for(int i = 0; i < ac::draw_max-5; ++i) {
         filters->addItem(ac::draw_strings[i].c_str());
     }
     
@@ -115,12 +115,14 @@ void AC_MainWindow::createControls() {
     
     filter_single = new QRadioButton(tr("Single Filter"), this);
     filter_single->setGeometry(30, 40, 100, 15);
-    
     filter_custom = new QRadioButton(tr("Custom Filter"), this);
     filter_custom->setGeometry(30, 65, 100, 15);
     
     filter_single->setChecked(true);
-    
+
+    connect(filter_single, SIGNAL(pressed()), this, SLOT(setFilterSingle()));
+    connect(filter_custom, SIGNAL(pressed()), this, SLOT(setFilterCustom()));
+
     btn_add = new QPushButton(tr("Add"), this);
     btn_remove = new QPushButton(tr("Remove"), this);
     btn_moveup = new QPushButton(tr("Move Up"), this);
@@ -335,12 +337,25 @@ void AC_MainWindow::colorChanged(int) {
 
 void AC_MainWindow::colorMapChanged(int pos) {
     playback->setColorMap(pos);
+    Log("Changed Color Map\n");
 }
 
-void AC_MainWindow::comboFilterChanged(int pos) {
-    
+void AC_MainWindow::comboFilterChanged(int) {
+    playback->setIndexChanged(filters->currentText().toStdString());
+    QString str;
+    QTextStream stream(&str);
+    stream << "Filter changed to: " << filters->currentText() << "\n";
+    Log(str);
 }
 
+void AC_MainWindow::setFilterSingle() {
+    playback->setSingleMode(true);
+    Log("Set to Single Filter Mode\n");
+}
+void AC_MainWindow::setFilterCustom() {
+    playback->setSingleMode(false);
+    Log("Set to Custom Filter Mode\n");
+}
 
 void AC_MainWindow::addClicked() {
     int row = filters->currentIndex();
@@ -535,6 +550,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     QString str;
     QTextStream stream(&str);
     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
+    stream << "Video File: " << filename << "\n";
     stream << "FPS: " << video_fps << "\n";
     stream << "Frame Count: " << video_frames << "\n";
     output_directory = outdir;
@@ -552,14 +568,12 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     time_t t = time(0);
     struct tm *m;
     m = localtime(&t);
-    
     QString ext;
 #if defined(__APPLE__) || defined(__linux__)
     ext = (type == 0) ? ".mov" : ".avi";
 #else
     ext = ".avi";
 #endif
-    
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
     stream_ << outdir << "/" << "Video." << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;

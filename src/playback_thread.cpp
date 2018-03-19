@@ -13,7 +13,6 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     isPaused = false;
     bright_ = gamma_ = saturation_ = 0;
     single_mode = true;
-    current_filter = 0;
 }
 
 void Playback::Play() {
@@ -111,8 +110,8 @@ void Playback::setColorOptions(int b, int g, int s) {
     mutex.unlock();
 }
 
-void Playback::setIndexChanged(int pos) {
-    current_filter = pos;
+void Playback::setIndexChanged(std::string value) {
+    current_filter = filter_map[value];
 }
 
 void Playback::setSingleMode(bool val) {
@@ -155,7 +154,31 @@ void Playback::run() {
         cur = current;
         mutex_shown.unlock();
         ac::orig_frame = frame.clone();
-        if(cur.size()>0) {
+        if(single_mode == true) {
+            ac::in_custom = false;
+            if(current_filter.first == 0) {
+                ac::draw_func[current_filter.second](frame);
+            } else if(current_filter.first == 1) {
+                current_filterx = current_filter.second;
+                ac::alphaFlame(frame);
+            } else if(current_filter.first == 2) {
+                draw_plugin(frame, current_filter.second);
+            }
+            msleep(duration/2);
+            mutex.lock();
+            if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
+            if(bright_ > 0) {
+                ac::setBrightness(frame, 1.0, bright_);
+            }
+            if(gamma_ > 0) {
+                cv::Mat gam = frame.clone();
+                ac::setGamma(gam, frame, gamma_);
+            }
+            if(saturation_ > 0) {
+                ac::setSaturation(frame, saturation_);
+            }
+            mutex.unlock();
+        } else if(cur.size()>0) {
             ac::in_custom = true;
             for(unsigned int i = 0; i < cur.size(); ++i) {
                 if(i == cur.size()-1)

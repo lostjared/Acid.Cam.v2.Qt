@@ -58,6 +58,8 @@ public slots:
     void colorChanged(int pos);
     void colorMapChanged(int pos);
     void comboFilterChanged(int pos);
+    void setFilterSingle();
+    void setFilterCustom();
 private:
     void createControls();
     void createMenu();
