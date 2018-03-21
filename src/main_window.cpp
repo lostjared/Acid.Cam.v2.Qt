@@ -736,7 +736,7 @@ void AC_MainWindow::updateFrame(QImage img) {
         QString frame_string;
         QTextStream frame_stream(&frame_string);
         if(!recording) {
-        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << ") ";
+        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned long)(frame_index/video_fps) << ") ";
         } else {
             struct stat buf;
             stat(video_file_name.toStdString().c_str(), &buf);

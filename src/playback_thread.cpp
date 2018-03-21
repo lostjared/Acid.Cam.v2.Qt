@@ -34,7 +34,7 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
     writer = wr;
     recording = record;
     if(capture.isOpened()) {
-        frame_rate = (int) capture.get(CV_CAP_PROP_FPS);
+        frame_rate =  capture.get(CV_CAP_PROP_FPS);
         if(frame_rate <= 0) frame_rate = 24;
     }
     mutex.unlock();

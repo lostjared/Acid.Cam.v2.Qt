@@ -21,7 +21,7 @@ private:
     QMutex mutex, mutex_shown, mutex_add;
     QWaitCondition condition;
     cv::Mat frame;
-    int frame_rate;
+    double frame_rate;
     bool recording;
     cv::VideoCapture capture;
     cv::VideoWriter  writer;
