@@ -45,7 +45,7 @@
 
 // Acid Cam namespace
 namespace ac {
-    const std::string version="2.3.4";
+    const std::string version="2.3.5";
     // variables
     unsigned int swapColor_r = 0, swapColor_g = 0, swapColor_b = 0;
     bool isNegative = false, noRecord = false, pass2_enabled = false, blendW = false, slide_Show = false, slide_Rand = false, strobe_It = false, switch_Back = false, blur_First = false;
@@ -97,6 +97,7 @@ namespace ac {
     std::unordered_map<std::string, int> filter_map;
     bool color_map_set = false;
     DrawFunction custom_callback = 0;
+    DrawFunction plugin_func = 0;
 }
 
 // globals
@@ -4831,9 +4832,8 @@ void ac::ScanSwitch(cv::Mat &frame) {
     unsigned int h = frame.rows;// frame height
     static unsigned int start_index = 0;
     unsigned int index = start_index;
-    cv::Mat temp = frame.clone();
-    for(unsigned int z = 1; z < h-1; ++z) {
-        for(unsigned int i = 1; i < w-1; ++i) {
+    for(unsigned int z = 3; z < h-3; ++z) {
+        for(unsigned int i = 3; i < w-3; ++i) {
             cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
             switch(index) {
                 case 0:
@@ -4864,9 +4864,8 @@ void ac::ScanAlphaSwitch(cv::Mat &frame) {
     static unsigned int start_index = 0;
     static double alpha = 1.0, alpha_max = 10.0;
     unsigned int index = start_index;
-    cv::Mat temp = frame.clone();
-    for(unsigned int z = 1; z < h-1; ++z) {
-        for(unsigned int i = 1; i < w-1; ++i) {
+    for(unsigned int z = 3; z < h-3; ++z) {
+        for(unsigned int i = 3; i < w-3; ++i) {
             cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
             switch(index) {
                 case 0:
@@ -5423,5 +5422,14 @@ void ac::setCustom(DrawFunction f) {
 void ac::custom(cv::Mat &frame) {
     if(custom_callback != 0)
         custom_callback(frame);
-    
+}
+
+void ac::setPlugin(DrawFunction f) {
+    plugin_func = f;
+}
+
+void ac::plugin(cv::Mat &frame) {
+    if(plugin_func != 0) {
+        plugin_func(frame);
+    }
 }
