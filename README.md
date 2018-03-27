@@ -6,6 +6,11 @@ First download GCC with g++ compiler and make then compile on Debian install lib
 
 	$ sudo apt-get install libqt4-dev libopencv-dev
 
+Also install pkg-config
+
+Then download libacidcam here https://github.com/lostjared/libacidcam
+Follow instructions in README.md
+
 Next download this project via git clone or zip enter the src directory
 
 	$ qmake
@@ -15,7 +20,6 @@ Then to build project
 	$ make 
 
 Then Run the program
-
 
 For sample videos and updates about this software view the Facebook page: http://facebook.com/AcidCam
 
@@ -37,15 +41,12 @@ void complete();
 pixel is called once for every pixel in the frame and complete is called
 when every pixel has been drawn. 
 
+The output from the program video file size can be very large. This is because OpenCV records at a very high bitrate. I usually load the file into Final Cut and share as H.264.
+You also could use Handbrake of FFmpeg to adjust the file size for uploading to the internet.
+
 Currently program works best when ran in Video mode, I have not been able to test
 on host os of windows or linux, just a guest virtual machine.  But in the VM webcam 
 resolution is maximum of 640x480.
-
-
-I believe there is a bug in current version of OpenCV where on OS X if you open
-a webcam capture device, close it then reopen a another it will cause the program to crash
-so I will have to wait until this is resolved before I can upload a complete working macOS 
-version.
 
 Screen shots of program on different Operating Systems:
 
