@@ -7,12 +7,12 @@ TARGET = Acid_Cam_v2_Qt
 QT += core gui widgets
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/ /usr/local/include
-LIBS += `pkg-config opencv --libs`
+LIBS += `pkg-config opencv acidcam --libs`
 #LIBS += -lopencv_contrib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
 #LIBS += -L/usr/local/lib -lopencv_world
-QMAKE_CXXFLAGS += -std=c++11 `pkg-config opencv --cflags`
+QMAKE_CXXFLAGS += -std=c++11 `pkg-config opencv acidcam --cflags`
 RESOURCES += qresource.qrc
 
 # Input
-HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h ac.h fractal.h display_window.h playback_thread.h
-SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp ac.cpp fractal.cpp display_window.cpp playback_thread.cpp
+HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h display_window.h playback_thread.h
+SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp display_window.cpp playback_thread.cpp
