@@ -299,7 +299,7 @@ void AC_MainWindow::createMenu() {
     controls_menu->addAction(controls_setkey);
     
     clear_images = new QAction(tr("Clear Images"), this);
-    clear_images->setShortcut(tr("Ctrl+K"));
+    clear_images->setShortcut(tr("Ctrl+E"));
     controls_menu->addAction(clear_images);
     
     controls_showvideo = new QAction(tr("Hide Display Video"), this);
