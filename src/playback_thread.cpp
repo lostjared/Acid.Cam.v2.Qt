@@ -152,7 +152,11 @@ void Playback::drawEffects(cv::Mat &frame) {
     if(saturation_ > 0) {
         ac::setSaturation(frame, saturation_);
     }
-
+    if(colorkey_set == true && !color_image.empty()) {
+        cv::Mat cframe = frame.clone();
+        cv::Vec3b well_color(255,0,255);
+        ac::filterColorKeyed(well_color, ac::orig_frame, cframe, frame);
+    }
 }
 
 void Playback::drawFilter(cv::Mat &frame, std::pair<int, int> &filter) {
@@ -245,6 +249,15 @@ Playback::~Playback() {
 #endif
 }
 
+void Playback::Clear() {
+    mutex.lock();
+    blend_set = false;
+    colorkey_set = false;
+    blend_image.release();
+    color_image.release();
+    mutex.unlock();
+}
+
 void Playback::Stop() {
     stop = true;
     alpha = 0;
@@ -277,6 +290,13 @@ void Playback::setImage(const cv::Mat &frame) {
     mutex.lock();
     blend_set = true;
     blend_image = frame;
+    mutex.unlock();
+}
+
+void Playback::setColorKey(const cv::Mat &image) {
+    mutex.lock();
+    colorkey_set = true;
+    color_image = image;
     mutex.unlock();
 }
 

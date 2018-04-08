@@ -294,6 +294,14 @@ void AC_MainWindow::createMenu() {
     controls_setimage->setShortcut(tr("Ctrl+I"));
     controls_menu->addAction(controls_setimage);
     
+    controls_setkey = new QAction(tr("Set Color Key Image"), this);
+    controls_setkey->setShortcut(tr("Ctrl+K"));
+    controls_menu->addAction(controls_setkey);
+    
+    clear_images = new QAction(tr("Clear Images"), this);
+    clear_images->setShortcut(tr("Ctrl+K"));
+    controls_menu->addAction(clear_images);
+    
     controls_showvideo = new QAction(tr("Hide Display Video"), this);
     controls_showvideo->setShortcut(tr("Ctrl+V"));
     controls_menu->addAction(controls_showvideo);
@@ -306,8 +314,9 @@ void AC_MainWindow::createMenu() {
     connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
     connect(controls_stop, SIGNAL(triggered()), this, SLOT(controls_Stop()));
     connect(controls_setimage, SIGNAL(triggered()), this, SLOT(controls_SetImage()));
+    connect(controls_setkey, SIGNAL(triggered()), this, SLOT(controls_SetKey()));
     connect(controls_showvideo, SIGNAL(triggered()), this, SLOT(controls_ShowVideo()));
-    
+    connect(clear_images, SIGNAL(triggered()), this, SLOT(controls_Clear()));
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
     controls_pause->setText(tr("Pause"));
     help_about = new QAction(tr("About"), this);
@@ -684,6 +693,10 @@ void AC_MainWindow::controls_Pause() {
     }
 }
 
+void AC_MainWindow::controls_Clear() {
+    playback->Clear();
+}
+
 void AC_MainWindow::controls_SetImage() {
     QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), "/home", tr("Image Files (*.png *.jpg)"));
     if(fileName != "") {
@@ -691,6 +704,24 @@ void AC_MainWindow::controls_SetImage() {
         if(!tblend_image.empty()) {
             playback->setImage(tblend_image);
             QMessageBox::information(this, tr("Loaded Image"), tr("Image set"));
+        } else {
+            QMessageBox::information(this, tr("Image Load failed"), tr("Could not load image"));
+        }
+    }
+}
+
+void AC_MainWindow::controls_SetKey() {
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Color Key Image"), "/home", tr("Image Files (*.png)"));
+    if(fileName != "") {
+        cv::Mat tblend_image = cv::imread(fileName.toStdString());
+        if(!tblend_image.empty()) {
+            playback->setColorKey(tblend_image);
+            QString str_value;
+            QTextStream stream(&str_value);
+            stream << "ColorKey is (255,0,255)\n Image Set: " << fileName;
+            QMessageBox::information(this, tr("Loaded Image"), tr(str_value.toStdString().c_str()));
+        } else {
+            QMessageBox::information(this, tr("Image Load failed"), tr("Could not load ColorKey image"));
         }
     }
 }

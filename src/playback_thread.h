@@ -49,10 +49,12 @@ public:
     bool setVideoCamera(int device, int res, cv::VideoWriter writer, bool record);
     bool isStopped() const;
     void run();
+    void Clear();
     void msleep(int ms);
     void setVector(std::vector<std::pair<int, int>> s);
     void setOptions(bool n, int c);
     void setImage(const cv::Mat &image);
+    void setColorKey(const cv::Mat &image);
     void setStep();
     void setDisplayed(bool shown);
     void setIndexChanged(std::string name);
