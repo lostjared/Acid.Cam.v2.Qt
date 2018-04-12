@@ -11,6 +11,10 @@ Also install pkg-config
 Then download libacidcam here https://github.com/lostjared/libacidcam
 Follow instructions in README.md
 
+Then (on Linux) use ldconfig 
+
+	$ sudo ldconfig
+
 Next download this project via git clone or zip enter the src directory
 
 	$ qmake
