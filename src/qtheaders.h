@@ -7,7 +7,7 @@
 #ifndef _QT_HEADERS__
 #define _QT_HEADERS__
 
-#define ac_version "v1.06"
+#define ac_version "v1.07"
 
 #include<QApplication>
 #include<QMainWindow>
