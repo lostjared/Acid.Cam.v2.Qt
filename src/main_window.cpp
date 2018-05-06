@@ -517,7 +517,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 #endif
         if(!writer.isOpened()) {
             Log(tr("Could not create video writer..\n"));
-            QMessageBox::information(this, tr("Error"), "Incorrect Pathname");
+            QMessageBox::information(this, tr("Error"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
             return false;
         }
         QString out_s;
@@ -599,7 +599,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 #endif
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
-            QMessageBox::information(this, tr("Error invalid path"), "Invalid Path name");
+            QMessageBox::information(this, tr("Error invalid path"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
             return false;
         }
         QString out_s;
