@@ -517,6 +517,8 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 #endif
         if(!writer.isOpened()) {
             Log(tr("Could not create video writer..\n"));
+            QMessageBox::information(this, tr("Error"), "Incorrect Pathname");
+            return false;
         }
         QString out_s;
         QTextStream out_stream(&out_s);
@@ -597,6 +599,8 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 #endif
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
+            QMessageBox::information(this, tr("Error invalid path"), "Invalid Path name");
+            return false;
         }
         QString out_s;
         QTextStream out_stream(&out_s);
