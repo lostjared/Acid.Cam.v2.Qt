@@ -48,6 +48,10 @@ when every pixel has been drawn.
 The output from the program video file size can be very large. This is because OpenCV records at a very high bitrate. I usually load the file into Final Cut and share as H.264.
 You also could use Handbrake of FFmpeg to adjust the file size for uploading to the internet.
 
+
+For the Windows version of this program requires the Visual Studio 2013 Runtime Redistributable:
+https://www.microsoft.com/en-us/download/confirmation.aspx?id=40784
+
 Currently program works best when ran in Video mode, I have not been able to test
 on host os of windows or linux, just a guest virtual machine.  But in the VM webcam 
 resolution is maximum of 640x480.
