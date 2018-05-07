@@ -17,8 +17,13 @@ First download GCC/Automake/Autoconf with g++ compiler and make then compile on 
 
 Also install pkg-config
 
-Then download libacidcam here https://github.com/lostjared/libacidcam
-Follow instructions in README.md
+You will also need libacidcam
+
+Download libacidcam from: https://github.com/lostjared/libacidcam
+
+Compile and install the library
+
+$ ./autogen.sh && ./configure && make && sudo make install
 
 Then (on Linux) use ldconfig 
 
