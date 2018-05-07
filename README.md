@@ -1,8 +1,17 @@
 # Acid.Cam.v2.Qt
 
+
+Acid Cam distorts video to create art. It is designed to bo used with other software or on its own. There is multiple versions of the program for macOS, Linux, and Windows as well as a command line version of the program.
+
+This project was created in hopes of providing some entertainment, or for the Glitch artist to give you a starting image/video to use with other tools.
+
+I call the art that I create with Acid Cam an Acid Glitch, but you can call it whatever you want. It is just meant to be a tool to use with other programs to help aid in the creation of artistic images/videos.
+
+Acid Cam's effects are created by using Acid Cam 'filters', or pieces of code that distort an image and can be combined to produce some interesting results. The project currently has 200 filters to mix and match.
+
 ![AnimatedImage](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/jaredpeace.gif "screenshot")
 
-First download GCC with g++ compiler and make then compile on Debian install libqt4-dev and libopencv-dev via Terminal with
+First download GCC/Automake/Autoconf with g++ compiler and make then compile on Debian install libqt4-dev and libopencv-dev via Terminal with
 
 	$ sudo apt-get install libqt4-dev libopencv-dev
 
