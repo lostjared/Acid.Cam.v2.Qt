@@ -9,7 +9,7 @@ QT += core gui widgets
 DEPENDPATH += .
 INCLUDEPATH += . C:\Users\Jared\Desktop\QtVS\opencv\build\include /usr/include/ /usr/local/include
 LIBS +=     C:\Users\Jared\Desktop\QtVS\Acid.Cam.v2.Qt\src\lib\opencv_core2413.lib C:\Users\Jared\Desktop\QtVS\Acid.Cam.v2.Qt\src\lib\opencv_contrib2413.lib C:\Users\Jared\Desktop\QtVS\Acid.Cam.v2.Qt\src\lib\opencv_highgui2413.lib   C:\Users\Jared\Desktop\QtVS\Acid.Cam.v2.Qt\src\lib\opencv_imgproc2413.lib  C:\Users\Jared\Desktop\QtVS\Acid.Cam.v2.Qt\src\lib\opencv_legacy2413.lib  C:\Users\Jared\Desktop\QtVS\Acid.Cam.v2.Qt\src\lib\opencv_video2413.lib -luser32 -lgdi32
-QMAKE_CXXFLAGS += -std=c++11
+#QMAKE_CXXFLAGS += -std=c++11
 RESOURCES += qresource.qrc
 
 # Input
