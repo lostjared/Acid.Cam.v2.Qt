@@ -13,5 +13,5 @@ LIBS +=     C:\Users\Jared\Desktop\QtVS\Acid.Cam.v2.Qt\src\lib\opencv_core2413.l
 RESOURCES += qresource.qrc
 
 # Input
-HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h ac.h fractal.h display_window.h playback_thread.h
-SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp ac.cpp fractal.cpp display_window.cpp playback_thread.cpp
+HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h ac.h fractal.h display_window.h playback_thread.h ac.h fractal.h
+SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp ac.cpp fractal.cpp display_window.cpp playback_thread.cpp ac.cpp fractal.cpp
