@@ -474,7 +474,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 #if defined(__APPLE__) || defined(__linux__)
     ext = (type == 0) ? ".mov" : ".avi";
 #else
-    ext = ".avi";
+    ext = ".mov";
 #endif
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
@@ -510,10 +510,11 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     
     if(recording) {
         video_file_name = output_name;
+
 #if defined(__linux__) || defined(__APPLE__)
         writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
 #else
-        writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('m', 'p', '4', 'v'), video_fps, cv::Size(res_w, res_h), true);
 #endif
         if(!writer.isOpened()) {
             Log(tr("Could not create video writer..\n"));
@@ -583,7 +584,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 #if defined(__APPLE__) || defined(__linux__)
     ext = (type == 0) ? ".mov" : ".avi";
 #else
-    ext = ".avi";
+    ext = ".mov";
 #endif
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
@@ -595,7 +596,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 #if defined(__linux__) || defined(__APPLE__)
         writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
 #else
-        writer = cv::VideoWriter(output_name.toStdString(), -1, video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('m', 'p', '4', 'v'), video_fps, cv::Size(res_w, res_h), true);
 #endif
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
