@@ -96,7 +96,7 @@ void CaptureCamera::btn_Start() {
             QMessageBox::information(this, tr("Could not open Capture device"), tr("Make sure you Webcam is pluged in. If you have more than one Webcam use the proper device index."));
         }
     } else {
-        QMessageBox::information(this, tr("Error could not open device"), tr("Could not open capture device"));
+        QMessageBox::information(this, tr("Error please fill out Save Directory"), tr("Could not create Capture device requires Save Directory"));
     }
 }
 
