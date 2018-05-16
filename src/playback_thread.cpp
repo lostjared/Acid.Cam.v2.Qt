@@ -189,6 +189,10 @@ void Playback::run() {
         cur = current;
         mutex_shown.unlock();
         ac::orig_frame = frame.clone();
+        if(blend_set == true && (blend_image_scaled.size() != frame.size())) {
+            ac::resolution = frame.size();
+            cv::resize(blend_image, blend_image_scaled, ac::resolution);
+        }
         
         if(single_mode == true && alpha > 0) {
             filterFade(frame, current_filter, prev_filter, alpha);
