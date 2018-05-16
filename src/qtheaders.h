@@ -19,7 +19,7 @@
 #define ac_version "v1.08 (Windows)"
 #endif
 
-#ifndef ac_versoin
+#ifndef ac_version
 #define ac_version "v1.08 (Generic)"
 #endif
 
