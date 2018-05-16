@@ -19,6 +19,10 @@
 #define ac_version "v1.08 (Windows)"
 #endif
 
+#ifndef ac_versoin
+#define ac_version "v1.08 (Generic)"
+#endif
+
 #include<QApplication>
 #include<QMainWindow>
 #include<QDialog>
