@@ -96,8 +96,14 @@ void AC_MainWindow::createControls() {
     filters = new QComboBox(this);
     filters->setGeometry(10, 105, 380, 30);
     
-    for(int i = 0; i < ac::draw_max-5; ++i) {
-        filters->addItem(ac::draw_strings[i].c_str());
+    std::vector<std::string> fnames;
+    for(int i = 0; i < ac::draw_max-5; ++i)
+        fnames.push_back(ac::draw_strings[i].c_str());
+    
+    std::sort(fnames.begin(), fnames.end());
+    
+    for(unsigned long i = 0; i < fnames.size(); ++i) {
+        filters->addItem(fnames[i].c_str());
     }
     
     for(int i = 0; filter_names[i] != 0; ++i) {

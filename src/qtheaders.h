@@ -56,6 +56,8 @@
 #include"fractal.h"
 #include<unordered_map>
 #include<utility>
+#include<vector>
+#include<algorithm>
 
 void init_plugins();
 void draw_plugin(cv::Mat &frame, int filter);
