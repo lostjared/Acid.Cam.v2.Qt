@@ -8,19 +8,19 @@
 #define _QT_HEADERS__
 
 #ifdef __linux__
-#define ac_version "v1.09 (Linux)"
+#define ac_version "v1.10 (Linux)"
 #endif
 
 #ifdef __APPLE__
-#define ac_version "v1.09 (Apple)"
+#define ac_version "v1.10 (Apple)"
 #endif
 
 #ifdef _WIN32
-#define ac_version "v1.09 (Windows)"
+#define ac_version "v1.10 (Windows)"
 #endif
 
 #ifndef ac_version
-#define ac_version "v1.09 (Generic)"
+#define ac_version "v1.10 (Generic)"
 #endif
 
 #include<QApplication>
