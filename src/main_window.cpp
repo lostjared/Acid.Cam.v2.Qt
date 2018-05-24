@@ -80,10 +80,12 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
         stream << "Loaded Plugin: " << plugins.plugin_list[i]->name().c_str() << "\n";
         Log(text);
     }
+    
+    int cindex = filters->findText("Self AlphaBlend");
+    filters->setCurrentIndex(cindex);
 }
 
 void AC_MainWindow::createControls() {
-    
     /*
     filters = new QListWidget(this);
     filters->setGeometry(10, 30, 390, 180);
@@ -97,8 +99,9 @@ void AC_MainWindow::createControls() {
     filters->setGeometry(10, 105, 380, 30);
     
     std::vector<std::string> fnames;
-    for(int i = 0; i < ac::draw_max-5; ++i)
+    for(int i = 0; i < ac::draw_max-5; ++i) {
         fnames.push_back(ac::draw_strings[i].c_str());
+    }
     
     std::sort(fnames.begin(), fnames.end());
     
@@ -231,8 +234,6 @@ void AC_MainWindow::createControls() {
     text += ac::version.c_str();
     text += " loaded.\n";
     log_text->setText(text);
-    
-    filters->setCurrentIndex(0);
     
     chk_negate = new QCheckBox(tr("Negate"), this);
     chk_negate->setGeometry(120,215,100, 20);
@@ -485,7 +486,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
-    stream_ << outdir << "/" << "Video." << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
+    stream_ << outdir << "/" << "Video" << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
     switch(res) {
         case 0:
             res_w = 640;
@@ -594,7 +595,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 #endif
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
-    stream_ << outdir << "/" << "Video." << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
+    stream_ << outdir << "/" << "Video" << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
     
     
     if(recording) {
@@ -782,7 +783,7 @@ void AC_MainWindow::updateFrame(QImage img) {
         } else {
             struct stat buf;
             stat(video_file_name.toStdString().c_str(), &buf);
-            frame_stream << "(Current/Total Frames/Seconds,Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1024)/1024) <<  " MB) ";
+            frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1024)/1024) <<  " MB) ";
         }
         if(programMode == MODE_VIDEO) {
             
