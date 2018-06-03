@@ -664,7 +664,7 @@ void AC_MainWindow::controls_ShowVideo() {
     QString st = controls_showvideo->text();
     
     if(st == "Hide Display Video") {
-        playback->setDisplayed(false);
+        playback->setDisplayed(Qt::Unchecked);
         disp->hide();
         controls_showvideo->setText("Show Display Video");
     } else {
@@ -694,12 +694,12 @@ void AC_MainWindow::controls_Pause() {
     QString p = controls_pause->text();
     if(p == "Pause") {
         controls_pause->setText("Paused");
-        controls_pause->setChecked(Qt::Checked);
+        controls_pause->setChecked(true);
         paused = true;
         playback->Stop();
     } else {
         controls_pause->setText("Pause");
-        controls_pause->setChecked(Qt::Unchecked);
+        controls_pause->setChecked(false);
         playback->Play();
         paused = false;
     }
