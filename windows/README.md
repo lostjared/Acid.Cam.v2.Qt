@@ -1,4 +1,7 @@
+
 # Example pro file for Windows
+
+# updated @ Sun Jun  3 14:58:17 PDT 2018
 
 Replace the hardcoded paths with the ones you have for your current version of OpenCV compiled  with Visual Studio.
 Copy this pro into a new directory with the source files and qrc file.
