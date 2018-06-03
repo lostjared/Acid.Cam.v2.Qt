@@ -3,7 +3,7 @@
 Replace the hardcoded paths with the ones you have for your current version of OpenCV compiled  with Visual Studio.
 Copy this pro into a new directory with the source files and qrc file.
 
-Also copy ac.h ac.cpp fractal.h fractal.cpp from libacidcam into the directory as well they can be found here:
+Also copy the source files (.cpp .h) from libacidcamm into the directory as well they can be found here:
 
 https://github.com/lostjared/libacidcam/tree/master/source
 
