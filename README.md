@@ -1,6 +1,8 @@
 # Acid.Cam.v2.Qt
 
 
+check /windows sub directory for Qt5 for Windows .pro file.
+
 Acid Cam distorts video to create art. It is designed to bo used with other software or on its own. There are multiple versions of the program for macOS, Linux, and Windows as well as a command line version of the program.
 
 This project was created in hopes of providing some entertainment, or for the Glitch artist to give you a starting image/video to use with other tools.
