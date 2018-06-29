@@ -31,7 +31,7 @@ public:
     QComboBox *color_maps, *filters;
     QMenu *file_menu, *controls_menu, *help_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
-    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images;
+    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images, *reset_filters;
     QAction *help_about;
     QRadioButton *filter_single, *filter_custom;
     
@@ -51,6 +51,7 @@ public slots:
     void controls_ShowVideo();
     void controls_SetKey();
     void controls_Clear();
+    void controls_Reset();
     void help_About();
     void updateFrame(QImage img);
     void stopRecording();

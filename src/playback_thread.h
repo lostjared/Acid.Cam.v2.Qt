@@ -62,6 +62,7 @@ public:
     void drawFilter(cv::Mat &frame, std::pair<int, int> &filter);
     void drawEffects(cv::Mat &frame);
     void filterFade(cv::Mat &frame, std::pair<int, int> &filter1, std::pair<int, int> &filter2, double alpha);
+    void reset_filters();
 signals:
     void procImage(const QImage image);
     void stopRecording();

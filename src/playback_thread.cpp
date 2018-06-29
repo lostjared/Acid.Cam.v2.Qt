@@ -105,6 +105,15 @@ void Playback::setOptions(bool n, int c) {
     mutex.unlock();
 }
 
+void Playback::reset_filters() {
+    mutex.lock();
+    if(ac::reset_alpha == false) {
+    	ac::reset_alpha = true;
+    }
+    ac::frames_released = true;
+    mutex.unlock();
+}
+
 void Playback::setColorOptions(int b, int g, int s) {
     mutex.lock();
     bright_ = b;
@@ -143,6 +152,8 @@ void Playback::setDisplayed(bool shown) {
 
 void Playback::drawEffects(cv::Mat &frame) {
     if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
+    ac::frames_released = false;
+    ac::reset_alpha = false;
     if(bright_ > 0) {
         ac::setBrightness(frame, 1.0, bright_);
     }

@@ -313,6 +313,10 @@ void AC_MainWindow::createMenu() {
     controls_showvideo->setShortcut(tr("Ctrl+V"));
     controls_menu->addAction(controls_showvideo);
     
+    reset_filters = new QAction(tr("Reset Filters"), this);
+    reset_filters->setShortcut(tr("Ctrl+R"));
+    controls_menu->addAction(reset_filters);
+    
     controls_showvideo->setEnabled(false);
     controls_showvideo->setCheckable(true);
     
@@ -323,6 +327,7 @@ void AC_MainWindow::createMenu() {
     connect(controls_setimage, SIGNAL(triggered()), this, SLOT(controls_SetImage()));
     connect(controls_setkey, SIGNAL(triggered()), this, SLOT(controls_SetKey()));
     connect(controls_showvideo, SIGNAL(triggered()), this, SLOT(controls_ShowVideo()));
+    connect(reset_filters, SIGNAL(triggered()), this, SLOT(controls_Reset()));
     connect(clear_images, SIGNAL(triggered()), this, SLOT(controls_Clear()));
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
     controls_pause->setText(tr("Pause"));
@@ -672,6 +677,10 @@ void AC_MainWindow::controls_ShowVideo() {
         playback->setDisplayed(true);
         disp->show();
     }
+}
+
+void AC_MainWindow::controls_Reset() {
+    playback->reset_filters();
 }
 
 void AC_MainWindow::file_Exit() {
