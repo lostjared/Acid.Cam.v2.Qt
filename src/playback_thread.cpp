@@ -128,6 +128,12 @@ void Playback::setIndexChanged(std::string value) {
     alpha = 1.0;
 }
 
+void Playback::setSubFilter(int index) {
+    mutex.lock();
+    ac::setSubFilter(index);
+    mutex.unlock();
+}
+
 void Playback::setSingleMode(bool val) {
     single_mode = val;
 }

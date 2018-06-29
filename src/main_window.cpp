@@ -136,16 +136,19 @@ void AC_MainWindow::createControls() {
     btn_remove = new QPushButton(tr("Remove"), this);
     btn_moveup = new QPushButton(tr("Move Up"), this);
     btn_movedown = new QPushButton(tr("Move Down"), this);
+    btn_sub = new QPushButton(tr("Subfilter"), this);
     
     btn_add->setGeometry(10, 215, 100, 20);
     btn_remove->setGeometry(400, 215, 100, 20);
     btn_moveup->setGeometry(500, 215, 100, 20);
     btn_movedown->setGeometry(600, 215, 100, 20);
+    btn_sub->setGeometry(700, 215, 90, 20);
     
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(btn_movedown, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(btn_sub, SIGNAL(clicked()), this, SLOT(setSub()));
     
     QLabel *r_label = new QLabel(tr("Red: "), this);
     r_label->setGeometry(10, 255, 50, 20);
@@ -430,6 +433,24 @@ void AC_MainWindow::downClicked() {
         playback->setVector(v);
     }
     
+}
+
+void AC_MainWindow::setSub() {
+    int row = filters->currentIndex();
+    if(row != -1) {
+        std::ostringstream stream;
+        //QListWidgetItem *item = filters->item(row);
+        QString filter_num = filters->currentText();
+        int value_index = filter_map[filter_num.toStdString()].first;
+        int filter_index = filter_map[filter_num.toStdString()].second;
+        if(value_index == 0) {
+        	stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
+        	stream << "SubFilter index: " << filter_index << "\n";
+            playback->setSubFilter(filter_index);
+            QString l = stream.str().c_str();
+            Log(l);
+        }
+    }
 }
 
 void AC_MainWindow::Log(const QString &s) {
