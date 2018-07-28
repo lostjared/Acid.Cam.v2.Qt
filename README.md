@@ -1,5 +1,7 @@
 # Acid.Cam.v2.Qt
 
+On Windows 10 make sure you create a directory you have full access to for the output directories for Webcam/Video mode. For me on my Windows 10 I have created a folder at C:\ProgramOutput
+There is currently a bug that if you try to use a resolution higher than the maximum your webcam supports it will cause the file written to be corrupt. So make sure you use a resolution your webcam supports. I will try to fix this problem in future release.
 
 check /windows sub directory for Qt5 for Windows .pro file.
 
