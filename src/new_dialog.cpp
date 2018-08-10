@@ -48,13 +48,10 @@ void CaptureCamera::createControls() {
     connect(btn_start, SIGNAL(clicked()), this, SLOT(btn_Start()));
     connect(btn_select, SIGNAL(clicked()), this, SLOT(btn_Select()));
     
-#if defined(__APPLE__) || defined(__linux__)
     video_type = new QComboBox(this);
     video_type->setGeometry(80, 90, 90, 25);
     video_type->addItem("MOV");
     video_type->addItem("AVI");
-#endif
-    
 }
 
 void CaptureCamera::setParent(AC_MainWindow *p) {
@@ -82,11 +79,7 @@ void CaptureCamera::btn_Select() {
 void CaptureCamera::btn_Start() {
     
     int vtype;
-#if defined(__APPLE__) || defined(__linux__)
     vtype = video_type->currentIndex();
-#else
-    vtype = 1;
-#endif
     
     if(output_dir->text().length() > 0) {
         if(win_parent->startCamera(combo_res->currentIndex(), combo_device->currentIndex(), output_dir->text(), chk_record->isChecked(), vtype)) {
@@ -124,13 +117,10 @@ void CaptureVideo::createControls() {
     chk_record = new QCheckBox(tr("Record"), this);
     chk_record->setGeometry(110, 60, 80, 20);
     
-#if defined(__APPLE__) || defined(__linux__)
     video_type = new QComboBox(this);
     video_type->setGeometry(180, 55, 120, 25);
     video_type->addItem("MOV");
     video_type->addItem("AVI");
-#endif
-    
     connect(btn_setedit, SIGNAL(clicked()), this, SLOT(btn_SetSourceFile()));
     connect(btn_setout, SIGNAL(clicked()), this, SLOT(btn_SetOutputDir()));
     connect(btn_start, SIGNAL(clicked()), this, SLOT(btn_Start()));
@@ -182,11 +172,7 @@ void CaptureVideo::btn_Start() {
     }
     
     int num;
-#if defined(__APPLE__) || defined(__linux__) 
     num = video_type->currentIndex();
-#else
-    num = 1;
-#endif
     
     if(win_parent->startVideo(edit_src->text(), edit_outdir->text(), chk_record->isChecked(), num)) {
         hide();
