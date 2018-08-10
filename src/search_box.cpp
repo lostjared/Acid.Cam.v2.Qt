@@ -23,6 +23,7 @@ void SearchWindow::createControls() {
     add->setGeometry((490+25+10)-100, 430, 100, 35);
     
     connect(search, SIGNAL(pressed()), this, SLOT(search_filter()));
+    connect(add, SIGNAL(pressed()), this, SLOT(add_current()));
 }
 
 void SearchWindow::search_filter() {
@@ -30,4 +31,8 @@ void SearchWindow::search_filter() {
     while(search_list->count() > 0) {
         search_list->takeItem(0);
     }
+}
+
+void SearchWindow::add_current() {
+    
 }

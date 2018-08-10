@@ -11,6 +11,7 @@ public:
     void createControls();
 public slots:
     void search_filter();
+    void add_current();
 private:
     QListWidget *search_list;
     QLineEdit *search_text;
