@@ -36,6 +36,7 @@
 #include<QFile>
 #include<QProgressBar>
 #include<QRadioButton>
+#include<QLineEdit>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

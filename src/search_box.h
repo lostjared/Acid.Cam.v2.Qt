@@ -9,6 +9,11 @@ class SearchWindow : public QDialog {
 public:
     SearchWindow(QWidget *parent = 0);
     void createControls();
+    
+private:
+    QListWidget *search_list;
+    QLineEdit *search_text;
+    QPushButton *search;
 };
 
 
