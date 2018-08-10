@@ -66,6 +66,9 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     cap_video = new CaptureVideo(this);
     cap_video->setParent(this);
     
+    search_box = new SearchWindow(this);
+    search_box->setParent(this);
+    
     statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
     take_snapshot = false;
     disp = new DisplayWindow(this);
@@ -232,12 +235,12 @@ void AC_MainWindow::createControls() {
     log_text->setGeometry(10, 325, 780,310);
     log_text->setReadOnly(true);
     
-    
-    QString text = tr("Acid Cam Filters v");
-    text += ac::version.c_str();
-    text += " loaded.\n";
+    QString text;
+    QTextStream stream(&text);
+    stream << tr("Acid Cam Filters v");
+    stream << ac::version.c_str();
+    stream << " loaded " << filters->count() << " filters.\n";
     log_text->setText(text);
-    
     chk_negate = new QCheckBox(tr("Negate"), this);
     chk_negate->setGeometry(120,215,100, 20);
     chk_negate->setCheckState(Qt::Unchecked);
@@ -323,6 +326,10 @@ void AC_MainWindow::createMenu() {
     controls_showvideo->setEnabled(false);
     controls_showvideo->setCheckable(true);
     
+    open_search = new QAction(tr("Search Filters"), this);
+    open_search->setShortcut(tr("Ctrl+S"));
+    controls_menu->addAction(open_search);
+    connect(open_search,SIGNAL(triggered()), this, SLOT(openSearch()));
     connect(controls_snapshot, SIGNAL(triggered()), this, SLOT(controls_Snap()));
     connect(controls_pause, SIGNAL(triggered()), this, SLOT(controls_Pause()));
     connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
@@ -504,11 +511,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     struct tm *m;
     m = localtime(&t);
     QString ext;
-#if defined(__APPLE__) || defined(__linux__)
     ext = (type == 0) ? ".mov" : ".avi";
-#else
-    ext = (type == 0) ? ".mov" : ".mov";
-#endif
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
@@ -543,12 +546,8 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     
     if(recording) {
         video_file_name = output_name;
-
-#if defined(__linux__) || defined(__APPLE__)
         writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
-#else
-        writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('m', 'p', '4', 'v'), video_fps, cv::Size(res_w, res_h), true);
-#endif
+
         if(!writer.isOpened()) {
             Log(tr("Could not create video writer..\n"));
             QMessageBox::information(this, tr("Error"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
@@ -614,11 +613,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     struct tm *m;
     m = localtime(&t);
     QString ext;
-#if defined(__APPLE__) || defined(__linux__)
     ext = (type == 0) ? ".mov" : ".avi";
-#else
-    ext = (type == 0) ? ".mov" : ".mov";
-#endif
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
     stream_ << outdir << "/" << "Video" << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
@@ -626,11 +621,8 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     
     if(recording) {
         video_file_name = output_name;
-#if defined(__linux__) || defined(__APPLE__)
         writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
-#else
-        writer = cv::VideoWriter(output_name.toStdString(), CV_FOURCC('m', 'p', '4', 'v'), video_fps, cv::Size(res_w, res_h), true);
-#endif
+
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
             QMessageBox::information(this, tr("Error invalid path"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
@@ -885,9 +877,12 @@ void AC_MainWindow::frameInc() {
 void AC_MainWindow::help_About() {
     QString about_str;
     QTextStream stream(&about_str);
-    stream << tr("<b>Acid Cam Qt version: ") << ac_version << "</b><br><br> ";
+    stream << tr("<b>Acid Cam Qt version: ") << ac_version << " filters: " << ac::version.c_str() << "</b><br><br> ";
     stream << tr("Engineering by <b>Jared Bruni</b><br><br><b>This software is dedicated to all the people that struggle with mental illness. </b><br><br><b>My Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostjared\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">LostSideDead Facebook</a><br><a href=\"http://facebook.com/lostsidedead\">My Facebook</a><br><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n");
     
     QMessageBox::information(this, tr("About Acid Cam"), about_str);
 }
 
+void AC_MainWindow::openSearch() {
+    search_box->show();
+}

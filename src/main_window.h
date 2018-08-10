@@ -12,6 +12,7 @@
 #include "new_dialog.h"
 #include "display_window.h"
 #include "playback_thread.h"
+#include "search_box.h"
 
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
@@ -33,6 +34,7 @@ public:
     QAction *file_exit, *file_new_capture, *file_new_video;
     QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images, *reset_filters;
     QAction *help_about;
+    QAction *open_search;
     QRadioButton *filter_single, *filter_custom;
     
 public slots:
@@ -65,12 +67,14 @@ public slots:
     void comboFilterChanged(int pos);
     void setFilterSingle();
     void setFilterCustom();
+    void openSearch();
 private:
     void createControls();
     void createMenu();
     DisplayWindow *disp;
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
+    SearchWindow *search_box;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
     unsigned long video_frames;
