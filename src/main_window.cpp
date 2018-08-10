@@ -68,7 +68,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     
     search_box = new SearchWindow(this);
     search_box->setParent(this);
-    
+    search_box->setFiltersControl(filters, custom_filters);
+    search_box->main_window = this;
     statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
     take_snapshot = false;
     disp = new DisplayWindow(this);
@@ -401,6 +402,12 @@ void AC_MainWindow::addClicked() {
         buildVector(v);
         playback->setVector(v);
     }
+}
+
+void AC_MainWindow::updateList() {
+    std::vector<std::pair<int, int>> v;
+    buildVector(v);
+    playback->setVector(v);
 }
 
 void AC_MainWindow::rmvClicked() {

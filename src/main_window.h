@@ -14,6 +14,8 @@
 #include "playback_thread.h"
 #include "search_box.h"
 
+class SearchWindow;
+
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
 public:
@@ -36,7 +38,7 @@ public:
     QAction *help_about;
     QAction *open_search;
     QRadioButton *filter_single, *filter_custom;
-    
+    void updateList();
 public slots:
     void addClicked();
     void rmvClicked();
