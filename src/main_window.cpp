@@ -268,6 +268,7 @@ void AC_MainWindow::createMenu() {
     
     file_menu = menuBar()->addMenu(tr("&File"));
     controls_menu = menuBar()->addMenu(tr("&Controls"));
+    options = menuBar()->addMenu(tr("&Options"));
     help_menu = menuBar()->addMenu(tr("Help"));
     
     file_new_capture = new QAction(tr("Capture from Webcam"),this);
@@ -282,7 +283,6 @@ void AC_MainWindow::createMenu() {
     file_exit->setShortcut(tr("Ctrl+X"));
     file_menu->addAction(file_exit);
     
-    options = menuBar()->addMenu(tr("&Options"));
     movement = options->addMenu("Movement");
     in_out_increase = new QAction(tr("Move In, Move Out, Increase"), this);
     in_out_increase->setCheckable(true);
