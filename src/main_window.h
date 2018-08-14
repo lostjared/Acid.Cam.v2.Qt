@@ -41,6 +41,8 @@ public:
     QAction *in_out;
     QAction *out_reset;
     QAction *speed_action_items[7];
+    QMenu *image_menu;
+    QAction *flip1, *flip2, *flip3, *noflip;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -85,6 +87,10 @@ public slots:
     void speed5();
     void speed6();
     void speed7();
+    void flip1_action();
+    void flip2_action();
+    void flip3_action();
+    void noflip_action();
 private:
     void createControls();
     void createMenu();

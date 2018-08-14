@@ -15,6 +15,8 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     single_mode = true;
     alpha = 0;
     prev_filter = std::pair<int, int>(0, 0);
+    flip_frame1 = false;
+    flip_frame2 = false;
 }
 
 void Playback::Play() {
@@ -23,8 +25,8 @@ void Playback::Play() {
             stop = false;
         }
     }
-    start(LowPriority);
-    //start(HighPriority);
+    //start(LowPriority);
+    start(HighPriority);
 }
 
 void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
@@ -114,6 +116,13 @@ void Playback::reset_filters() {
     mutex.unlock();
 }
 
+void Playback::SetFlip(bool f1, bool f2) {
+    mutex.lock();
+    flip_frame1 = f1;
+    flip_frame2 = f2;
+    mutex.unlock();
+}
+
 void Playback::setColorOptions(int b, int g, int s) {
     mutex.lock();
     bright_ = b;
@@ -200,6 +209,16 @@ void Playback::run() {
             emit stopRecording();
             return;
         }
+        cv::Mat temp_frame;
+        if(flip_frame1 == true) {
+            cv::flip(frame, temp_frame, 1);
+            frame = temp_frame;
+        }
+        if(flip_frame2 == true) {
+            cv::flip(frame, temp_frame, 0);
+            frame = temp_frame;
+        }
+        
         mutex.unlock();
         static std::vector<std::pair<int, int>> cur;
         mutex_shown.lock();

@@ -2,7 +2,7 @@
  * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
  * (C) 2017 GPL
-*/
+ */
 
 
 #include "main_window.h"
@@ -91,10 +91,10 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 void AC_MainWindow::createControls() {
     /*
-    filters = new QListWidget(this);
-    filters->setGeometry(10, 30, 390, 180);
-    filters->show();
-    */
+     filters = new QListWidget(this);
+     filters->setGeometry(10, 30, 390, 180);
+     filters->show();
+     */
     custom_filters = new QListWidget(this);
     custom_filters->setGeometry(400, 30, 390, 180);
     custom_filters->show();
@@ -132,10 +132,10 @@ void AC_MainWindow::createControls() {
     filter_custom->setGeometry(30, 65, 100, 15);
     
     filter_single->setChecked(true);
-
+    
     connect(filter_single, SIGNAL(pressed()), this, SLOT(setFilterSingle()));
     connect(filter_custom, SIGNAL(pressed()), this, SLOT(setFilterCustom()));
-
+    
     btn_add = new QPushButton(tr("Add"), this);
     btn_remove = new QPushButton(tr("Remove"), this);
     btn_moveup = new QPushButton(tr("Move Up"), this);
@@ -189,7 +189,7 @@ void AC_MainWindow::createControls() {
     slide_bright->setMaximum(255);
     slide_bright->setMinimum(0);
     slide_bright->setTickInterval(0);
-
+    
     
     QLabel *label_slide_gamma = new QLabel(tr("Gamma: "), this);
     label_slide_gamma->setGeometry(190, 280, 65, 20);
@@ -198,7 +198,7 @@ void AC_MainWindow::createControls() {
     slide_gamma->setMaximum(255);
     slide_gamma->setMinimum(0);
     slide_gamma->setTickInterval(0);
-   
+    
     QLabel *label_sat = new QLabel(tr("Saturation: "), this);
     label_sat->setGeometry(350, 280, 100, 20);
     slide_saturation = new QSlider(Qt::Horizontal, this);
@@ -214,7 +214,7 @@ void AC_MainWindow::createControls() {
     QLabel *color_maps_label = new QLabel("<b>Color Maps</b>", this);
     color_maps_label->setGeometry(545, 260, 75, 20);
     
-   	color_maps = new QComboBox(this);
+    color_maps = new QComboBox(this);
     color_maps->setGeometry(540, 275, 250, 30);
     color_maps->addItem(tr("None"));
     color_maps->addItem(tr("Autum"));
@@ -231,7 +231,7 @@ void AC_MainWindow::createControls() {
     color_maps->addItem(tr("Parula"));
     
     connect(color_maps, SIGNAL(currentIndexChanged(int)), this, SLOT(colorMapChanged(int)));
-
+    
     log_text = new QTextEdit(this);
     log_text->setGeometry(10, 325, 780,310);
     log_text->setReadOnly(true);
@@ -283,13 +283,12 @@ void AC_MainWindow::createMenu() {
     file_exit->setShortcut(tr("Ctrl+X"));
     file_menu->addAction(file_exit);
     
-    movement = options->addMenu("Movement");
+    movement = options->addMenu(tr("Movement"));
     in_out_increase = new QAction(tr("Move In, Move Out, Increase"), this);
     in_out_increase->setCheckable(true);
     in_out_increase->setChecked(true);
-    
     movement->addAction(in_out_increase);
-    
+
     in_out = new QAction(tr("Move in, Move Out"), this);
     in_out->setCheckable(true);
     movement->addAction(in_out);
@@ -310,30 +309,38 @@ void AC_MainWindow::createMenu() {
         speed_action_items[i] = new QAction(act_val[i], this);
         speed_action_items[i]->setCheckable(true);
         speed_menu->addAction(speed_action_items[i]);
-        switch(i) {
-            case 0:
-        		connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed1()));
-            break;
-            case 1:
-            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed2()));
-            break;
-            case 2:
-            connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed3()));
-                break;
-            case 3:
-            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed4()));
-                break;
-            case 4:
-            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed5()));
-                break;
-            case 5:
-            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed6()));
-                break;
-            case 6:
-            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed7()));
-                break;
-        }
     }
+   
+    image_menu = options->addMenu(tr("Image"));
+    noflip = new QAction(tr("Normal"), this);
+    noflip->setCheckable(true);
+    noflip->setChecked(true);
+    image_menu->addAction(noflip);
+    flip1 = new QAction(tr("Flip Vertical"), this);
+    flip1->setCheckable(true);
+    flip1->setChecked(false);
+    image_menu->addAction(flip1);
+    flip2 = new QAction(tr("Flip Horizontal"), this);
+    flip2->setCheckable(true);
+    flip2->setChecked(false);
+    image_menu->addAction(flip2);
+    flip3 = new QAction(tr("Flip Vertical and Horizontal"), this);
+    flip3->setCheckable(true);
+    flip3->setChecked(false);
+    image_menu->addAction(flip3);
+    
+    connect(flip1, SIGNAL(triggered()), this, SLOT(flip1_action()));
+    connect(flip2, SIGNAL(triggered()), this, SLOT(flip2_action()));
+    connect(flip3, SIGNAL(triggered()), this, SLOT(flip3_action()));
+    connect(noflip, SIGNAL(triggered()), this, SLOT(noflip_action()));
+
+    connect(speed_action_items[0], SIGNAL(triggered()), this, SLOT(speed1()));
+    connect(speed_action_items[1], SIGNAL(triggered()), this, SLOT(speed2()));
+    connect(speed_action_items[2], SIGNAL(triggered()), this, SLOT(speed3()));
+    connect(speed_action_items[3], SIGNAL(triggered()), this, SLOT(speed4()));
+    connect(speed_action_items[4], SIGNAL(triggered()), this, SLOT(speed5()));
+    connect(speed_action_items[5], SIGNAL(triggered()), this, SLOT(speed6()));
+    connect(speed_action_items[6], SIGNAL(triggered()), this, SLOT(speed7()));
     speed2();
     connect(file_new_capture, SIGNAL(triggered()), this, SLOT(file_NewCamera()));
     connect(file_new_video, SIGNAL(triggered()), this, SLOT(file_NewVideo()));
@@ -407,6 +414,39 @@ void AC_MainWindow::createMenu() {
     controls_pause->setEnabled(false);
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
+
+}
+
+void AC_MainWindow::flip1_action() {
+    flip1->setChecked(true);
+    flip2->setChecked(false);
+    flip3->setChecked(false);
+    noflip->setChecked(false);
+    playback->SetFlip(false, true);
+}
+
+void AC_MainWindow::flip2_action() {
+    flip1->setChecked(false);
+    flip2->setChecked(true);
+    flip3->setChecked(false);
+    noflip->setChecked(false);
+    playback->SetFlip(true, false);
+}
+
+void AC_MainWindow::flip3_action() {
+    flip1->setChecked(false);
+    flip2->setChecked(false);
+    flip3->setChecked(true);
+    noflip->setChecked(false);
+    playback->SetFlip(true, true);
+}
+
+void AC_MainWindow::noflip_action() {
+    flip1->setChecked(false);
+    flip2->setChecked(false);
+    flip3->setChecked(false);
+    noflip->setChecked(true);
+    playback->SetFlip(false, false);
 }
 
 void AC_MainWindow::speed1() {
@@ -431,7 +471,7 @@ void AC_MainWindow::speed2() {
         speed_action_items[i]->setChecked(false);
     }
     speed_action_items[1]->setChecked(true);
-
+    
 }
 void AC_MainWindow::speed3() {
     ac::alpha_increase = speed_actions[2];
@@ -443,7 +483,7 @@ void AC_MainWindow::speed3() {
         speed_action_items[i]->setChecked(false);
     }
     speed_action_items[2]->setChecked(true);
-
+    
 }
 void AC_MainWindow::speed4() {
     ac::alpha_increase = speed_actions[3];
@@ -620,8 +660,8 @@ void AC_MainWindow::setSub() {
         int value_index = filter_map[filter_num.toStdString()].first;
         int filter_index = filter_map[filter_num.toStdString()].second;
         if(value_index == 0) {
-        	stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
-        	stream << "SubFilter index: " << filter_index << "\n";
+            stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
+            stream << "SubFilter index: " << filter_index << "\n";
             playback->setSubFilter(filter_index);
             QString l = stream.str().c_str();
             Log(l);
@@ -653,21 +693,21 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     video_file_name = "";
     frame_index = 0;
     /*
-    capture_camera.open(dev);
-    if(!capture_camera.isOpened()) {
-        return false;
-    }*/
+     capture_camera.open(dev);
+     if(!capture_camera.isOpened()) {
+     return false;
+     }*/
     video_frames = 0;
     video_fps = 24; /*
-    int ores_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
-    int ores_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
-     */
+                     int ores_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
+                     int ores_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
+                     */
     int res_w = 0;
     int res_h = 0;
     /*QString str;
-    QTextStream stream(&str);
-    stream << "Opened capture device " << res_w << "x" << res_h << "\n";
-    stream << "FPS: " << video_fps << "\n";*/
+     QTextStream stream(&str);
+     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
+     stream << "FPS: " << video_fps << "\n";*/
     output_directory = outdir;
     frame_index = 0;
     //Log(str);
@@ -697,26 +737,26 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         case 2:
             res_w = 1920;
             res_h = 1080;
-      
-     break;
+            
+            break;
     }
     
     /*
-    bool cw = capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
-    bool ch = capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
-    
-    if(cw == false || ch == false) {
-        QMessageBox::information(this, tr("Info"), tr("Could not set resolution reverting to default .."));
-        res_w = ores_w;
-        res_h = ores_h;
-        capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
-        capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
-    } */
+     bool cw = capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
+     bool ch = capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+     
+     if(cw == false || ch == false) {
+     QMessageBox::information(this, tr("Info"), tr("Could not set resolution reverting to default .."));
+     res_w = ores_w;
+     res_h = ores_h;
+     capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
+     capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+     } */
     
     if(recording) {
         video_file_name = output_name;
         writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
-
+        
         if(!writer.isOpened()) {
             Log(tr("Could not create video writer..\n"));
             QMessageBox::information(this, tr("Error"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
@@ -745,7 +785,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     controls_step->setEnabled(true);
     controls_snapshot->setEnabled(true);
     if(record == true)
-    	controls_showvideo->setEnabled(true);
+        controls_showvideo->setEnabled(true);
     
     progress_bar->show();
     playback->setDisplayed(true);
@@ -791,7 +831,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     if(recording) {
         video_file_name = output_name;
         writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
-
+        
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
             QMessageBox::information(this, tr("Error invalid path"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
@@ -970,7 +1010,7 @@ void AC_MainWindow::updateFrame(QImage img) {
         QString frame_string;
         QTextStream frame_stream(&frame_string);
         if(!recording) {
-        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned long)(frame_index/video_fps) << ") ";
+            frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned long)(frame_index/video_fps) << ") ";
         } else {
             struct stat buf;
             stat(video_file_name.toStdString().c_str(), &buf);
@@ -1024,12 +1064,12 @@ void AC_MainWindow::frameInc() {
     QTextStream frame_stream(&frame_string);
     
     if(!recording) {
-    	frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << ") ";
+        frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << ") ";
     } else {
         struct stat buf;
         stat(video_file_name.toStdString().c_str(), &buf);
         frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1024)/1024)  <<  " MB) ";
-
+        
     }
     if(programMode == MODE_VIDEO) {
         float index = frame_index;

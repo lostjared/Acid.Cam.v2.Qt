@@ -36,6 +36,7 @@ private:
     bool single_mode;
     std::pair<int, int> current_filter, prev_filter;
     double alpha;
+    bool flip_frame1, flip_frame2;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -45,6 +46,7 @@ public:
     void Play();
     void Stop();
     void Release();
+    void SetFlip(bool f1, bool f2);
     void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record);
     bool setVideoCamera(int device, int res, cv::VideoWriter writer, bool record);
     bool isStopped() const;
