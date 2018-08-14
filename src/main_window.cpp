@@ -297,7 +297,44 @@ void AC_MainWindow::createMenu() {
     out_reset = new QAction(tr("Move Out, Reset"), this);
     out_reset->setCheckable(true);
     movement->addAction(out_reset);
-    
+    speed_actions[0] = 0.001;
+    speed_actions[1] = 0.05;
+    speed_actions[2] = 0.01;
+    speed_actions[3] = 0.1;
+    speed_actions[4] = 0.5;
+    speed_actions[5] = 1.0;
+    speed_actions[6] = 3.0;
+    const QString act_val[] = { "0.001", "0.05", "0.01", "0.1", "0.5", "1.0", "3.0"};
+    speed_menu = options->addMenu("Movement Speed");
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i] = new QAction(act_val[i], this);
+        speed_action_items[i]->setCheckable(true);
+        speed_menu->addAction(speed_action_items[i]);
+        switch(i) {
+            case 0:
+        		connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed1()));
+            break;
+            case 1:
+            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed2()));
+            break;
+            case 2:
+            connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed3()));
+                break;
+            case 3:
+            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed4()));
+                break;
+            case 4:
+            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed5()));
+                break;
+            case 5:
+            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed6()));
+                break;
+            case 6:
+            	connect(speed_action_items[i], SIGNAL(triggered()), this, SLOT(speed7()));
+                break;
+        }
+    }
+    speed2();
     connect(file_new_capture, SIGNAL(triggered()), this, SLOT(file_NewCamera()));
     connect(file_new_video, SIGNAL(triggered()), this, SLOT(file_NewVideo()));
     connect(file_exit, SIGNAL(triggered()), this, SLOT(file_Exit()));
@@ -370,6 +407,88 @@ void AC_MainWindow::createMenu() {
     controls_pause->setEnabled(false);
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
+}
+
+void AC_MainWindow::speed1() {
+    ac::alpha_increase = speed_actions[0];
+    QString text;
+    QTextStream stream(&text);
+    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    Log(text);
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i]->setChecked(false);
+    }
+    speed_action_items[0]->setChecked(true);
+    
+}
+void AC_MainWindow::speed2() {
+    QString text;
+    QTextStream stream(&text);
+    ac::alpha_increase = speed_actions[1];
+    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    Log(text);
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i]->setChecked(false);
+    }
+    speed_action_items[1]->setChecked(true);
+
+}
+void AC_MainWindow::speed3() {
+    ac::alpha_increase = speed_actions[2];
+    QString text;
+    QTextStream stream(&text);
+    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    Log(text);
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i]->setChecked(false);
+    }
+    speed_action_items[2]->setChecked(true);
+
+}
+void AC_MainWindow::speed4() {
+    ac::alpha_increase = speed_actions[3];
+    QString text;
+    QTextStream stream(&text);
+    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    Log(text);
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i]->setChecked(false);
+    }
+    speed_action_items[3]->setChecked(true);
+}
+void AC_MainWindow::speed5() {
+    ac::alpha_increase = speed_actions[4];
+    QString text;
+    QTextStream stream(&text);
+    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    Log(text);
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i]->setChecked(false);
+    }
+    speed_action_items[4]->setChecked(true);
+}
+void AC_MainWindow::speed6() {
+    ac::alpha_increase = speed_actions[5];
+    QString text;
+    QTextStream stream(&text);
+    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    Log(text);
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i]->setChecked(false);
+    }
+    speed_action_items[5]->setChecked(true);
+}
+
+void AC_MainWindow::speed7() {
+    QString text;
+    QTextStream stream(&text);
+    ac::alpha_increase = speed_actions[6];
+    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    Log(text);
+    for(int i = 0; i < 7; ++i) {
+        speed_action_items[i]->setChecked(false);
+    }
+    speed_action_items[6]->setChecked(true);
 }
 
 void AC_MainWindow::movementOption1() {
