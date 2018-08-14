@@ -282,9 +282,29 @@ void AC_MainWindow::createMenu() {
     file_exit->setShortcut(tr("Ctrl+X"));
     file_menu->addAction(file_exit);
     
+    options = menuBar()->addMenu(tr("&Options"));
+    movement = options->addMenu("Movement");
+    in_out_increase = new QAction(tr("Move In, Move Out, Increase"), this);
+    in_out_increase->setCheckable(true);
+    in_out_increase->setChecked(true);
+    
+    movement->addAction(in_out_increase);
+    
+    in_out = new QAction(tr("Move in, Move Out"), this);
+    in_out->setCheckable(true);
+    movement->addAction(in_out);
+    
+    out_reset = new QAction(tr("Move Out, Reset"), this);
+    out_reset->setCheckable(true);
+    movement->addAction(out_reset);
+    
     connect(file_new_capture, SIGNAL(triggered()), this, SLOT(file_NewCamera()));
     connect(file_new_video, SIGNAL(triggered()), this, SLOT(file_NewVideo()));
     connect(file_exit, SIGNAL(triggered()), this, SLOT(file_Exit()));
+    
+    connect(in_out_increase, SIGNAL(triggered()), this, SLOT(movementOption1()));
+    connect(in_out, SIGNAL(triggered()), this, SLOT(movementOption2()));
+    connect(out_reset, SIGNAL(triggered()), this, SLOT(movementOption3()));
     
     controls_stop = new QAction(tr("Sto&p"), this);
     controls_stop->setShortcut(tr("Ctrl+C"));
@@ -350,6 +370,29 @@ void AC_MainWindow::createMenu() {
     controls_pause->setEnabled(false);
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
+}
+
+void AC_MainWindow::movementOption1() {
+    ac::setProcMode(0);
+    in_out_increase->setChecked(true);
+    in_out->setChecked(false);
+    out_reset->setChecked(false);
+    Log(tr("Proc Mode set to: 0\n"));
+}
+void AC_MainWindow::movementOption2() {
+    in_out_increase->setChecked(false);
+    in_out->setChecked(true);
+    out_reset->setChecked(false);
+    ac::setProcMode(1);
+    Log(tr("Proc Mode set to: 1\n"));
+}
+
+void AC_MainWindow::movementOption3() {
+    in_out_increase->setChecked(false);
+    in_out->setChecked(false);
+    out_reset->setChecked(true);
+    ac::setProcMode(2);
+    Log(tr("Proc Mode set to: 2\n"));
 }
 
 void AC_MainWindow::chk_Clicked() {

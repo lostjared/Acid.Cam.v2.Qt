@@ -32,11 +32,14 @@ public:
     QSlider *slide_r, *slide_g, *slide_b, *slide_bright, *slide_gamma, *slide_saturation;
     QProgressBar *progress_bar;
     QComboBox *color_maps, *filters;
-    QMenu *file_menu, *controls_menu, *help_menu;
+    QMenu *file_menu, *controls_menu, *help_menu, *options, *movement;
     QAction *file_exit, *file_new_capture, *file_new_video;
     QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images, *reset_filters;
     QAction *help_about;
     QAction *open_search;
+    QAction *in_out_increase;
+    QAction *in_out;
+    QAction *out_reset;
     QRadioButton *filter_single, *filter_custom;
     void updateList();
 public slots:
@@ -70,6 +73,9 @@ public slots:
     void setFilterSingle();
     void setFilterCustom();
     void openSearch();
+    void movementOption1();
+    void movementOption2();
+    void movementOption3();
 private:
     void createControls();
     void createMenu();
