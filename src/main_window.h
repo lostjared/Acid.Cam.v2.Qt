@@ -34,7 +34,7 @@ public:
     QComboBox *color_maps, *filters;
     QMenu *file_menu, *controls_menu, *help_menu, *options, *movement, *speed_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
-    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images, *reset_filters;
+    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *reset_filters;
     QAction *help_about;
     QAction *open_search;
     QAction *in_out_increase;
@@ -45,6 +45,7 @@ public:
     QAction *flip1, *flip2, *flip3, *noflip;
     QAction *clear_sub;
     QAction *clear_image;
+    QAction *repeat_v;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -64,11 +65,11 @@ public slots:
     void controls_SetImage();
     void controls_ShowVideo();
     void controls_SetKey();
-    void controls_Clear();
     void controls_Reset();
     void help_About();
     void updateFrame(QImage img);
     void stopRecording();
+    void resetIndex();
     void chk_Clicked();
     void cb_SetIndex(int index);
     void frameInc();
@@ -95,6 +96,7 @@ public slots:
     void noflip_action();
     void clear_subfilter();
     void clear_img();
+    void repeat_vid();
 private:
     void createControls();
     void createMenu();

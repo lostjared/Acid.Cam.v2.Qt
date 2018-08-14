@@ -31,12 +31,15 @@ private:
     bool isPaused, isStep;
     VideoMode mode;
     int device_num;
+    unsigned long *frame_index;
     unsigned int red, green, blue;
     unsigned int bright_, gamma_, saturation_;
     bool single_mode;
     std::pair<int, int> current_filter, prev_filter;
     double alpha;
     bool flip_frame1, flip_frame2;
+    bool repeat_video;
+    void setFrameIndex(const long &index);
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -66,10 +69,12 @@ public:
     void filterFade(cv::Mat &frame, std::pair<int, int> &filter1, std::pair<int, int> &filter2, double alpha);
     void reset_filters();
     void setSubFilter(int index);
+    void enableRepeat(bool re);
 signals:
     void procImage(const QImage image);
     void stopRecording();
     void frameIncrement();
+    void resetIndex();
     
 };
 

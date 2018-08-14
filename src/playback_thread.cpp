@@ -17,6 +17,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     prev_filter = std::pair<int, int>(0, 0);
     flip_frame1 = false;
     flip_frame2 = false;
+    repeat_video = false;
 }
 
 void Playback::Play() {
@@ -204,6 +205,12 @@ void Playback::run() {
     while(!stop) {
         mutex.lock();
         if(!capture.read(frame)) {
+            if(repeat_video && mode == MODE_VIDEO) {
+                setFrameIndex(0);
+                mutex.unlock();
+                emit resetIndex();
+                continue;
+            }
             stop = true;
             mutex.unlock();
             emit stopRecording();
@@ -284,6 +291,17 @@ Playback::~Playback() {
     wait();
 #endif
 }
+
+void Playback::setFrameIndex(const long &index) {
+    capture.set(CV_CAP_PROP_POS_FRAMES, index);
+}
+
+void Playback::enableRepeat(bool re) {
+    mutex.lock();
+    repeat_video = re;
+    mutex.unlock();
+}
+
 
 void Playback::Clear() {
     mutex.lock();

@@ -77,6 +77,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
     QObject::connect(playback, SIGNAL(frameIncrement()), this, SLOT(frameInc()));
+    QObject::connect(playback, SIGNAL(resetIndex()), this, SLOT(resetIndex()));
     
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
         QString text;
@@ -310,7 +311,6 @@ void AC_MainWindow::createMenu() {
         speed_action_items[i]->setCheckable(true);
         speed_menu->addAction(speed_action_items[i]);
     }
-   
     image_menu = options->addMenu(tr("Image"));
     noflip = new QAction(tr("Normal"), this);
     noflip->setCheckable(true);
@@ -332,9 +332,14 @@ void AC_MainWindow::createMenu() {
     clear_sub = new QAction(tr("Clear SubFilter"), this);
     options->addAction(clear_sub);
     clear_sub->setShortcut(tr("Ctrl+F"));
-    
     clear_image = new QAction(tr("Clear Image"), this);
     options->addAction(clear_image);
+    options->addSeparator();
+    repeat_v = new QAction(tr("Repeat"), this);
+    repeat_v->setCheckable(true);
+    repeat_v->setChecked(false);
+    options->addAction(repeat_v);
+    connect(repeat_v, SIGNAL(triggered()), this, SLOT(repeat_vid()));
     connect(clear_image, SIGNAL(triggered()), this, SLOT(clear_img()));
     connect(clear_sub, SIGNAL(triggered()), this, SLOT(clear_subfilter()));
     connect(flip1, SIGNAL(triggered()), this, SLOT(flip1_action()));
@@ -352,52 +357,36 @@ void AC_MainWindow::createMenu() {
     connect(file_new_capture, SIGNAL(triggered()), this, SLOT(file_NewCamera()));
     connect(file_new_video, SIGNAL(triggered()), this, SLOT(file_NewVideo()));
     connect(file_exit, SIGNAL(triggered()), this, SLOT(file_Exit()));
-    
     connect(in_out_increase, SIGNAL(triggered()), this, SLOT(movementOption1()));
     connect(in_out, SIGNAL(triggered()), this, SLOT(movementOption2()));
     connect(out_reset, SIGNAL(triggered()), this, SLOT(movementOption3()));
-    
     controls_stop = new QAction(tr("Sto&p"), this);
     controls_stop->setShortcut(tr("Ctrl+C"));
     controls_menu->addAction(controls_stop);
-    
     controls_stop->setEnabled(false);
-    
     controls_snapshot = new QAction(tr("Take &Snapshot"), this);
     controls_snapshot->setShortcut(tr("Ctrl+A"));
     controls_menu->addAction(controls_snapshot);
-    
     controls_pause = new QAction(tr("&Pause"), this);
     controls_pause->setShortcut(tr("Ctrl+P"));
     controls_menu->addAction(controls_pause);
-    
     controls_step = new QAction(tr("Step"), this);
     controls_step->setShortcut(tr("Ctrl+I"));
     controls_menu->addAction(controls_step);
-    
     controls_setimage = new QAction(tr("Set Image"), this);
     controls_setimage->setShortcut(tr("Ctrl+I"));
     controls_menu->addAction(controls_setimage);
-    
     controls_setkey = new QAction(tr("Set Color Key Image"), this);
     controls_setkey->setShortcut(tr("Ctrl+K"));
     controls_menu->addAction(controls_setkey);
-    
-    clear_images = new QAction(tr("Clear Images"), this);
-    clear_images->setShortcut(tr("Ctrl+E"));
-    controls_menu->addAction(clear_images);
-    
     controls_showvideo = new QAction(tr("Hide Display Video"), this);
     controls_showvideo->setShortcut(tr("Ctrl+V"));
     controls_menu->addAction(controls_showvideo);
-    
     reset_filters = new QAction(tr("Reset Filters"), this);
     reset_filters->setShortcut(tr("Ctrl+R"));
     controls_menu->addAction(reset_filters);
-    
     controls_showvideo->setEnabled(false);
     controls_showvideo->setCheckable(true);
-    
     open_search = new QAction(tr("Search Filters"), this);
     open_search->setShortcut(tr("Ctrl+S"));
     controls_menu->addAction(open_search);
@@ -410,7 +399,6 @@ void AC_MainWindow::createMenu() {
     connect(controls_setkey, SIGNAL(triggered()), this, SLOT(controls_SetKey()));
     connect(controls_showvideo, SIGNAL(triggered()), this, SLOT(controls_ShowVideo()));
     connect(reset_filters, SIGNAL(triggered()), this, SLOT(controls_Reset()));
-    connect(clear_images, SIGNAL(triggered()), this, SLOT(controls_Clear()));
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
     controls_pause->setText(tr("Pause"));
     help_about = new QAction(tr("About"), this);
@@ -421,7 +409,10 @@ void AC_MainWindow::createMenu() {
     controls_pause->setEnabled(false);
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
+}
 
+void AC_MainWindow::resetIndex() {
+    frame_index = 0;
 }
 
 void AC_MainWindow::clear_subfilter() {
@@ -470,6 +461,16 @@ void AC_MainWindow::noflip_action() {
     playback->SetFlip(false, false);
     Log(tr("Removed Flip Action\n"));
 
+}
+
+void AC_MainWindow::repeat_vid() {
+    bool val = repeat_v->isChecked();
+    playback->enableRepeat(val);
+    if(val == true) {
+        Log(tr("Repeat Enabled\n"));
+    } else {
+        Log(tr("Repeat Disabled\n"));
+    }
 }
 
 void AC_MainWindow::speed1() {
@@ -959,17 +960,16 @@ void AC_MainWindow::controls_Pause() {
     }
 }
 
-void AC_MainWindow::controls_Clear() {
-    playback->Clear();
-}
-
 void AC_MainWindow::controls_SetImage() {
     QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), "/home", tr("Image Files (*.png *.jpg)"));
     if(fileName != "") {
         cv::Mat tblend_image = cv::imread(fileName.toStdString());
         if(!tblend_image.empty()) {
             playback->setImage(tblend_image);
-            QMessageBox::information(this, tr("Loaded Image"), tr("Image set"));
+            QString text;
+            QTextStream stream(&text);
+            stream << "Successfully Loaded Image: [" << fileName << "] Size: " << tblend_image.cols << "x" << tblend_image.rows << "\n";
+            Log(text);
         } else {
             QMessageBox::information(this, tr("Image Load failed"), tr("Could not load image"));
         }
