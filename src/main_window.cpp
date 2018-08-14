@@ -303,7 +303,7 @@ void AC_MainWindow::createMenu() {
     speed_actions[4] = 0.5;
     speed_actions[5] = 1.0;
     speed_actions[6] = 3.0;
-    const QString act_val[] = { "0.001", "0.05", "0.01", "0.1", "0.5", "1.0", "3.0"};
+    const QString act_val[] = { "0.001 (Very Slow)", "0.05 (Slow)", "0.01 (Normal)", "0.1 (Regular)", "0.5 (Fast)", "1.0 (Faster)", "3.0 (Very Fast)"};
     speed_menu = options->addMenu("Movement Speed");
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i] = new QAction(act_val[i], this);
@@ -328,12 +328,19 @@ void AC_MainWindow::createMenu() {
     flip3->setCheckable(true);
     flip3->setChecked(false);
     image_menu->addAction(flip3);
+    options->addSeparator();
+    clear_sub = new QAction(tr("Clear SubFilter"), this);
+    options->addAction(clear_sub);
+    clear_sub->setShortcut(tr("Ctrl+F"));
     
+    clear_image = new QAction(tr("Clear Image"), this);
+    options->addAction(clear_image);
+    connect(clear_image, SIGNAL(triggered()), this, SLOT(clear_img()));
+    connect(clear_sub, SIGNAL(triggered()), this, SLOT(clear_subfilter()));
     connect(flip1, SIGNAL(triggered()), this, SLOT(flip1_action()));
     connect(flip2, SIGNAL(triggered()), this, SLOT(flip2_action()));
     connect(flip3, SIGNAL(triggered()), this, SLOT(flip3_action()));
     connect(noflip, SIGNAL(triggered()), this, SLOT(noflip_action()));
-
     connect(speed_action_items[0], SIGNAL(triggered()), this, SLOT(speed1()));
     connect(speed_action_items[1], SIGNAL(triggered()), this, SLOT(speed2()));
     connect(speed_action_items[2], SIGNAL(triggered()), this, SLOT(speed3()));
@@ -357,15 +364,15 @@ void AC_MainWindow::createMenu() {
     controls_stop->setEnabled(false);
     
     controls_snapshot = new QAction(tr("Take &Snapshot"), this);
-    controls_snapshot->setShortcut(tr("S"));
+    controls_snapshot->setShortcut(tr("Ctrl+A"));
     controls_menu->addAction(controls_snapshot);
     
     controls_pause = new QAction(tr("&Pause"), this);
-    controls_pause->setShortcut(tr("P"));
+    controls_pause->setShortcut(tr("Ctrl+P"));
     controls_menu->addAction(controls_pause);
     
     controls_step = new QAction(tr("Step"), this);
-    controls_step->setShortcut(tr("I"));
+    controls_step->setShortcut(tr("Ctrl+I"));
     controls_menu->addAction(controls_step);
     
     controls_setimage = new QAction(tr("Set Image"), this);
@@ -417,12 +424,24 @@ void AC_MainWindow::createMenu() {
 
 }
 
+void AC_MainWindow::clear_subfilter() {
+    ac::setSubFilter(-1);
+    Log(tr("Cleared SubFilter"));
+}
+
+void AC_MainWindow::clear_img() {
+	blend_set = false;
+    blend_image.release();
+    Log(tr("Cleared Image\n"));
+}
+
 void AC_MainWindow::flip1_action() {
     flip1->setChecked(true);
     flip2->setChecked(false);
     flip3->setChecked(false);
     noflip->setChecked(false);
     playback->SetFlip(false, true);
+    Log(tr("Flipped Image\n"));
 }
 
 void AC_MainWindow::flip2_action() {
@@ -431,6 +450,7 @@ void AC_MainWindow::flip2_action() {
     flip3->setChecked(false);
     noflip->setChecked(false);
     playback->SetFlip(true, false);
+    Log(tr("Flipped Image\n"));
 }
 
 void AC_MainWindow::flip3_action() {
@@ -439,6 +459,7 @@ void AC_MainWindow::flip3_action() {
     flip3->setChecked(true);
     noflip->setChecked(false);
     playback->SetFlip(true, true);
+    Log(tr("Flipped Image\n"));
 }
 
 void AC_MainWindow::noflip_action() {
@@ -447,6 +468,8 @@ void AC_MainWindow::noflip_action() {
     flip3->setChecked(false);
     noflip->setChecked(true);
     playback->SetFlip(false, false);
+    Log(tr("Removed Flip Action\n"));
+
 }
 
 void AC_MainWindow::speed1() {
