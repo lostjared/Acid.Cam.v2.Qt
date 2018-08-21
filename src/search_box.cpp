@@ -21,17 +21,21 @@ void SearchWindow::createControls() {
     search_list->setGeometry(25, 25, 595, 400);
     search_list->show();
     search_text = new QLineEdit(this);
-    search_text->setGeometry(25, 430, 390, 25);
+    search_text->setGeometry(25, 430, 290, 30);
     search_text->show();
     search = new QPushButton(this);
-    search->setGeometry(490+25+10,430, 100, 35);
+    search->setGeometry(325, 430, 100, 25);
     search->setText(tr("Search"));
+    subf = new QPushButton(this);
+    subf->setGeometry(490+25+10,430, 100, 30);
+    subf->setText(tr("SubFilter"));
     add = new QPushButton(this);
     add->setText(tr("Add"));
-    add->setGeometry((490+25+10)-100, 430, 100, 35);
+    add->setGeometry((490+25+10)-100, 430, 100, 30);
     
     connect(search, SIGNAL(pressed()), this, SLOT(search_filter()));
     connect(add, SIGNAL(pressed()), this, SLOT(add_current()));
+    connect(subf, SIGNAL(pressed()), this, SLOT(set_subf()));
 }
 
 void SearchWindow::search_filter() {
@@ -66,4 +70,13 @@ void SearchWindow::add_current() {
 void SearchWindow::setFiltersControl(QComboBox *filter_box, QListWidget *custombox) {
     filters = filter_box;
     custom_list = custombox;
+}
+
+void SearchWindow::set_subf() {
+    int index = search_list->currentRow();
+    if(index >= 0) {
+        QListWidgetItem *in = search_list->item(index);
+        main_window->setSubFilter(in->text());
+        main_window->updateList();
+    }
 }

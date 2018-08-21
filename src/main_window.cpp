@@ -1081,6 +1081,19 @@ void AC_MainWindow::stopRecording() {
     progress_bar->hide();
 }
 
+void AC_MainWindow::setSubFilter(const QString &filter_num) {
+    int value_index = filter_map[filter_num.toStdString()].first;
+    int filter_index = filter_map[filter_num.toStdString()].second;
+    if(value_index == 0) {
+        std::ostringstream stream;
+        stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
+        stream << "SubFilter index: " << filter_index << "\n";
+        playback->setSubFilter(filter_index);
+        QString l = stream.str().c_str();
+        Log(l);
+    }
+}
+
 void AC_MainWindow::frameInc() {
     frame_index++;
     QString frame_string;

@@ -15,10 +15,11 @@ public:
 public slots:
     void search_filter();
     void add_current();
+    void set_subf();
 private:
     QListWidget *search_list,*custom_list;
     QLineEdit *search_text;
-    QPushButton *search, *add;
+    QPushButton *search, *add, *subf;
     QComboBox *filters;
 };
 

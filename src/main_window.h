@@ -49,6 +49,7 @@ public:
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
+    void setSubFilter(const QString &num);
 public slots:
     void addClicked();
     void rmvClicked();
