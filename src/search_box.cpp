@@ -1,4 +1,4 @@
-#include "search_box.h"
+#include"search_box.h"
 #include"tokenize.h"
 
 std::string lowerString(std::string text) {
@@ -24,7 +24,7 @@ void SearchWindow::createControls() {
     search_text->setGeometry(25, 430, 290, 30);
     search_text->show();
     search = new QPushButton(this);
-    search->setGeometry(325, 430, 100, 25);
+    search->setGeometry(325, 430, 100, 30);
     search->setText(tr("Search"));
     subf = new QPushButton(this);
     subf->setGeometry(490+25+10,430, 100, 30);
@@ -32,7 +32,6 @@ void SearchWindow::createControls() {
     add = new QPushButton(this);
     add->setText(tr("Add"));
     add->setGeometry((490+25+10)-100, 430, 100, 30);
-    
     connect(search, SIGNAL(pressed()), this, SLOT(search_filter()));
     connect(add, SIGNAL(pressed()), this, SLOT(add_current()));
     connect(subf, SIGNAL(pressed()), this, SLOT(set_subf()));
