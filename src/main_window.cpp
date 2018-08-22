@@ -701,6 +701,11 @@ void AC_MainWindow::setSub() {
             playback->setSubFilter(filter_index);
             QString l = stream.str().c_str();
             Log(l);
+        } else {
+            QString txt;
+            QTextStream stream(&txt);
+            stream << "Only Regular Filters can be used as a SubFilter not AF\n";
+            Log(txt);
         }
     }
 }
@@ -1103,6 +1108,11 @@ void AC_MainWindow::setSubFilter(const QString &filter_num) {
         playback->setSubFilter(filter_index);
         QString l = stream.str().c_str();
         Log(l);
+    } else {
+        QString txt;
+        QTextStream stream(&txt);
+        stream << "Only Regular Filters can be used as a SubFilter not AF\n";
+        Log(txt);
     }
 }
 
