@@ -604,6 +604,12 @@ void AC_MainWindow::comboFilterChanged(int) {
     QTextStream stream(&str);
     stream << "Filter changed to: " << filters->currentText() << "\n";
     Log(str);
+    std::string text = filters->currentText().toStdString();
+    if(text.find("Image") != std::string::npos)
+        Log(tr("Set an Image to use this filter\n"));
+    else if(text.find("SubFilter") != std::string::npos)
+        Log(tr("Set a SubFilter to use this filter\n"));
+
 }
 
 void AC_MainWindow::setFilterSingle() {
@@ -624,6 +630,12 @@ void AC_MainWindow::addClicked() {
         QTextStream stream(&qs);
         stream << "Added Filter: " << filters->currentText() << "\n";
         Log(qs);
+        std::string text = filters->currentText().toStdString();
+        if(text.find("Image") != std::string::npos)
+            Log(tr("Set an Image to use this filter\n"));
+        else if(text.find("SubFilter") != std::string::npos)
+            Log(tr("Set a SubFilter to use this filter\n"));
+
         std::vector<std::pair<int, int>> v;
         buildVector(v);
         playback->setVector(v);

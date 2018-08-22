@@ -63,6 +63,15 @@ void SearchWindow::add_current() {
         QListWidgetItem *in = search_list->item(index);
         custom_list->addItem(in->text());
         main_window->updateList();
+        std::string text = in->text().toStdString();
+        if(text.find("Image") != std::string::npos)
+            main_window->Log(tr("Set an Image to use this filter\n"));
+        else if(text.find("SubFilter") != std::string::npos)
+            main_window->Log(tr("Set a SubFilter to use this filter\n"));
+        QString qtext;
+        QTextStream stream(&qtext);
+        stream << "Filter set to: " << in->text() << "\n";
+        main_window->Log(qtext);
     }
 }
 
