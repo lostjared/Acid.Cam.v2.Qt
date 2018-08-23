@@ -374,10 +374,10 @@ void AC_MainWindow::createMenu() {
     controls_step->setShortcut(tr("Ctrl+I"));
     controls_menu->addAction(controls_step);
     controls_setimage = new QAction(tr("Set Image"), this);
-    controls_setimage->setShortcut(tr("Ctrl+I"));
+    //controls_setimage->setShortcut(tr("Ctrl+Q"));
     controls_menu->addAction(controls_setimage);
     controls_setkey = new QAction(tr("Set Color Key Image"), this);
-    controls_setkey->setShortcut(tr("Ctrl+K"));
+    //controls_setkey->setShortcut(tr("Ctrl+K"));
     controls_menu->addAction(controls_setkey);
     controls_showvideo = new QAction(tr("Hide Display Video"), this);
     controls_showvideo->setShortcut(tr("Ctrl+V"));
