@@ -631,7 +631,7 @@ void AC_MainWindow::addClicked() {
         stream << "Added Filter: " << filters->currentText() << "\n";
         Log(qs);
         std::string text = filters->currentText().toStdString();
-        if(text.find("Image") != std::string::npos)
+        if(blend_set == false && text.find("Image") != std::string::npos)
             Log(tr("Set an Image to use this filter\n"));
         else if(text.find("SubFilter") != std::string::npos)
             Log(tr("Set a SubFilter to use this filter\n"));

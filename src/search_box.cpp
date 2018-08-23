@@ -64,7 +64,7 @@ void SearchWindow::add_current() {
         custom_list->addItem(in->text());
         main_window->updateList();
         std::string text = in->text().toStdString();
-        if(text.find("Image") != std::string::npos)
+        if(blend_set == false && text.find("Image") != std::string::npos)
             main_window->Log(tr("Set an Image to use this filter\n"));
         else if(text.find("SubFilter") != std::string::npos)
             main_window->Log(tr("Set a SubFilter to use this filter\n"));
