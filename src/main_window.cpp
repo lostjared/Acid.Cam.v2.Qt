@@ -605,9 +605,9 @@ void AC_MainWindow::comboFilterChanged(int) {
     stream << "Filter changed to: " << filters->currentText() << "\n";
     Log(str);
     std::string text = filters->currentText().toStdString();
-    if(text.find("Image") != std::string::npos)
+    if(blend_set == false && text.find("Image") != std::string::npos)
         Log(tr("Set an Image to use this filter\n"));
-    else if(text.find("SubFilter") != std::string::npos)
+    else if(ac::subfilter == -1 && text.find("SubFilter") != std::string::npos)
         Log(tr("Set a SubFilter to use this filter\n"));
 
 }
@@ -633,7 +633,7 @@ void AC_MainWindow::addClicked() {
         std::string text = filters->currentText().toStdString();
         if(blend_set == false && text.find("Image") != std::string::npos)
             Log(tr("Set an Image to use this filter\n"));
-        else if(text.find("SubFilter") != std::string::npos)
+        else if(ac::subfilter != -1 && text.find("SubFilter") != std::string::npos)
             Log(tr("Set a SubFilter to use this filter\n"));
 
         std::vector<std::pair<int, int>> v;
@@ -693,6 +693,14 @@ void AC_MainWindow::setSub() {
         std::ostringstream stream;
         //QListWidgetItem *item = filters->item(row);
         QString filter_num = filters->currentText();
+        std::string text = filter_num.toStdString();
+        if(text.find("SubFilter") != std::string::npos) {
+            std::ostringstream stream;
+            stream << "SubFilter function: " << filter_num.toStdString() << " cannot be set to a SubFilter function.\n";
+            Log(stream.str().c_str());
+            return;
+        }
+        
         int value_index = filter_map[filter_num.toStdString()].first;
         int filter_index = filter_map[filter_num.toStdString()].second;
         if(value_index == 0) {
@@ -1102,6 +1110,13 @@ void AC_MainWindow::setSubFilter(const QString &filter_num) {
     int value_index = filter_map[filter_num.toStdString()].first;
     int filter_index = filter_map[filter_num.toStdString()].second;
     if(value_index == 0) {
+        std::string text = filter_num.toStdString();
+        if(text.find("SubFilter") != std::string::npos) {
+            std::ostringstream stream;
+            stream << "SubFilter function: " << filter_num.toStdString() << " cannot be set to a SubFilter function.\n";
+            Log(stream.str().c_str());
+            return;
+        }
         std::ostringstream stream;
         stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
         stream << "SubFilter index: " << filter_index << "\n";
