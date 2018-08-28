@@ -39,10 +39,10 @@ private:
     double alpha;
     bool flip_frame1, flip_frame2;
     bool repeat_video;
-    void setFrameIndex(const long &index);
 public:
     Playback(QObject *parent = 0);
     ~Playback();
+    void setFrameIndex(const long &index);
     void setRGB(int r, int g, int b);
     void setColorOptions(int b, int g, int s);
     void setColorMap(int c);

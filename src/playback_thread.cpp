@@ -206,8 +206,8 @@ void Playback::run() {
         mutex.lock();
         if(!capture.read(frame)) {
             if(repeat_video && mode == MODE_VIDEO) {
-                setFrameIndex(0);
                 mutex.unlock();
+                setFrameIndex(0);
                 emit resetIndex();
                 continue;
             }
@@ -293,7 +293,9 @@ Playback::~Playback() {
 }
 
 void Playback::setFrameIndex(const long &index) {
+    mutex.lock();
     capture.set(CV_CAP_PROP_POS_FRAMES, index);
+    mutex.unlock();
 }
 
 void Playback::enableRepeat(bool re) {
