@@ -74,6 +74,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     take_snapshot = false;
     disp = new DisplayWindow(this);
     playback = new Playback();
+    goto_window = new GotoWindow(this);
+    goto_window->setDisplayWindow(disp);
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
     QObject::connect(playback, SIGNAL(frameIncrement()), this, SLOT(frameInc()));

@@ -13,6 +13,7 @@
 #include "display_window.h"
 #include "playback_thread.h"
 #include "search_box.h"
+#include "goto_window.h"
 
 class SearchWindow;
 
@@ -105,6 +106,7 @@ private:
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
     SearchWindow *search_box;
+    GotoWindow *goto_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
     unsigned long video_frames;
