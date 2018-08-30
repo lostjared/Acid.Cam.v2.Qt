@@ -51,6 +51,7 @@ public:
     QRadioButton *filter_single, *filter_custom;
     void updateList();
     void setSubFilter(const QString &num);
+    void setFrameIndex(int i);
 public slots:
     void addClicked();
     void rmvClicked();

@@ -1,4 +1,5 @@
 #include "goto_window.h"
+#include "main_window.h"
 
 
 GotoWindow::GotoWindow(QWidget *parent) : QDialog(parent) {
@@ -8,6 +9,9 @@ GotoWindow::GotoWindow(QWidget *parent) : QDialog(parent) {
     setGeometry(300, 50, 400, 70);
 }
 
+void GotoWindow::setPlayback(Playback *playback) {
+    playback_thread = playback;
+}
 
 void GotoWindow::setVideoCapture(cv::VideoCapture *cap) {
     capture_device = cap;
@@ -39,17 +43,31 @@ void GotoWindow::createControls() {
     
 }
 
-void GotoWindow::setFrameIndex(const long &i) {
-    index = i;
+void GotoWindow::setFrameIndex(int i) {
+    frame_index = i;
+    QString frame_string;
+    QTextStream frame_stream(&frame_string);
+    frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << goto_pos->maximum() << "/" <<  (unsigned long)(goto_pos->minimum()/goto_pos->maximum()) << ") ";
+    main_window->setFrameIndex(frame_index);
+    main_window->statusBar()->showMessage(frame_string);
+}
+
+void GotoWindow::setMainWindow(AC_MainWindow *window) {
+    main_window = window;
 }
 
 void GotoWindow::showImage() {
-    
+    QImage img;
+    if(playback_thread->getFrame(img, frame_index)) {
+        disp_window->displayImage(img);
+    }
 }
 
-void GotoWindow::showWindow(int min, int max) {
+void GotoWindow::showWindow(int frame_index, int min, int max) {
     goto_pos->setMaximum(min);
     goto_pos->setMaximum(max);
+    goto_pos->setSliderPosition(frame_index);
+    slideChanged(frame_index);
     show();
 }
 
@@ -59,6 +77,7 @@ void GotoWindow::pressedGo() {
     if(f_pos != goto_pos->sliderPosition()) {
         goto_pos->setSliderPosition(f_pos);
     }
+    setFrameIndex(f_pos);
     showImage();
 }
 

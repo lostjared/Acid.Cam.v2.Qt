@@ -43,6 +43,7 @@ public:
     Playback(QObject *parent = 0);
     ~Playback();
     void setFrameIndex(const long &index);
+    bool getFrame(QImage &img, const int &index);
     void setRGB(int r, int g, int b);
     void setColorOptions(int b, int g, int s);
     void setColorMap(int c);

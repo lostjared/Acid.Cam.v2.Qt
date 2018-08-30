@@ -280,6 +280,7 @@ void Playback::run() {
     }
 }
 
+
 Playback::~Playback() {
     mutex.lock();
     stop = true;
@@ -296,6 +297,22 @@ void Playback::setFrameIndex(const long &index) {
     mutex.lock();
     capture.set(CV_CAP_PROP_POS_FRAMES, index);
     mutex.unlock();
+}
+
+bool Playback::getFrame(QImage &img, const int &index) {
+    QImage image;
+    setFrameIndex(index);
+    mutex.lock();
+    cv::Mat frame;
+    if(mode == MODE_VIDEO && capture.read(frame)) {
+    	cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
+    	img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
+        mutex.unlock();
+        setFrameIndex(index);
+        return true;
+    }
+    mutex.unlock();
+    return false;
 }
 
 void Playback::enableRepeat(bool re) {

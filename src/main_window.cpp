@@ -76,9 +76,10 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     disp = new DisplayWindow(this);
     playback = new Playback();
     
-    goto_window->showWindow(0, 100);
     goto_window->setParent(this);
     goto_window->setDisplayWindow(disp);
+    goto_window->setPlayback(playback);
+    goto_window->setMainWindow(this);
     
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
@@ -905,6 +906,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
 
 void AC_MainWindow::controls_Stop() {
     playback->Stop();
+    goto_window->hide();
     progress_bar->hide();
     controls_showvideo->setEnabled(false);
     controls_stop->setEnabled(false);
@@ -966,10 +968,12 @@ void AC_MainWindow::file_Exit() {
 
 void AC_MainWindow::file_NewVideo() {
     cap_video->show();
+    goto_window->hide();
 }
 
 void AC_MainWindow::file_NewCamera() {
     cap_camera->show();
+    goto_window->hide();
 }
 
 void AC_MainWindow::controls_Snap() {
@@ -982,7 +986,7 @@ void AC_MainWindow::controls_Pause() {
         controls_pause->setText("Paused");
         controls_pause->setChecked(true);
         paused = true;
-        goto_window->showWindow(0, video_frames);
+        if(programMode == MODE_VIDEO) goto_window->showWindow(frame_index, 0, video_frames);
         playback->Stop();
     } else {
         controls_pause->setText("Pause");
@@ -1058,6 +1062,9 @@ QImage Mat2QImage(cv::Mat const& src)
     return dest;
 }
 
+void AC_MainWindow::setFrameIndex(int index) {
+    frame_index = index;
+}
 
 void AC_MainWindow::updateFrame(QImage img) {
     if(playback->isStopped() == false) {
