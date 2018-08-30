@@ -5,7 +5,7 @@
 GotoWindow::GotoWindow(QWidget *parent) : QDialog(parent) {
     createControls();
     setFixedSize(400, 70);
-    setWindowTitle("Jump to Frame");
+    setWindowTitle(tr("Jump to Frame"));
     setGeometry(300, 50, 400, 70);
 }
 
@@ -27,8 +27,8 @@ void GotoWindow::createControls() {
     goto_pos->setMinimum(0);
     goto_pos->setTickInterval(0);
     
-    QLabel *lbl_sec = new QLabel("Second: ", this);
-    QLabel *lbl_frame = new QLabel("Frame: ", this);
+    QLabel *lbl_sec = new QLabel(tr("Second: "), this);
+    QLabel *lbl_frame = new QLabel(tr("Frame: "), this);
     lbl_sec->setGeometry(10, 30, 50, 20);
     lbl_frame->setGeometry(180, 30, 50, 20);
     goto_sec = new QLineEdit("0", this);
@@ -44,6 +44,10 @@ void GotoWindow::createControls() {
 }
 
 void GotoWindow::setFrameIndex(int i) {
+    if(i < goto_pos->minimum() || i > goto_pos->maximum()) {
+        QMessageBox::information(this, tr("Error"), tr("Index out of range"));
+        return;
+    }
     frame_index = i;
     QString frame_string;
     QTextStream frame_stream(&frame_string);
