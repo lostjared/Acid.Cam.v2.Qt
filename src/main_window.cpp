@@ -982,7 +982,7 @@ void AC_MainWindow::controls_Pause() {
         controls_pause->setText("Paused");
         controls_pause->setChecked(true);
         paused = true;
-        goto_window->show();
+        goto_window->showWindow(0, video_frames);
         playback->Stop();
     } else {
         controls_pause->setText("Pause");

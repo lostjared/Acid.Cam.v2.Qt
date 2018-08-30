@@ -59,6 +59,7 @@ void GotoWindow::pressedGo() {
     if(f_pos != goto_pos->sliderPosition()) {
         goto_pos->setSliderPosition(f_pos);
     }
+    showImage();
 }
 
 void GotoWindow::slideChanged(int pos) {
@@ -69,4 +70,5 @@ void GotoWindow::slideChanged(int pos) {
     text = "";
     stream << (pos);
     goto_frame->setText(text);
+    
 }
