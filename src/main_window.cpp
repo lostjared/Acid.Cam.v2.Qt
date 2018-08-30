@@ -72,9 +72,10 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     search_box->main_window = this;
     statusBar()->showMessage(tr("Acid Cam v2 Loaded - Use File Menu to Start"));
     take_snapshot = false;
+    goto_window = new GotoWindow(this);
     disp = new DisplayWindow(this);
     playback = new Playback();
-    goto_window = new GotoWindow(this);
+    //goto_window->show();
     goto_window->setDisplayWindow(disp);
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
@@ -978,10 +979,12 @@ void AC_MainWindow::controls_Pause() {
         controls_pause->setText("Paused");
         controls_pause->setChecked(true);
         paused = true;
+        goto_window->show();
         playback->Stop();
     } else {
         controls_pause->setText("Pause");
         controls_pause->setChecked(false);
+        goto_window->hide();
         playback->Play();
         paused = false;
     }

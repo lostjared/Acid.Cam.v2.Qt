@@ -3,6 +3,7 @@
 
 GotoWindow::GotoWindow(QWidget *parent) : QDialog(parent) {
     createControls();
+    setFixedSize(400, 150);
 }
 
 void GotoWindow::setDisplayWindow(DisplayWindow *win) {
