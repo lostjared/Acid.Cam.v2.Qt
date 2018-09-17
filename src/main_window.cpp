@@ -719,7 +719,7 @@ void AC_MainWindow::setSub() {
                 stream << filter_val << " does not support a subfilter.\n";
                 Log(stream.str().c_str());
                 return;
-            }            
+            }
             stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
             stream << "SubFilter index: " << filter_index << "\n";
             std::ostringstream stream1;
@@ -1144,24 +1144,28 @@ void AC_MainWindow::setSubFilter(const QString &filter_num) {
     int filter_index = filter_map[filter_num.toStdString()].filter;
     int crow = custom_filters->currentRow();
     if(value_index == 0 && crow >= 0) {
-        std::string text = filter_num.toStdString();
-        if(text.find("SubFilter") != std::string::npos) {
-            std::ostringstream stream;
-            stream << "SubFilter function: " << filter_num.toStdString() << " cannot be set to a SubFilter function.\n";
+        std::ostringstream stream;
+        QListWidgetItem *item = custom_filters->item(crow);
+        std::string fname = filter_num.toStdString();
+        std::string filter_val = item->text().toStdString();
+        if(filter_val.find(":") != std::string::npos)
+            filter_val = filter_val.substr(0, filter_val.find(":"));
+        
+        if(!(fname.find("SubFilter") == std::string::npos && filter_val.find("SubFilter") != std::string::npos)) {
+            stream << filter_val << " does not support a subfilter.\n";
             Log(stream.str().c_str());
             return;
         }
-        QListWidgetItem *item = custom_filters->item(crow);
-        std::ostringstream stream;
-        stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
-        stream << "SubFilter index: " << filter_index << "\n";
-        std::ostringstream stream1;
-        stream1 << filter_num.toStdString() << ":" << item->text().toStdString();
-        item->setText(stream1.str().c_str());
-        std::vector<FilterValue> v;
-        buildVector(v);
-        QString l = stream.str().c_str();
-        Log(l);
+            stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
+            stream << "SubFilter index: " << filter_index << "\n";
+            std::ostringstream stream1;
+            stream1 << filter_val << ":" << fname;
+            item->setText(stream1.str().c_str());
+            std::vector<FilterValue> v;
+            buildVector(v);
+            playback->setVector(v);
+            QString l = stream.str().c_str();
+            Log(l);
     } else {
         QString txt;
         QTextStream stream(&txt);
