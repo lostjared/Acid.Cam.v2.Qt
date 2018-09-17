@@ -14,10 +14,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     bright_ = gamma_ = saturation_ = 0;
     single_mode = true;
     alpha = 0;
-    prev_filter = std::pair<int, int>(0, 0);
-    flip_frame1 = false;
-    flip_frame2 = false;
-    repeat_video = false;
+    prev_filter = FilterValue();
 }
 
 void Playback::Play() {
@@ -26,7 +23,7 @@ void Playback::Play() {
             stop = false;
         }
     }
-    //start(LowPriority);
+ //   start(LowPriority);
     start(HighPriority);
 }
 
@@ -92,7 +89,7 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
     return true;
 }
 
-void Playback::setVector(std::vector<std::pair<int, int>> v) {
+void Playback::setVector(std::vector<FilterValue> v) {
     mutex_add.lock();
     current = v;
     mutex_add.unlock();
@@ -114,13 +111,6 @@ void Playback::reset_filters() {
     	ac::reset_alpha = true;
     }
     ac::frames_released = true;
-    mutex.unlock();
-}
-
-void Playback::SetFlip(bool f1, bool f2) {
-    mutex.lock();
-    flip_frame1 = f1;
-    flip_frame2 = f2;
     mutex.unlock();
 }
 
@@ -187,47 +177,31 @@ void Playback::drawEffects(cv::Mat &frame) {
     }
 }
 
-void Playback::drawFilter(cv::Mat &frame, std::pair<int, int> &filter) {
-    if(filter.first == 0) {
-        ac::draw_func[filter.second](frame);
-    } else if(current_filter.first == 1) {
-        current_filterx = filter.second;
+void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
+    if(f.index == 0) {
+        ac::setSubFilter(f.subfilter);
+        ac::draw_func[f.filter](frame);
+        ac::setSubFilter(-1);
+    } else if(current_filter.index == 1) {
+        current_filterx = f.filter;
         ac::alphaFlame(frame);
-    } else if(filter.first == 2) {
-        draw_plugin(frame, filter.second);
+    } else if(f.index == 2) {
+        draw_plugin(frame, f.filter);
     }
 }
 
 void Playback::run() {
-    
     int duration = 1000/ac::fps;
-    
     while(!stop) {
         mutex.lock();
         if(!capture.read(frame)) {
-            if(repeat_video && mode == MODE_VIDEO) {
-                mutex.unlock();
-                setFrameIndex(0);
-                emit resetIndex();
-                continue;
-            }
             stop = true;
             mutex.unlock();
             emit stopRecording();
             return;
         }
-        cv::Mat temp_frame;
-        if(flip_frame1 == true) {
-            cv::flip(frame, temp_frame, 1);
-            frame = temp_frame;
-        }
-        if(flip_frame2 == true) {
-            cv::flip(frame, temp_frame, 0);
-            frame = temp_frame;
-        }
-        
         mutex.unlock();
-        static std::vector<std::pair<int, int>> cur;
+        static std::vector<FilterValue> cur;
         mutex_shown.lock();
         cur = current;
         mutex_shown.unlock();
@@ -280,7 +254,6 @@ void Playback::run() {
     }
 }
 
-
 Playback::~Playback() {
     mutex.lock();
     stop = true;
@@ -292,35 +265,6 @@ Playback::~Playback() {
     wait();
 #endif
 }
-
-void Playback::setFrameIndex(const long &index) {
-    mutex.lock();
-    capture.set(CV_CAP_PROP_POS_FRAMES, index);
-    mutex.unlock();
-}
-
-bool Playback::getFrame(QImage &img, const int &index) {
-    QImage image;
-    setFrameIndex(index);
-    mutex.lock();
-    cv::Mat frame;
-    if(mode == MODE_VIDEO && capture.read(frame)) {
-    	cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
-    	img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
-        mutex.unlock();
-        setFrameIndex(index);
-        return true;
-    }
-    mutex.unlock();
-    return false;
-}
-
-void Playback::enableRepeat(bool re) {
-    mutex.lock();
-    repeat_video = re;
-    mutex.unlock();
-}
-
 
 void Playback::Clear() {
     mutex.lock();
@@ -334,7 +278,7 @@ void Playback::Clear() {
 void Playback::Stop() {
     stop = true;
     alpha = 0;
-    prev_filter = std::pair<int, int>(0, 0);
+    prev_filter = FilterValue(0, 0, -1);
 }
 
 void Playback::Release() {
@@ -373,7 +317,7 @@ void Playback::setColorKey(const cv::Mat &image) {
     mutex.unlock();
 }
 
-void Playback::filterFade(cv::Mat &frame, std::pair<int, int> &filter1, std::pair<int, int> &filter2, double alpha) {
+void Playback::filterFade(cv::Mat &frame, FilterValue &filter1, FilterValue &filter2, double alpha) {
     unsigned int h = frame.rows; // frame height
     unsigned int w = frame.cols;// framew idth
     // make copies of original frame
