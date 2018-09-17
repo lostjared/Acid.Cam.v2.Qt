@@ -296,7 +296,7 @@ void AC_MainWindow::createMenu() {
     in_out_increase->setCheckable(true);
     in_out_increase->setChecked(true);
     movement->addAction(in_out_increase);
-
+    
     in_out = new QAction(tr("Move in, Move Out"), this);
     in_out->setCheckable(true);
     movement->addAction(in_out);
@@ -439,7 +439,7 @@ void AC_MainWindow::clear_subfilter() {
 }
 
 void AC_MainWindow::clear_img() {
-	blend_set = false;
+    blend_set = false;
     blend_image.release();
     Log(tr("Cleared Image\n"));
 }
@@ -478,7 +478,7 @@ void AC_MainWindow::noflip_action() {
     noflip->setChecked(true);
     playback->SetFlip(false, false);
     Log(tr("Removed Flip Action\n"));
-
+    
 }
 
 void AC_MainWindow::repeat_vid() {
@@ -627,7 +627,7 @@ void AC_MainWindow::comboFilterChanged(int) {
         Log(tr("Set an Image to use this filter\n"));
     else if(ac::subfilter == -1 && text.find("SubFilter") != std::string::npos)
         Log(tr("Set a SubFilter to use this filter\n"));
-
+    
 }
 
 void AC_MainWindow::setFilterSingle() {
@@ -1156,16 +1156,16 @@ void AC_MainWindow::setSubFilter(const QString &filter_num) {
             Log(stream.str().c_str());
             return;
         }
-            stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
-            stream << "SubFilter index: " << filter_index << "\n";
-            std::ostringstream stream1;
-            stream1 << filter_val << ":" << fname;
-            item->setText(stream1.str().c_str());
-            std::vector<FilterValue> v;
-            buildVector(v);
-            playback->setVector(v);
-            QString l = stream.str().c_str();
-            Log(l);
+        stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
+        stream << "SubFilter index: " << filter_index << "\n";
+        std::ostringstream stream1;
+        stream1 << filter_val << ":" << fname;
+        item->setText(stream1.str().c_str());
+        std::vector<FilterValue> v;
+        buildVector(v);
+        playback->setVector(v);
+        QString l = stream.str().c_str();
+        Log(l);
     } else {
         QString txt;
         QTextStream stream(&txt);
