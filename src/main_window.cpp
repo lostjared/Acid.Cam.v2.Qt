@@ -710,16 +710,20 @@ void AC_MainWindow::setSub() {
         int value_index = filter_map[filter_num.toStdString()].index;
         int filter_index = filter_map[filter_num.toStdString()].filter;
         if(value_index == 0) {
+            std::string fname = filters->currentText().toStdString();
             std::string filter_val = item->text().toStdString();
-            if(filter_val.find("SubFilter") == std::string::npos) {
+            if(filter_val.find(":") != std::string::npos)
+                filter_val = filter_val.substr(0, filter_val.find(":"));
+            
+            if(!(fname.find("SubFilter") == std::string::npos && filter_val.find("SubFilter") != std::string::npos)) {
                 stream << filter_val << " does not support a subfilter.\n";
                 Log(stream.str().c_str());
                 return;
-            }
+            }            
             stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
             stream << "SubFilter index: " << filter_index << "\n";
             std::ostringstream stream1;
-            stream1 << filter_num.toStdString() << ":" << item->text().toStdString();
+            stream1 << filter_val << ":" << fname;
             item->setText(stream1.str().c_str());
             std::vector<FilterValue> v;
             buildVector(v);
