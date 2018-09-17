@@ -10,7 +10,7 @@
 #include"plugin.h"
 #include<sys/stat.h>
 
-std::unordered_map<std::string, std::pair<int, int>> filter_map;
+std::unordered_map<std::string, FilterValue> filter_map;
 void custom_filter(cv::Mat &);
 
 const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
@@ -25,18 +25,18 @@ const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
 
 void generate_map() {
     for(int i = 0; i < ac::draw_max; ++i )
-        filter_map[ac::draw_strings[i]] = std::make_pair(0, i);
+        filter_map[ac::draw_strings[i]] = FilterValue(0, i, -1);
     
     int index = 0;
     while(filter_names[index] != 0) {
         std::string filter_n = "AF_";
         filter_n += filter_names[index];
-        filter_map[filter_n] = std::make_pair(1, index);
+        filter_map[filter_n] = FilterValue(1, index, -1);
         ++index;
     }
     for(unsigned int j = 0; j < plugins.plugin_list.size(); ++j) {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
-        filter_map[name] = std::make_pair(2, j);
+        filter_map[name] = FilterValue(2, j, -1);
     }
 }
 
@@ -423,8 +423,19 @@ void AC_MainWindow::resetIndex() {
 }
 
 void AC_MainWindow::clear_subfilter() {
+    int crow = custom_filters->currentRow();
+    if(crow >= 0) {
+        QListWidgetItem *item = custom_filters->item(crow);
+        std::string text = item->text().toStdString();
+        if(text.find(":") == std::string::npos)
+            return;
+        std::string val = text.substr(0, text.find(":"));
+        item->setText(val.c_str());
+        std::vector<FilterValue> v;
+        buildVector(v);
+        Log(tr("Cleared SubFilter"));
+    }
     ac::setSubFilter(-1);
-    Log(tr("Cleared SubFilter"));
 }
 
 void AC_MainWindow::clear_img() {
@@ -632,25 +643,21 @@ void AC_MainWindow::addClicked() {
     int row = filters->currentIndex();
     if(row != -1) {
         //QListWidgetItem *item = filters->item(row);
+        
+        std::string sub_str = filters->currentText().toStdString();
         custom_filters->addItem(filters->currentText());
+        //custom_filters->addItem(sub_str.c_str());
         QString qs;
         QTextStream stream(&qs);
         stream << "Added Filter: " << filters->currentText() << "\n";
         Log(qs);
-        std::string text = filters->currentText().toStdString();
-        if(blend_set == false && text.find("Image") != std::string::npos)
-            Log(tr("Set an Image to use this filter\n"));
-        else if(ac::subfilter != -1 && text.find("SubFilter") != std::string::npos)
-            Log(tr("Set a SubFilter to use this filter\n"));
-
-        std::vector<std::pair<int, int>> v;
+        std::vector<FilterValue> v;
         buildVector(v);
         playback->setVector(v);
     }
 }
-
 void AC_MainWindow::updateList() {
-    std::vector<std::pair<int, int>> v;
+    std::vector<FilterValue> v;
     buildVector(v);
     playback->setVector(v);
 }
@@ -663,7 +670,7 @@ void AC_MainWindow::rmvClicked() {
         QTextStream stream(&qs);
         stream << "Removed Filter: " << i->text() << "\n";
         Log(qs);
-        std::vector<std::pair<int, int>> v;
+        std::vector<FilterValue> v;
         buildVector(v);
         playback->setVector(v);
     }
@@ -675,7 +682,7 @@ void AC_MainWindow::upClicked() {
         QListWidgetItem *i = custom_filters->takeItem(item);
         custom_filters->insertItem(item-1, i->text());
         custom_filters->setCurrentRow(item-1);
-        std::vector<std::pair<int, int>> v;
+        std::vector<FilterValue> v;
         buildVector(v);
         playback->setVector(v);
     }
@@ -687,44 +694,41 @@ void AC_MainWindow::downClicked() {
         QListWidgetItem *i = custom_filters->takeItem(item);
         custom_filters->insertItem(item+1, i->text());
         custom_filters->setCurrentRow(item+1);
-        std::vector<std::pair<int, int>> v;
+        std::vector<FilterValue> v;
         buildVector(v);
         playback->setVector(v);
     }
-    
 }
 
 void AC_MainWindow::setSub() {
     int row = filters->currentIndex();
-    if(row != -1) {
+    int crow = custom_filters->currentRow();
+    if(row != -1 && crow != -1) {
         std::ostringstream stream;
-        //QListWidgetItem *item = filters->item(row);
+        QListWidgetItem *item = custom_filters->item(crow);
         QString filter_num = filters->currentText();
-        std::string text = filter_num.toStdString();
-        if(text.find("SubFilter") != std::string::npos) {
-            std::ostringstream stream;
-            stream << "SubFilter function: " << filter_num.toStdString() << " cannot be set to a SubFilter function.\n";
-            Log(stream.str().c_str());
-            return;
-        }
-        
-        int value_index = filter_map[filter_num.toStdString()].first;
-        int filter_index = filter_map[filter_num.toStdString()].second;
+        int value_index = filter_map[filter_num.toStdString()].index;
+        int filter_index = filter_map[filter_num.toStdString()].filter;
         if(value_index == 0) {
+            std::string filter_val = item->text().toStdString();
+            if(filter_val.find("SubFilter") == std::string::npos) {
+                stream << filter_val << " does not support a subfilter.\n";
+                Log(stream.str().c_str());
+                return;
+            }
             stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
             stream << "SubFilter index: " << filter_index << "\n";
-            playback->setSubFilter(filter_index);
+            std::ostringstream stream1;
+            stream1 << filter_num.toStdString() << ":" << item->text().toStdString();
+            item->setText(stream1.str().c_str());
+            std::vector<FilterValue> v;
+            buildVector(v);
+            playback->setVector(v);
             QString l = stream.str().c_str();
             Log(l);
-        } else {
-            QString txt;
-            QTextStream stream(&txt);
-            stream << "Only Regular Filters can be used as a SubFilter not AF\n";
-            Log(txt);
         }
     }
 }
-
 void AC_MainWindow::Log(const QString &s) {
     QString text;
     text = log_text->toPlainText();
@@ -1035,15 +1039,24 @@ void AC_MainWindow::controls_Step() {
     step_frame = true;
 }
 
-void AC_MainWindow::buildVector(std::vector<std::pair<int,int>> &v) {
+void AC_MainWindow::buildVector(std::vector<FilterValue> &v) {
     if(!v.empty()) v.erase(v.begin(), v.end());
     for(int i = 0; i < custom_filters->count(); ++i) {
         QListWidgetItem *val = custom_filters->item(i);
         QString name = val->text();
-        v.push_back(filter_map[name.toStdString()]);
+        std::string n = name.toStdString();
+        if(n.find(":") == std::string::npos)
+            v.push_back(filter_map[name.toStdString()]);
+        else {
+            std::string namev = name.toStdString();
+            std::string left_str = namev.substr(0, namev.find(":"));
+            std::string right_str = namev.substr(namev.find(":")+1,namev.length()-left_str.length()-1);
+            int index_val = filter_map[right_str].filter;
+            FilterValue fv(filter_map[left_str].index, filter_map[left_str].filter, index_val);
+            v.push_back(fv);
+        }
     }
 }
-
 
 cv::Mat QImage2Mat(QImage const& src)
 {
@@ -1121,10 +1134,12 @@ void AC_MainWindow::stopRecording() {
     progress_bar->hide();
 }
 
+
 void AC_MainWindow::setSubFilter(const QString &filter_num) {
-    int value_index = filter_map[filter_num.toStdString()].first;
-    int filter_index = filter_map[filter_num.toStdString()].second;
-    if(value_index == 0) {
+    int value_index = filter_map[filter_num.toStdString()].index;
+    int filter_index = filter_map[filter_num.toStdString()].filter;
+    int crow = custom_filters->currentRow();
+    if(value_index == 0 && crow >= 0) {
         std::string text = filter_num.toStdString();
         if(text.find("SubFilter") != std::string::npos) {
             std::ostringstream stream;
@@ -1132,10 +1147,15 @@ void AC_MainWindow::setSubFilter(const QString &filter_num) {
             Log(stream.str().c_str());
             return;
         }
+        QListWidgetItem *item = custom_filters->item(crow);
         std::ostringstream stream;
         stream << "SubFilter set to: " << filter_num.toStdString() << "\n";
         stream << "SubFilter index: " << filter_index << "\n";
-        playback->setSubFilter(filter_index);
+        std::ostringstream stream1;
+        stream1 << filter_num.toStdString() << ":" << item->text().toStdString();
+        item->setText(stream1.str().c_str());
+        std::vector<FilterValue> v;
+        buildVector(v);
         QString l = stream.str().c_str();
         Log(l);
     } else {

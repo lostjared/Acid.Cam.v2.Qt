@@ -35,7 +35,7 @@ public:
     QComboBox *color_maps, *filters;
     QMenu *file_menu, *controls_menu, *help_menu, *options, *movement, *speed_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
-    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *reset_filters;
+    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images, *reset_filters;
     QAction *help_about;
     QAction *open_search;
     QAction *in_out_increase;
@@ -119,11 +119,11 @@ private:
     unsigned long file_pos, frame_index;
     Playback *playback;
     VideoMode programMode;
-    void buildVector(std::vector<std::pair<int,int>> &v);
+    void buildVector(std::vector<FilterValue> &v);
 };
 
 extern const char *filer_names[];
-extern std::unordered_map<std::string, std::pair<int, int>> filter_map;
+extern std::unordered_map<std::string, FilterValue> filter_map;
 void generate_map();
 
 #endif

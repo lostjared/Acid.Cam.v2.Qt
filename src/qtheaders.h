@@ -6,7 +6,7 @@
 
 #ifndef _QT_HEADERS__
 #define _QT_HEADERS__
-#define ac_version "v1.18.0"
+#define ac_version "v1.19.0"
 #include<QApplication>
 #include<QMainWindow>
 #include<QDialog>
@@ -44,7 +44,19 @@
 #include<vector>
 #include<algorithm>
 
+struct FilterValue {
+    int index, filter, subfilter;
+    FilterValue() : index(0), filter(0), subfilter(-1) {}
+    FilterValue(int i, int f, int s) : index(i), filter(f), subfilter(s) {}
+    FilterValue &operator=(const FilterValue &v) {
+        index = v.index;
+        filter = v.filter;
+        subfilter = v.subfilter;
+        return *this;
+    }
+};
 void init_plugins();
 void draw_plugin(cv::Mat &frame, int filter);
-extern std::unordered_map<std::string, std::pair<int, int>> filter_map;
+extern std::unordered_map<std::string, FilterValue> filter_map;
+
 #endif

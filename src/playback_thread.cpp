@@ -14,7 +14,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     bright_ = gamma_ = saturation_ = 0;
     single_mode = true;
     alpha = 0;
-    prev_filter = std::pair<int, int>(0, 0);
+    prev_filter = FilterValue(0, 0, -1);
     flip_frame1 = false;
     flip_frame2 = false;
     repeat_video = false;
@@ -92,7 +92,7 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
     return true;
 }
 
-void Playback::setVector(std::vector<std::pair<int, int>> v) {
+void Playback::setVector(std::vector<FilterValue> v) {
     mutex_add.lock();
     current = v;
     mutex_add.unlock();
@@ -187,14 +187,16 @@ void Playback::drawEffects(cv::Mat &frame) {
     }
 }
 
-void Playback::drawFilter(cv::Mat &frame, std::pair<int, int> &filter) {
-    if(filter.first == 0) {
-        ac::draw_func[filter.second](frame);
-    } else if(current_filter.first == 1) {
-        current_filterx = filter.second;
+void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
+    if(f.index == 0) {
+        ac::setSubFilter(f.subfilter);
+        ac::draw_func[f.filter](frame);
+        ac::setSubFilter(-1);
+    } else if(current_filter.index == 1) {
+        current_filterx = f.filter;
         ac::alphaFlame(frame);
-    } else if(filter.first == 2) {
-        draw_plugin(frame, filter.second);
+    } else if(f.index == 2) {
+        draw_plugin(frame, f.filter);
     }
 }
 
@@ -227,7 +229,7 @@ void Playback::run() {
         }
         
         mutex.unlock();
-        static std::vector<std::pair<int, int>> cur;
+        static std::vector<FilterValue> cur;
         mutex_shown.lock();
         cur = current;
         mutex_shown.unlock();
@@ -334,7 +336,7 @@ void Playback::Clear() {
 void Playback::Stop() {
     stop = true;
     alpha = 0;
-    prev_filter = std::pair<int, int>(0, 0);
+    prev_filter = FilterValue(0, 0, -1);
 }
 
 void Playback::Release() {
@@ -373,7 +375,7 @@ void Playback::setColorKey(const cv::Mat &image) {
     mutex.unlock();
 }
 
-void Playback::filterFade(cv::Mat &frame, std::pair<int, int> &filter1, std::pair<int, int> &filter2, double alpha) {
+void Playback::filterFade(cv::Mat &frame, FilterValue &filter1, FilterValue &filter2, double alpha) {
     unsigned int h = frame.rows; // frame height
     unsigned int w = frame.cols;// framew idth
     // make copies of original frame
