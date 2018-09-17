@@ -13,6 +13,9 @@
 #include "display_window.h"
 #include "playback_thread.h"
 #include "search_box.h"
+#include "goto_window.h"
+
+class SearchWindow;
 
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
@@ -30,13 +33,25 @@ public:
     QSlider *slide_r, *slide_g, *slide_b, *slide_bright, *slide_gamma, *slide_saturation;
     QProgressBar *progress_bar;
     QComboBox *color_maps, *filters;
-    QMenu *file_menu, *controls_menu, *help_menu;
+    QMenu *file_menu, *controls_menu, *help_menu, *options, *movement, *speed_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
-    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images, *reset_filters;
+    QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *reset_filters;
     QAction *help_about;
     QAction *open_search;
+    QAction *in_out_increase;
+    QAction *in_out;
+    QAction *out_reset;
+    QAction *speed_action_items[7];
+    QMenu *image_menu;
+    QAction *flip1, *flip2, *flip3, *noflip;
+    QAction *clear_sub;
+    QAction *clear_image;
+    QAction *repeat_v;
+    double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
-    
+    void updateList();
+    void setSubFilter(const QString &num);
+    void setFrameIndex(int i);
 public slots:
     void addClicked();
     void rmvClicked();
@@ -53,11 +68,11 @@ public slots:
     void controls_SetImage();
     void controls_ShowVideo();
     void controls_SetKey();
-    void controls_Clear();
     void controls_Reset();
     void help_About();
     void updateFrame(QImage img);
     void stopRecording();
+    void resetIndex();
     void chk_Clicked();
     void cb_SetIndex(int index);
     void frameInc();
@@ -68,6 +83,23 @@ public slots:
     void setFilterSingle();
     void setFilterCustom();
     void openSearch();
+    void movementOption1();
+    void movementOption2();
+    void movementOption3();
+    void speed1();
+    void speed2();
+    void speed3();
+    void speed4();
+    void speed5();
+    void speed6();
+    void speed7();
+    void flip1_action();
+    void flip2_action();
+    void flip3_action();
+    void noflip_action();
+    void clear_subfilter();
+    void clear_img();
+    void repeat_vid();
 private:
     void createControls();
     void createMenu();
@@ -75,6 +107,7 @@ private:
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
     SearchWindow *search_box;
+    GotoWindow *goto_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
     unsigned long video_frames;
@@ -86,11 +119,11 @@ private:
     unsigned long file_pos, frame_index;
     Playback *playback;
     VideoMode programMode;
-    void buildVector(std::vector<FilterValue> &v);
+    void buildVector(std::vector<std::pair<int,int>> &v);
 };
 
 extern const char *filer_names[];
-extern std::unordered_map<std::string, FilterValue> filter_map;
+extern std::unordered_map<std::string, std::pair<int, int>> filter_map;
 void generate_map();
 
 #endif
