@@ -149,18 +149,20 @@ void AC_MainWindow::createControls() {
     btn_moveup = new QPushButton(tr("Move Up"), this);
     btn_movedown = new QPushButton(tr("Move Down"), this);
     btn_sub = new QPushButton(tr("Subfilter"), this);
-    
+    btn_clr = new QPushButton(tr("Clear Sub"), this);
     btn_add->setGeometry(10, 215, 100, 20);
     btn_remove->setGeometry(400, 215, 100, 20);
     btn_moveup->setGeometry(500, 215, 100, 20);
     btn_movedown->setGeometry(600, 215, 100, 20);
-    btn_sub->setGeometry(700, 215, 90, 20);
+    btn_sub->setGeometry(10, 145, 100, 20);
+    btn_clr->setGeometry(115, 145, 100, 20);
     
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(btn_movedown, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(btn_sub, SIGNAL(clicked()), this, SLOT(setSub()));
+    connect(btn_clr, SIGNAL(clicked()), this, SLOT(clear_subfilter()));
     
     QLabel *r_label = new QLabel(tr("Red: "), this);
     r_label->setGeometry(10, 255, 50, 20);
@@ -345,7 +347,14 @@ void AC_MainWindow::createMenu() {
     repeat_v = new QAction(tr("Repeat"), this);
     repeat_v->setCheckable(true);
     repeat_v->setChecked(false);
+    
+    fade_on = new QAction(tr("Fade"), this);
+    fade_on->setCheckable(true);
+    fade_on->setChecked(true);
+    options->addAction(fade_on);
     options->addAction(repeat_v);
+    
+    connect(fade_on, SIGNAL(triggered()), this, SLOT(setFade()));
     connect(repeat_v, SIGNAL(triggered()), this, SLOT(repeat_vid()));
     connect(clear_image, SIGNAL(triggered()), this, SLOT(clear_img()));
     connect(clear_sub, SIGNAL(triggered()), this, SLOT(clear_subfilter()));
@@ -1172,6 +1181,11 @@ void AC_MainWindow::setSubFilter(const QString &filter_num) {
         stream << "Only Regular Filters can be used as a SubFilter not AF\n";
         Log(txt);
     }
+}
+
+void AC_MainWindow::setFade() {
+    bool fc = fade_on->isChecked();
+    playback->setFadeFilter(fc);
 }
 
 void AC_MainWindow::frameInc() {

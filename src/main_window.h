@@ -26,7 +26,7 @@ public:
     bool startCamera(int res, int dev, const QString &outdir, bool record, int type);
     bool startVideo(const QString &filename, const QString &outdir, bool record, int type);
     QListWidget /**filters,*/ *custom_filters;
-    QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown, *btn_sub;
+    QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown, *btn_sub, *btn_clr;
     QTextEdit *log_text;
     QCheckBox *chk_negate;
     QComboBox *combo_rgb;
@@ -47,6 +47,7 @@ public:
     QAction *clear_sub;
     QAction *clear_image;
     QAction *repeat_v;
+    QAction *fade_on;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -100,6 +101,7 @@ public slots:
     void clear_subfilter();
     void clear_img();
     void repeat_vid();
+    void setFade();
 private:
     void createControls();
     void createMenu();

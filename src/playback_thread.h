@@ -39,9 +39,11 @@ private:
     double alpha;
     bool flip_frame1, flip_frame2;
     bool repeat_video;
+    bool fadefilter;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
+    void setFadeFilter(bool f);
     void setFrameIndex(const long &index);
     bool getFrame(QImage &img, const int &index);
     void setRGB(int r, int g, int b);

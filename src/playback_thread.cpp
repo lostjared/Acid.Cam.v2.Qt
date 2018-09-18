@@ -18,6 +18,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     flip_frame1 = false;
     flip_frame2 = false;
     repeat_video = false;
+    fadefilter = true;
 }
 
 void Playback::Play() {
@@ -235,7 +236,7 @@ void Playback::run() {
         mutex_shown.unlock();
         ac::orig_frame = frame.clone();
         if(single_mode == true && alpha > 0) {
-            filterFade(frame, current_filter, prev_filter, alpha);
+            if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
             drawEffects(frame);
             alpha -= 0.08;
         } else if(single_mode == true) {
@@ -365,6 +366,12 @@ void Playback::setImage(const cv::Mat &frame) {
     mutex.lock();
     blend_set = true;
     blend_image = frame;
+    mutex.unlock();
+}
+
+void Playback::setFadeFilter(bool f) {
+    mutex.lock();
+    fadefilter = f;
     mutex.unlock();
 }
 
