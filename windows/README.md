@@ -1,15 +1,2 @@
-
-# Example pro file for Windows
-
-# updated @ Sun Jun  3 14:58:17 PDT 2018
-
-Replace the hardcoded paths with the ones you have for your current version of OpenCV compiled  with Visual Studio.
-Copy this pro into a new directory with the source files and qrc file.
-
-Also copy the source files (.cpp .h) from libacidcam into the directory as well they can be found here:
-
-https://github.com/lostjared/libacidcam/tree/master/source
-
-Using Qt Creator call qmake on the file and it will build Makefiles for Visual Studio.
-
+This folder contains the project files for the Windows version of Acid Cam.It requires you have OpenCV/Qt5 installed and you will need to edit the .pro file with the path to the OpenCV C++ Libraries.
 
