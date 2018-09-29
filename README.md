@@ -83,7 +83,7 @@ Screen shots of program on different Operating Systems:
 
 Screenshot from Windows:
 
-![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.1.win.jpg?raw=true "screenshot 1")
+![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acqt-ss.png?raw=true "screenshot 1")
 
 Screenshot from Linux:
 
