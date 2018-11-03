@@ -8,6 +8,9 @@ class ChromaWindow : public QDialog {
     Q_OBJECT
 public:
     ChromaWindow(QWidget *parent);
+    
+private:
+    void createControls();
 };
 
 
