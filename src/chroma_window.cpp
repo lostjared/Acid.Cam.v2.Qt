@@ -7,7 +7,6 @@ ChromaWindow::ChromaWindow(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Chroma Key"));
     setWindowIcon(QPixmap(":/images/icon.png"));
     createControls();
-    color_dialog = new QColorDialog(this);
 }
 
 void ChromaWindow::createControls() {
@@ -17,5 +16,8 @@ void ChromaWindow::createControls() {
 
 
 void ChromaWindow::openColorSelect() {
+    
+    QColor color = QColorDialog::getColor();
+    
     
 }

@@ -14,7 +14,6 @@ public slots:
     
 private:
     void createControls();
-    QColorDialog *color_dialog;
     QPushButton *button_select;
 };
 
