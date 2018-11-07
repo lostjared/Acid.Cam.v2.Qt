@@ -9,8 +9,13 @@ class ChromaWindow : public QDialog {
 public:
     ChromaWindow(QWidget *parent);
     
+public slots:
+    void openColorSelect();
+    
 private:
     void createControls();
+    QColorDialog *color_dialog;
+    QPushButton *button_select;
 };
 
 

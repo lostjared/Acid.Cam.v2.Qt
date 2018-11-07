@@ -95,6 +95,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     
     int cindex = filters->findText("Self AlphaBlend");
     filters->setCurrentIndex(cindex);
+    chroma_window = new ChromaWindow(this);
+    chroma_window->hide();
 }
 
 void AC_MainWindow::createControls() {
@@ -406,6 +408,9 @@ void AC_MainWindow::createMenu() {
     open_search = new QAction(tr("Search Filters"), this);
     open_search->setShortcut(tr("Ctrl+S"));
     controls_menu->addAction(open_search);
+    select_key = new QAction(tr("Set Chroma Key"), this);
+    controls_menu->addAction(select_key);
+    connect(select_key, SIGNAL(triggered()), this, SLOT(openColorWindow()));
     connect(open_search,SIGNAL(triggered()), this, SLOT(openSearch()));
     connect(controls_snapshot, SIGNAL(triggered()), this, SLOT(controls_Snap()));
     connect(controls_pause, SIGNAL(triggered()), this, SLOT(controls_Pause()));
@@ -1224,4 +1229,8 @@ void AC_MainWindow::help_About() {
 
 void AC_MainWindow::openSearch() {
     search_box->show();
+}
+
+void AC_MainWindow::openColorWindow() {
+    chroma_window->show();
 }

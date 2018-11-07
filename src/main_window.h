@@ -14,6 +14,7 @@
 #include "playback_thread.h"
 #include "search_box.h"
 #include "goto_window.h"
+#include "chroma_window.h"
 
 class SearchWindow;
 
@@ -48,6 +49,7 @@ public:
     QAction *clear_image;
     QAction *repeat_v;
     QAction *fade_on;
+    QAction *select_key;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -102,6 +104,7 @@ public slots:
     void clear_img();
     void repeat_vid();
     void setFade();
+    void openColorWindow();
 private:
     void createControls();
     void createMenu();
@@ -109,6 +112,7 @@ private:
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
     SearchWindow *search_box;
+    ChromaWindow *chroma_window;
     GotoWindow *goto_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
