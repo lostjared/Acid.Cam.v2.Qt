@@ -14,7 +14,7 @@ public slots:
 private:
     void createControls();
     QRadioButton *button_select_range, *button_select_tolerance;
-    QLabel *color_select_low, *color_select_high;
+    QLineEdit *low_b, *low_g, *low_r, *high_b, *high_g, *high_r;
 };
 
 
