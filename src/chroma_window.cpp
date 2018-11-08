@@ -10,14 +10,20 @@ ChromaWindow::ChromaWindow(QWidget *parent) : QDialog(parent) {
 }
 
 void ChromaWindow::createControls() {
-    button_select = new QPushButton("Select Color", this);
-    connect(button_select, SIGNAL(clicked()), this, SLOT(openColorSelect()));
+    button_select_range = new QRadioButton("Color Range", this);
+    button_select_range->setGeometry(75, 25, 120, 20);
+    connect(button_select_range, SIGNAL(clicked()), this, SLOT(openColorSelectRange()));
+    button_select_tolerance = new QRadioButton("Select Color Tolerance", this);
+    button_select_tolerance->setGeometry(75+120+10, 25, 150, 20);
+    connect(button_select_tolerance, SIGNAL(clicked()), this, SLOT(openColorSelectTolerance()));
+    // create 6 text input boxes.
 }
 
 
-void ChromaWindow::openColorSelect() {
-    
-    QColor color = QColorDialog::getColor();
-    
-    
+void ChromaWindow::openColorSelectRange() {
+// set to use range
+}
+
+void ChromaWindow::openColorSelectTolerance() {
+// set to use tolerance
 }

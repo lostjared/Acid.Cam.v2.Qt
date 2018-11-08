@@ -8,21 +8,14 @@ class ChromaWindow : public QDialog {
     Q_OBJECT
 public:
     ChromaWindow(QWidget *parent);
-    
 public slots:
-    void openColorSelect();
-    
+    void openColorSelectRange();
+    void openColorSelectTolerance();
 private:
     void createControls();
-    QPushButton *button_select;
+    QRadioButton *button_select_range, *button_select_tolerance;
+    QLabel *color_select_low, *color_select_high;
 };
-
-
-
-
-
-
-
 
 
 #endif
