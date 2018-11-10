@@ -11,6 +11,9 @@ public:
 public slots:
     void openColorSelectRange();
     void openColorSelectTolerance();
+    void colorAdd();
+    void colorRemove();
+    void colorSet();
 private:
     void createControls();
     QRadioButton *button_select_range, *button_select_tolerance;

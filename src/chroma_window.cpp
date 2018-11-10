@@ -41,6 +41,9 @@ void ChromaWindow::createControls() {
     color_remove->setGeometry(320-10, 155, 75, 20);
     color_okay = new QPushButton(tr("Set Keys"), this);
     color_okay->setGeometry(320-10,210, 75, 20);
+    connect(color_add, SIGNAL(clicked()), this, SLOT(colorAdd()));
+    connect(color_remove, SIGNAL(clicked()), this, SLOT(colorRemove()));
+    connect(color_okay, SIGNAL(clicked()), this, SLOT(colorSet()));
 }
 
 
@@ -54,4 +57,14 @@ void ChromaWindow::openColorSelectTolerance() {
 // set to use tolerance
     string_low->setText(tr("<b>Tolerance -</b>"));
     string_high->setText(tr("<b>Tolerance +</b>"));
+}
+
+void ChromaWindow::colorAdd() {
+    
+}
+void ChromaWindow::colorRemove() {
+    
+}
+void ChromaWindow::colorSet() {
+    
 }
