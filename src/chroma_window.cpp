@@ -10,10 +10,10 @@ ChromaWindow::ChromaWindow(QWidget *parent) : QDialog(parent) {
 }
 
 void ChromaWindow::createControls() {
-    button_select_range = new QRadioButton("Color Range", this);
+    button_select_range = new QRadioButton(tr("Color Range"), this);
     button_select_range->setGeometry(75, 25, 120, 20);
     connect(button_select_range, SIGNAL(clicked()), this, SLOT(openColorSelectRange()));
-    button_select_tolerance = new QRadioButton("Select Color Tolerance", this);
+    button_select_tolerance = new QRadioButton(tr("Select Color Tolerance"), this);
     button_select_tolerance->setGeometry(75+120+10, 25, 150, 20);
     connect(button_select_tolerance, SIGNAL(clicked()), this, SLOT(openColorSelectTolerance()));
     low_b = new QLineEdit("0", this);
@@ -35,10 +35,12 @@ void ChromaWindow::createControls() {
     button_select_range->setChecked(true);
     color_keys = new QListWidget(this);
     color_keys->setGeometry(15, 130, 320-30, 100);
-    color_add = new QPushButton("Add Key", this);
+    color_add = new QPushButton(tr("Add Key"), this);
     color_add->setGeometry(320-10, 130, 75, 20);
-    color_remove = new QPushButton("Remove", this);
+    color_remove = new QPushButton(tr("Remove"), this);
     color_remove->setGeometry(320-10, 155, 75, 20);
+    color_okay = new QPushButton(tr("Set Keys"), this);
+    color_okay->setGeometry(320-10,210, 75, 20);
 }
 
 
