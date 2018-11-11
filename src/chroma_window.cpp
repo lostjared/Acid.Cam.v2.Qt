@@ -10,12 +10,20 @@ ChromaWindow::ChromaWindow(QWidget *parent) : QDialog(parent) {
     createControls();
 }
 
+bool ChromaWindow::checkEdit(QLineEdit *edit) {
+    QString text = edit->text();
+    std::string chk_value;
+    chk_value = text.toStdString();
+    for(unsigned int i = 0; i < chk_value.length(); ++i) {
+        if(!(chk_value[i] >= '0' && chk_value[i] <= '9'))
+            return false;
+    }
+    return true;
+}
+
 bool ChromaWindow::checkInput(cv::Vec3b &low, cv::Vec3b &high) {
     double lo_b, lo_g, lo_r;
     double hi_b, hi_g, hi_r;
-    
-    
-    
     lo_b = atof(low_b->text().toStdString().c_str());
     lo_g = atof(low_g->text().toStdString().c_str());
     lo_r = atof(low_r->text().toStdString().c_str());
@@ -85,11 +93,17 @@ void ChromaWindow::openColorSelectTolerance() {
 
 void ChromaWindow::colorAdd() {
     cv::Vec3b low, high;
+    QLineEdit *array[] = { low_r, low_g, low_b, high_r, high_g, high_b, 0 };
+    for(int i = 0; array[i] != 0; ++i) {
+        if(checkEdit(array[i])==false) {
+            QMessageBox::information(this, "Invalid Value", "Values must be between 0-255 no characters");
+            return;
+        }
+    }
     if(checkInput(low, high)==false) {
         QMessageBox::information(this,"Error ","Error Color Values must be between 0-255");
         return;
     }
-    
 }
 void ChromaWindow::colorRemove() {
     
