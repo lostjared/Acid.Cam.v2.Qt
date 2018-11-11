@@ -8,6 +8,7 @@ class ChromaWindow : public QDialog {
     Q_OBJECT
 public:
     ChromaWindow(QWidget *parent);
+    bool checkInput(cv::Vec3b &low, cv::Vec3b &high);
 public slots:
     void openColorSelectRange();
     void openColorSelectTolerance();

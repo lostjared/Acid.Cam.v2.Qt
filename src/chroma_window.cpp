@@ -1,12 +1,36 @@
 
 #include "chroma_window.h"
-
+#include<cmath>
+#include<cstdlib>
 
 ChromaWindow::ChromaWindow(QWidget *parent) : QDialog(parent) {
     setFixedSize(400, 240);
     setWindowTitle(tr("Chroma Key"));
     setWindowIcon(QPixmap(":/images/icon.png"));
     createControls();
+}
+
+bool ChromaWindow::checkInput(cv::Vec3b &low, cv::Vec3b &high) {
+    double lo_b, lo_g, lo_r;
+    double hi_b, hi_g, hi_r;
+    
+    
+    
+    lo_b = atof(low_b->text().toStdString().c_str());
+    lo_g = atof(low_g->text().toStdString().c_str());
+    lo_r = atof(low_r->text().toStdString().c_str());
+    hi_b = atof(high_b->text().toStdString().c_str());
+    hi_g = atof(high_g->text().toStdString().c_str());
+    hi_r = atof(high_r->text().toStdString().c_str());
+    if(lo_b >= 0 && lo_b <= 255 && lo_g >= 0 && lo_g <= 255 && lo_r >= 0 && lo_r <= 255 && hi_b >= 0 && hi_b <= 255 && hi_g >= 0 && hi_g <= 255 && hi_b >= 0 && hi_b <= 255)
+    return true;
+    low[0] = lo_b;
+    low[1] = lo_g;
+    low[2] = lo_r;
+    high[0] = lo_b;
+    high[1] = lo_g;
+    high[2] = lo_r;
+    return false;
 }
 
 void ChromaWindow::createControls() {
@@ -60,6 +84,11 @@ void ChromaWindow::openColorSelectTolerance() {
 }
 
 void ChromaWindow::colorAdd() {
+    cv::Vec3b low, high;
+    if(checkInput(low, high)==false) {
+        QMessageBox::information(this,"Error ","Error Color Values must be between 0-255");
+        return;
+    }
     
 }
 void ChromaWindow::colorRemove() {
