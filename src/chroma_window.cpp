@@ -127,7 +127,14 @@ void ChromaWindow::colorAdd() {
     color_keys->addItem(text);
 }
 void ChromaWindow::colorRemove() {
-    
+    int index = color_keys->currentRow();
+    if(index >= 0) {
+        QListWidgetItem *i = color_keys->takeItem(index);
+        auto in = colorkeys_vec.begin()+index;
+        if(!colorkeys_vec.empty()) {
+            colorkeys_vec.erase(in);
+        }
+    }
 }
 void ChromaWindow::colorSet() {
     QString text;
