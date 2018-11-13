@@ -23,6 +23,7 @@ private:
     QLabel *string_low, *string_high;
     QListWidget *color_keys;
     QPushButton *color_add, *color_remove, *color_okay;
+    std::vector<ac::Keys> colorkeys_vec;
 };
 
 

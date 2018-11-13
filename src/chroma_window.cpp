@@ -30,14 +30,18 @@ bool ChromaWindow::checkInput(cv::Vec3b &low, cv::Vec3b &high) {
     hi_b = atof(high_b->text().toStdString().c_str());
     hi_g = atof(high_g->text().toStdString().c_str());
     hi_r = atof(high_r->text().toStdString().c_str());
-    if(lo_b >= 0 && lo_b <= 255 && lo_g >= 0 && lo_g <= 255 && lo_r >= 0 && lo_r <= 255 && hi_b >= 0 && hi_b <= 255 && hi_g >= 0 && hi_g <= 255 && hi_b >= 0 && hi_b <= 255)
-    return true;
     low[0] = lo_b;
     low[1] = lo_g;
     low[2] = lo_r;
-    high[0] = lo_b;
-    high[1] = lo_g;
-    high[2] = lo_r;
+    high[0] = hi_b;
+    high[1] = hi_g;
+    high[2] = hi_r;
+    
+    if(button_select_range->isChecked() && (lo_b > hi_b || lo_g > hi_g || lo_r > hi_r))
+            return false;
+    
+    if(lo_b >= 0 && lo_b <= 255 && lo_g >= 0 && lo_g <= 255 && lo_r >= 0 && lo_r <= 255 && hi_b >= 0 && hi_b <= 255 && hi_g >= 0 && hi_g <= 255 && hi_b >= 0 && hi_b <= 255)
+    return true;
     return false;
 }
 
@@ -101,13 +105,34 @@ void ChromaWindow::colorAdd() {
         }
     }
     if(checkInput(low, high)==false) {
-        QMessageBox::information(this,"Error ","Error Color Values must be between 0-255");
+        QMessageBox::information(this,"Error ","Error Color Values must be between 0-255 and a valid range");
         return;
     }
+    ac::Keys key_id;
+    key_id.low = low;
+    key_id.high = high;
+    if(button_select_range->isChecked())
+        key_id.key_type = ac::KeyValueType::KEY_RANGE;
+     else
+        key_id.key_type = ac::KeyValueType::KEY_TOLERANCE;
+    colorkeys_vec.push_back(key_id);
+    QString text;
+    QTextStream stream(&text);
+    QString type_key = ((key_id.key_type == ac::KeyValueType::KEY_RANGE) ? "Range" : "Tolerance");
+    
+    stream << "Added Chroma Key " << type_key << "\n" << colorkeys_vec.size() << " Keys set.\n";
+    QMessageBox::information(this, "Key Added", text);
+    text = "";
+    stream << type_key << " BGR(" << low[0] << "," << low[1] << "," << low[2] << ") - BGR(" << high[0] << "," << high[1] << "," << high[2] << ")\n";
+    color_keys->addItem(text);
 }
 void ChromaWindow::colorRemove() {
     
 }
 void ChromaWindow::colorSet() {
-    
+    QString text;
+    QTextStream stream(&text);
+    stream << "Set " << colorkeys_vec.size() << " Chroma Keys.\n";
+    QMessageBox::information(this, "Set Key Values", text);
+    ac::setBlockedColorKeys(colorkeys_vec);
 }
