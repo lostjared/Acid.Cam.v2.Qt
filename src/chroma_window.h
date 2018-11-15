@@ -10,7 +10,7 @@ public:
     ChromaWindow(QWidget *parent);
     bool checkInput(cv::Vec3b &low, cv::Vec3b &high);
     bool checkEdit(QLineEdit *edit);
-    void setEditFromVec(int val, QColor color);
+    void setEditFromColor(int val, QColor color);
 public slots:
     void openColorSelectRange();
     void openColorSelectTolerance();

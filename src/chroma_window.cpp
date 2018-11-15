@@ -158,7 +158,7 @@ void ChromaWindow::colorSet() {
     ac::setBlockedColorKeys(colorkeys_vec);
 }
 
-void ChromaWindow::setEditFromVec(int val, QColor color) {
+void ChromaWindow::setEditFromColor(int val, QColor color) {
     if(val == 0) {
     	QString text;
     	QTextStream stream(&text);
@@ -194,7 +194,7 @@ void ChromaWindow::setColorLow() {
     set_low_color = color;
     lowColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
     lowColor->setText("");
-    setEditFromVec(0, color);
+    setEditFromColor(0, color);
 }
 
 void ChromaWindow::setColorHigh() {
@@ -205,5 +205,5 @@ void ChromaWindow::setColorHigh() {
     set_high_color = color;
     highColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
     highColor->setText("");
-    setEditFromVec(1, color);
+    setEditFromColor(1, color);
 }
