@@ -16,6 +16,8 @@ public slots:
     void colorAdd();
     void colorRemove();
     void colorSet();
+    void setColorLow();
+    void setColorHigh();
 private:
     void createControls();
     QRadioButton *button_select_range, *button_select_tolerance;
@@ -23,7 +25,10 @@ private:
     QLabel *string_low, *string_high;
     QListWidget *color_keys;
     QPushButton *color_add, *color_remove, *color_okay;
+    QLabel *lowColor, *highColor;
     std::vector<ac::Keys> colorkeys_vec;
+    QPushButton *lowButton, *highButton;
+    QColor set_low_color, set_high_color;
 };
 
 

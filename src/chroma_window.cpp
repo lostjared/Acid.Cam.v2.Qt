@@ -77,9 +77,23 @@ void ChromaWindow::createControls() {
     color_remove->setGeometry(320-10, 155, 75, 20);
     color_okay = new QPushButton(tr("Set Keys"), this);
     color_okay->setGeometry(320-10,210, 75, 20);
+    
+    lowColor = new QLabel("Set", this);
+    highColor = new QLabel("Set", this);
+    
+    lowColor->setGeometry(330, 65, 25, 20);
+    highColor->setGeometry(330, 90, 25, 20);
+    
+    lowButton = new QPushButton("Set", this);
+    lowButton->setGeometry(300, 65, 25, 20);
+    highButton = new QPushButton("Set", this);
+    highButton->setGeometry(300, 90, 25, 20);
+    
     connect(color_add, SIGNAL(clicked()), this, SLOT(colorAdd()));
     connect(color_remove, SIGNAL(clicked()), this, SLOT(colorRemove()));
     connect(color_okay, SIGNAL(clicked()), this, SLOT(colorSet()));
+    connect(lowButton, SIGNAL(clicked()), this, SLOT(setColorLow()));
+    connect(highButton, SIGNAL(clicked()), this, SLOT(setColorHigh()));
 }
 
 
@@ -129,7 +143,7 @@ void ChromaWindow::colorAdd() {
 void ChromaWindow::colorRemove() {
     int index = color_keys->currentRow();
     if(index >= 0) {
-        QListWidgetItem *i = color_keys->takeItem(index);
+        /*QListWidgetItem *i = */color_keys->takeItem(index);
         auto in = colorkeys_vec.begin()+index;
         if(!colorkeys_vec.empty()) {
             colorkeys_vec.erase(in);
@@ -142,4 +156,25 @@ void ChromaWindow::colorSet() {
     stream << "Set " << colorkeys_vec.size() << " Chroma Keys.\n";
     QMessageBox::information(this, "Set Key Values", text);
     ac::setBlockedColorKeys(colorkeys_vec);
+}
+
+
+void ChromaWindow::setColorLow() {
+    QColorDialog *dialog = new QColorDialog(this);
+    QColor color=  dialog->getColor();
+    QVariant variant= color;
+    QString colcode = variant.toString();
+    set_low_color = color;
+    lowColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
+    lowColor->setText("");
+}
+
+void ChromaWindow::setColorHigh() {
+    QColorDialog *dialog = new QColorDialog(this);
+    QColor color = dialog->getColor();
+    QVariant variant= color;
+    QString colcode = variant.toString();
+    set_high_color = color;
+    highColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
+    highColor->setText("");
 }
