@@ -78,8 +78,8 @@ void ChromaWindow::createControls() {
     color_okay = new QPushButton(tr("Set Keys"), this);
     color_okay->setGeometry(320-10,210, 75, 20);
     
-    lowColor = new QLabel("Set", this);
-    highColor = new QLabel("Set", this);
+    lowColor = new QLabel("", this);
+    highColor = new QLabel("", this);
     
     lowColor->setGeometry(330, 65, 25, 20);
     highColor->setGeometry(330, 90, 25, 20);
@@ -101,12 +101,16 @@ void ChromaWindow::openColorSelectRange() {
     // set to use range
     string_low->setText(tr("<b>BGR Low:</b> "));
     string_high->setText(tr("<b>BGR High:</b>"));
+    highColor->show();
+    highButton->show();
 }
 
 void ChromaWindow::openColorSelectTolerance() {
     // set to use tolerance
     string_low->setText(tr("<b>Tolerance -</b>"));
     string_high->setText(tr("<b>Tolerance +</b>"));
+    highColor->hide();
+    highButton->hide();
 }
 
 void ChromaWindow::colorAdd() {
@@ -127,8 +131,23 @@ void ChromaWindow::colorAdd() {
     key_id.high = high;
     if(button_select_range->isChecked())
         key_id.key_type = ac::KeyValueType::KEY_RANGE;
-    else
+    else {
         key_id.key_type = ac::KeyValueType::KEY_TOLERANCE;
+        int low_color[] = { set_low_color.blue()-low[0], set_low_color.green()-low[1], set_low_color.red()-low[2]};
+        for(int i = 0; i < 3; ++i) {
+            if(low_color[i] < 0)
+                low_color[i] = 0;
+            key_id.low[i] = low_color[i];
+        }
+        int high_color[] = { set_high_color.blue()+high[0], set_high_color.green()+high[1], set_high_color.red()+high[2]};
+        for(int i = 0; i < 3; ++i) {
+            if(high_color[i] > 255)
+                high_color[i] = 255;
+            key_id.high[i] = high_color[i];
+        }
+        low = key_id.low;
+        high = key_id.high;
+    }
     colorkeys_vec.push_back(key_id);
     QString text;
     QTextStream stream(&text);
@@ -194,7 +213,8 @@ void ChromaWindow::setColorLow() {
     set_low_color = color;
     lowColor->setStyleSheet("QLabel { background-color :" + color_var + " ; }");
     lowColor->setText("");
-    setEditFromColor(0, color);
+    if(!button_select_range->isChecked())
+        setEditFromColor(0, color);
 }
 
 void ChromaWindow::setColorHigh() {
@@ -205,6 +225,7 @@ void ChromaWindow::setColorHigh() {
     set_high_color = color;
     highColor->setStyleSheet("QLabel { background-color :" + color_var + " ;}");
     highColor->setText("");
-    setEditFromColor(1, color);
+    if(!button_select_range->isChecked())
+        setEditFromColor(1, color);
 }
 
