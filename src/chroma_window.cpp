@@ -38,10 +38,10 @@ bool ChromaWindow::checkInput(cv::Vec3b &low, cv::Vec3b &high) {
     high[2] = hi_r;
     
     if(button_select_range->isChecked() && (lo_b > hi_b || lo_g > hi_g || lo_r > hi_r))
-            return false;
+        return false;
     
     if(lo_b >= 0 && lo_b <= 255 && lo_g >= 0 && lo_g <= 255 && lo_r >= 0 && lo_r <= 255 && hi_b >= 0 && hi_b <= 255 && hi_g >= 0 && hi_g <= 255 && hi_b >= 0 && hi_b <= 255)
-    return true;
+        return true;
     return false;
 }
 
@@ -98,13 +98,13 @@ void ChromaWindow::createControls() {
 
 
 void ChromaWindow::openColorSelectRange() {
-// set to use range
+    // set to use range
     string_low->setText(tr("<b>BGR Low:</b> "));
     string_high->setText(tr("<b>BGR High:</b>"));
 }
 
 void ChromaWindow::openColorSelectTolerance() {
-// set to use tolerance
+    // set to use tolerance
     string_low->setText(tr("<b>Tolerance -</b>"));
     string_high->setText(tr("<b>Tolerance +</b>"));
 }
@@ -127,7 +127,7 @@ void ChromaWindow::colorAdd() {
     key_id.high = high;
     if(button_select_range->isChecked())
         key_id.key_type = ac::KeyValueType::KEY_RANGE;
-     else
+    else
         key_id.key_type = ac::KeyValueType::KEY_TOLERANCE;
     colorkeys_vec.push_back(key_id);
     QString text;
@@ -160,10 +160,10 @@ void ChromaWindow::colorSet() {
 
 void ChromaWindow::setEditFromColor(int val, QColor color) {
     if(val == 0) {
-    	QString text;
-    	QTextStream stream(&text);
-    	stream << color.blue();
-    	low_b->setText(text);
+        QString text;
+        QTextStream stream(&text);
+        stream << color.blue();
+        low_b->setText(text);
         text = "";
         stream << color.green();
         low_g->setText(text);
@@ -189,10 +189,10 @@ void ChromaWindow::setEditFromColor(int val, QColor color) {
 void ChromaWindow::setColorLow() {
     QColorDialog *dialog = new QColorDialog(this);
     QColor color=  dialog->getColor();
-    QVariant variant= color;
-    QString colcode = variant.toString();
+    QVariant variant = color;
+    QString color_var = variant.toString();
     set_low_color = color;
-    lowColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
+    lowColor->setStyleSheet("QLabel { background-color :" + color_var + " ; }");
     lowColor->setText("");
     setEditFromColor(0, color);
 }
@@ -200,10 +200,11 @@ void ChromaWindow::setColorLow() {
 void ChromaWindow::setColorHigh() {
     QColorDialog *dialog = new QColorDialog(this);
     QColor color = dialog->getColor();
-    QVariant variant= color;
-    QString colcode = variant.toString();
+    QVariant variant = color;
+    QString color_var = variant.toString();
     set_high_color = color;
-    highColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
+    highColor->setStyleSheet("QLabel { background-color :" + color_var + " ;}");
     highColor->setText("");
     setEditFromColor(1, color);
 }
+
