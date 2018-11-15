@@ -158,6 +158,33 @@ void ChromaWindow::colorSet() {
     ac::setBlockedColorKeys(colorkeys_vec);
 }
 
+void ChromaWindow::setEditFromVec(int val, QColor color) {
+    if(val == 0) {
+    	QString text;
+    	QTextStream stream(&text);
+    	stream << color.blue();
+    	low_b->setText(text);
+        text = "";
+        stream << color.green();
+        low_g->setText(text);
+        text = "";
+        stream << color.red();
+        low_r->setText(text);
+        text = "";
+    } else if(val == 1) {
+        QString text;
+        QTextStream stream(&text);
+        stream << color.blue();
+        high_b->setText(text);
+        text = "";
+        stream << color.green();
+        high_g->setText(text);
+        text = "";
+        stream << color.red();
+        high_r->setText(text);
+        text = "";
+    }
+}
 
 void ChromaWindow::setColorLow() {
     QColorDialog *dialog = new QColorDialog(this);
@@ -167,6 +194,7 @@ void ChromaWindow::setColorLow() {
     set_low_color = color;
     lowColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
     lowColor->setText("");
+    setEditFromVec(0, color);
 }
 
 void ChromaWindow::setColorHigh() {
@@ -177,4 +205,5 @@ void ChromaWindow::setColorHigh() {
     set_high_color = color;
     highColor->setStyleSheet("QLabel { background-color :"+colcode+" ; color : blue; }");
     highColor->setText("");
+    setEditFromVec(1, color);
 }
