@@ -139,7 +139,7 @@ void ChromaWindow::colorAdd() {
                 low_color[i] = 0;
             key_id.low[i] = low_color[i];
         }
-        int high_color[] = { set_high_color.blue()+high[0], set_high_color.green()+high[1], set_high_color.red()+high[2]};
+        int high_color[] = { set_low_color.blue()+high[0], set_low_color.green()+high[1], set_low_color.red()+high[2]};
         for(int i = 0; i < 3; ++i) {
             if(high_color[i] > 255)
                 high_color[i] = 255;
