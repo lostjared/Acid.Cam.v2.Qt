@@ -19,6 +19,7 @@ public slots:
     void colorSet();
     void setColorLow();
     void setColorHigh();
+    void setImage();
 private:
     void createControls();
     QRadioButton *button_select_range, *button_select_tolerance;
@@ -31,6 +32,9 @@ private:
     QPushButton *lowButton, *highButton;
     QColor set_low_color, set_high_color;
     QComboBox *select_mode;
+    QPushButton *select_setimage;
+    QLabel *select_image_path;
+    QCheckBox *keys_enabled;
 };
 
 

@@ -95,6 +95,16 @@ void ChromaWindow::createControls() {
     select_mode->addItem("Replace with Filter");
     select_mode->addItem("Replace with Image");
     
+    select_setimage = new QPushButton("Image", this);
+    select_setimage->setGeometry(20, 265, 60, 20);
+    
+    select_image_path = new QLabel("Test Path", this);
+    select_image_path->setGeometry(85, 265, 400-85-5, 20);
+    
+    keys_enabled = new QCheckBox("Enable", this);
+    keys_enabled->setGeometry(315, 240, 80, 20);
+    
+    connect(select_setimage, SIGNAL(clicked()), this, SLOT(setImage()));
     connect(color_add, SIGNAL(clicked()), this, SLOT(colorAdd()));
     connect(color_remove, SIGNAL(clicked()), this, SLOT(colorRemove()));
     connect(color_okay, SIGNAL(clicked()), this, SLOT(colorSet()));
@@ -102,6 +112,10 @@ void ChromaWindow::createControls() {
     connect(highButton, SIGNAL(clicked()), this, SLOT(setColorHigh()));
 }
 
+
+void ChromaWindow::setImage() {
+    
+}
 
 void ChromaWindow::openColorSelectRange() {
     // set to use range
