@@ -259,6 +259,22 @@ void ChromaWindow::enableKey(bool op) {
             keys_enabled->setChecked(false);
             return;
         }
+        
+        int row = select_mode->currentIndex();
+        if(row >= 0) {
+            switch(row) {
+                case 0:
+                    colorkey_filter = true;
+                    break;
+                case 1:
+                    break;
+            }
+        }
+    } else {
+        colorkey_filter = false;
+        colorkey_set = false;
+        colorkey_bg = false;
+        colorkey_replace = false;
     }
 }
 
