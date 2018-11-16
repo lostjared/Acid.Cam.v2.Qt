@@ -213,8 +213,9 @@ void ChromaWindow::setColorLow() {
     set_low_color = color;
     lowColor->setStyleSheet("QLabel { background-color :" + color_var + " ; }");
     lowColor->setText("");
-    if(!button_select_range->isChecked())
+    if(button_select_range->isChecked()) {
         setEditFromColor(0, color);
+    }
 }
 
 void ChromaWindow::setColorHigh() {
@@ -225,7 +226,8 @@ void ChromaWindow::setColorHigh() {
     set_high_color = color;
     highColor->setStyleSheet("QLabel { background-color :" + color_var + " ;}");
     highColor->setText("");
-    if(!button_select_range->isChecked())
+    if(button_select_range->isChecked()) {
         setEditFromColor(1, color);
+    }
 }
 
