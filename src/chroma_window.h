@@ -11,6 +11,7 @@ public:
     bool checkInput(cv::Vec3b &low, cv::Vec3b &high);
     bool checkEdit(QLineEdit *edit);
     void setEditFromColor(int val, QColor color);
+    void enableKey(bool op);
 public slots:
     void openColorSelectRange();
     void openColorSelectTolerance();
@@ -20,6 +21,7 @@ public slots:
     void setColorLow();
     void setColorHigh();
     void setImage();
+    void toggleKey();
 private:
     void createControls();
     QRadioButton *button_select_range, *button_select_tolerance;

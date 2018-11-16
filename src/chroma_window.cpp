@@ -110,6 +110,7 @@ void ChromaWindow::createControls() {
     connect(color_okay, SIGNAL(clicked()), this, SLOT(colorSet()));
     connect(lowButton, SIGNAL(clicked()), this, SLOT(setColorLow()));
     connect(highButton, SIGNAL(clicked()), this, SLOT(setColorHigh()));
+    connect(keys_enabled, SIGNAL(clicked()), this, SLOT(toggleKey()));
 }
 
 
@@ -251,3 +252,20 @@ void ChromaWindow::setColorHigh() {
     }
 }
 
+void ChromaWindow::enableKey(bool op) {
+    if(op) {
+        if(colorkeys_vec.size()==0) {
+            QMessageBox::information(this, "Needs a Key", "Please set a key to enable this feature");
+            keys_enabled->setChecked(false);
+            return;
+        }
+    }
+}
+
+void ChromaWindow::toggleKey() {
+    if(keys_enabled->isChecked()) {
+        enableKey(true);
+    } else {
+        enableKey(false);
+    }
+}
