@@ -30,6 +30,7 @@ private:
     std::vector<ac::Keys> colorkeys_vec;
     QPushButton *lowButton, *highButton;
     QColor set_low_color, set_high_color;
+    QComboBox *select_mode;
 };
 
 

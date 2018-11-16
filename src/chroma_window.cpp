@@ -4,7 +4,7 @@
 #include<cstdlib>
 
 ChromaWindow::ChromaWindow(QWidget *parent) : QDialog(parent) {
-    setFixedSize(400, 240);
+    setFixedSize(400, 300);
     setWindowTitle(tr("Chroma Key"));
     setWindowIcon(QPixmap(":/images/icon.png"));
     createControls();
@@ -88,6 +88,12 @@ void ChromaWindow::createControls() {
     lowButton->setGeometry(300, 65, 25, 20);
     highButton = new QPushButton("Set", this);
     highButton->setGeometry(300, 90, 25, 20);
+    
+    select_mode = new QComboBox(this);
+    select_mode->setGeometry(15, 235, 290, 25);
+    
+    select_mode->addItem("Replace with Filter");
+    select_mode->addItem("Replace with Image");
     
     connect(color_add, SIGNAL(clicked()), this, SLOT(colorAdd()));
     connect(color_remove, SIGNAL(clicked()), this, SLOT(colorRemove()));
