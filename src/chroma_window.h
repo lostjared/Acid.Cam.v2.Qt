@@ -22,6 +22,10 @@ public slots:
     void setColorHigh();
     void setImage();
     void toggleKey();
+    void editSetLowB(const QString &text);
+    void editSetLowG(const QString &text);
+    void editSetLowR(const QString &text);
+    void editSetHigh();
 private:
     void createControls();
     QRadioButton *button_select_range, *button_select_tolerance;
