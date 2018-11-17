@@ -7,6 +7,8 @@ ChromaWindow::ChromaWindow(QWidget *parent) : QDialog(parent) {
     setFixedSize(400, 300);
     setWindowTitle(tr("Chroma Key"));
     setWindowIcon(QPixmap(":/images/icon.png"));
+    color1_set = false;
+    color2_set = false;
     createControls();
 }
 
@@ -135,6 +137,7 @@ void ChromaWindow::openColorSelectTolerance() {
 }
 
 void ChromaWindow::colorAdd() {
+    
     cv::Vec3b low, high;
     QLineEdit *array[] = { low_r, low_g, low_b, high_r, high_g, high_b, 0 };
     for(int i = 0; array[i] != 0; ++i) {
@@ -143,6 +146,12 @@ void ChromaWindow::colorAdd() {
             return;
         }
     }
+    
+    if(button_select_range->isChecked() == false && color1_set == false) {
+        QMessageBox::information(this, "Please Set a Color", "Please Select a Color with Set Button");
+        return;
+    }
+    
     if(checkInput(low, high)==false) {
         QMessageBox::information(this,"Error ","Error Color Values must be between 0-255 and a valid range");
         return;
@@ -150,8 +159,9 @@ void ChromaWindow::colorAdd() {
     ac::Keys key_id;
     key_id.low = low;
     key_id.high = high;
-    if(button_select_range->isChecked())
+    if(button_select_range->isChecked()) {
         key_id.key_type = ac::KeyValueType::KEY_RANGE;
+    }
     else {
         key_id.key_type = ac::KeyValueType::KEY_TOLERANCE;
         int low_color[] = { set_low_color.blue()-low[0], set_low_color.green()-low[1], set_low_color.red()-low[2]};
@@ -234,6 +244,7 @@ void ChromaWindow::setColorLow() {
     set_low_color = color;
     lowColor->setStyleSheet("QLabel { background-color :" + color_var + " ; }");
     lowColor->setText("");
+    color1_set = true;
     if(button_select_range->isChecked()) {
         setEditFromColor(0, color);
     }
@@ -247,6 +258,7 @@ void ChromaWindow::setColorHigh() {
     set_high_color = color;
     highColor->setStyleSheet("QLabel { background-color :" + color_var + " ;}");
     highColor->setText("");
+    color2_set = false;
     if(button_select_range->isChecked()) {
         setEditFromColor(1, color);
     }
@@ -262,9 +274,13 @@ void ChromaWindow::enableKey(bool op) {
         
         int row = select_mode->currentIndex();
         if(row >= 0) {
+            QString keys_text;
+            QTextStream stream(&keys_text);
             switch(row) {
                 case 0:
                     colorkey_filter = true;
+                    stream << "Enabled " << colorkeys_vec.size() << " keys in filter mode";
+                    QMessageBox::information(this, "Enabled Keys", keys_text);
                     break;
                 case 1:
                     break;

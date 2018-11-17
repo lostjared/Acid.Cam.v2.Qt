@@ -37,6 +37,7 @@ private:
     QPushButton *select_setimage;
     QLabel *select_image_path;
     QCheckBox *keys_enabled;
+    bool color1_set, color2_set;
 };
 
 
