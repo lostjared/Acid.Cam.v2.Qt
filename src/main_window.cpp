@@ -1008,7 +1008,9 @@ void AC_MainWindow::controls_Pause() {
         controls_pause->setText("Paused");
         controls_pause->setChecked(true);
         paused = true;
-        if(programMode == MODE_VIDEO) goto_window->showWindow(frame_index, 0, video_frames);
+        if(programMode == MODE_VIDEO) {
+            goto_window->showWindow(frame_index, 0, video_frames);
+        }
         playback->Stop();
     } else {
         controls_pause->setText("Pause");
