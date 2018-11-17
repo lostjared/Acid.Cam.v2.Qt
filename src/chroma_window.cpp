@@ -111,7 +111,7 @@ void ChromaWindow::createControls() {
     select_setimage->setGeometry(20, 265, 60, 20);
     
     select_image_path = new QLabel("Test Path", this);
-    select_image_path->setGeometry(85, 265, 400-85-5, 20);
+    select_image_path->setGeometry(85, 265, 400-85-25, 20);
     
     keys_enabled = new QCheckBox("Enable", this);
     keys_enabled->setGeometry(315, 240, 80, 20);
@@ -127,7 +127,15 @@ void ChromaWindow::createControls() {
 
 
 void ChromaWindow::setImage() {
-    
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"),".", tr("Image Files (*.png *.jpg *.bmp *.tiff)"));
+    if(fileName != "") {
+        color_replace_image = cv::imread(fileName.toStdString());
+        if(color_replace_image.empty()) {
+            QMessageBox::information(this, "Error", "Could not open image file...");
+        } else {
+            select_image_path->setText(fileName);
+        }
+    }
 }
 
 void ChromaWindow::openColorSelectRange() {
@@ -296,6 +304,16 @@ void ChromaWindow::enableKey(bool op) {
                     QMessageBox::information(this, "Enabled Keys", keys_text);
                     break;
                 case 1:
+                    if(color_replace_image.empty()) {
+                        QMessageBox::information(this, "Need to Set Image", "Please Select a image to replace key with");
+                        return;
+                    }
+                    colorkey_filter = false;
+                    colorkey_set = false;
+                    colorkey_bg = false;
+                    colorkey_replace = true;
+                    stream << "Enabled Key replace with: " << select_image_path->text() << "\n";
+                    QMessageBox::information(this, "Key Replaced", keys_text);
                     break;
             }
         }
