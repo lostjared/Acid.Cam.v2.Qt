@@ -181,7 +181,7 @@ void Playback::drawEffects(cv::Mat &frame) {
     if(saturation_ > 0) {
         ac::setSaturation(frame, saturation_);
     }
-    if(colorkey_set == true && !color_image.empty()) {
+    if(colorkey_filter == true ||  (colorkey_replace == true && !color_replace_image.empty())) {
         cv::Mat cframe = frame.clone();
         cv::Vec3b well_color(255,0,255);
         ac::filterColorKeyed(well_color, ac::orig_frame, cframe, frame);
