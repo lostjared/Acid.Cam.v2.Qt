@@ -289,6 +289,9 @@ void ChromaWindow::enableKey(bool op) {
             switch(row) {
                 case 0:
                     colorkey_filter = true;
+                    colorkey_set = false;
+                    colorkey_bg = false;
+                    colorkey_replace = false;
                     stream << "Enabled " << colorkeys_vec.size() << " keys in filter mode";
                     QMessageBox::information(this, "Enabled Keys", keys_text);
                     break;
