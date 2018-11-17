@@ -25,7 +25,9 @@ public slots:
     void editSetLowB(const QString &text);
     void editSetLowG(const QString &text);
     void editSetLowR(const QString &text);
-    void editSetHigh();
+    void editSetHighB(const QString &text);
+    void editSetHighG(const QString &text);
+    void editSetHighR(const QString &text);
 private:
     void createControls();
     QRadioButton *button_select_range, *button_select_tolerance;

@@ -84,10 +84,12 @@ void ChromaWindow::createControls() {
     connect(low_g, SIGNAL(textChanged(const QString &)), this, SLOT(editSetLowG(const QString &)));
     connect(low_r, SIGNAL(textChanged(const QString &)), this, SLOT(editSetLowR(const QString &)));
 
-    connect(high_b, SIGNAL(returnPressed()), this, SLOT(editSetHigh()));
-    connect(high_g, SIGNAL(returnPressed()), this, SLOT(editSetHigh()));
-    connect(high_r, SIGNAL(returnPressed()), this, SLOT(editSetHigh()));
-
+   
+    connect(high_b, SIGNAL(textChanged(const QString &)), this, SLOT(editSetHighB(const QString &)));
+    connect(high_g, SIGNAL(textChanged(const QString &)), this, SLOT(editSetHighG(const QString &)));
+    connect(high_r, SIGNAL(textChanged(const QString &)), this, SLOT(editSetHighR(const QString &)));
+    
+    
     lowColor = new QLabel("", this);
     highColor = new QLabel("", this);
     
@@ -372,6 +374,64 @@ void ChromaWindow::editSetLowR(const QString &text) {
     color1_set = true;
 }
 
-void ChromaWindow::editSetHigh() {
+void ChromaWindow::editSetHighB(const QString &text) {
+    if(button_select_range->isChecked()==false)
+        return;
     
+    cv::Vec3b low;
+    double lo_b, lo_g, lo_r;
+    lo_b = atof(text.toStdString().c_str());
+    lo_g = atof(high_g->text().toStdString().c_str());
+    lo_r = atof(high_r->text().toStdString().c_str());
+    low[0] = cv::saturate_cast<unsigned char>(lo_b);
+    low[1] = cv::saturate_cast<unsigned char>(lo_g);
+    low[2] = cv::saturate_cast<unsigned char>(lo_r);
+    QColor color_value(low[2], low[1], low[0]);
+    QVariant variant = color_value;
+    QString color_var = variant.toString();
+    set_high_color = color_value;
+    highColor->setStyleSheet("QLabel { background-color :" + color_var + " ; }");
+    highColor->setText("");
+    color2_set = true;
 }
+void ChromaWindow::editSetHighG(const QString &text) {
+    if(button_select_range->isChecked()==false)
+        return;
+    
+    cv::Vec3b low;
+    double lo_b, lo_g, lo_r;
+    lo_b = atof(high_b->text().toStdString().c_str());
+    lo_g = atof(text.toStdString().c_str());
+    lo_r = atof(high_r->text().toStdString().c_str());
+    low[0] = cv::saturate_cast<unsigned char>(lo_b);
+    low[1] = cv::saturate_cast<unsigned char>(lo_g);
+    low[2] = cv::saturate_cast<unsigned char>(lo_r);
+    QColor color_value(low[2], low[1], low[0]);
+    QVariant variant = color_value;
+    QString color_var = variant.toString();
+    set_high_color = color_value;
+    highColor->setStyleSheet("QLabel { background-color :" + color_var + " ; }");
+    highColor->setText("");
+    color2_set = true;
+}
+void ChromaWindow::editSetHighR(const QString &text) {
+    if(button_select_range->isChecked()==false)
+        return;
+    
+    cv::Vec3b low;
+    double lo_b, lo_g, lo_r;
+    lo_b = atof(high_b->text().toStdString().c_str());
+    lo_g = atof(high_g->text().toStdString().c_str());
+    lo_r = atof(text.toStdString().c_str());
+    low[0] = cv::saturate_cast<unsigned char>(lo_b);
+    low[1] = cv::saturate_cast<unsigned char>(lo_g);
+    low[2] = cv::saturate_cast<unsigned char>(lo_r);
+    QColor color_value(low[2], low[1], low[0]);
+    QVariant variant = color_value;
+    QString color_var = variant.toString();
+    set_high_color = color_value;
+    highColor->setStyleSheet("QLabel { background-color :" + color_var + " ; }");
+    highColor->setText("");
+    color2_set = true;
+}
+
