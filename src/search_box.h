@@ -12,7 +12,7 @@ public:
     SearchWindow(QWidget *parent = 0);
     void createControls();
     void setFiltersControl(QComboBox *filter_box, QListWidget *custom);
-    public slots:
+public slots:
     void search_filter();
     void add_current();
     void set_subf();

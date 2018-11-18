@@ -24,7 +24,7 @@ public:
     QCheckBox *chk_record;
     QPushButton *btn_start, *btn_select;
     QComboBox *video_type;
-    public slots:
+public slots:
     void btn_Select();
     void btn_Start();
     
@@ -44,7 +44,7 @@ public:
     QCheckBox *chk_record;
     QComboBox *video_type;
     
-    public slots:
+public slots:
     void btn_SetSourceFile();
     void btn_SetOutputDir();
     void btn_Start();

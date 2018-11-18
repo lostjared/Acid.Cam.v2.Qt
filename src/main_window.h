@@ -55,7 +55,7 @@ public:
     void updateList();
     void setSubFilter(const QString &num);
     void setFrameIndex(int i);
-    public slots:
+public slots:
     void addClicked();
     void rmvClicked();
     void upClicked();
