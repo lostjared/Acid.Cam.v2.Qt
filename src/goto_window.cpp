@@ -73,14 +73,7 @@ void GotoWindow::showWindow(int frame_index, int min, int max) {
     goto_pos->setSliderPosition(frame_index);
     slideChanged(frame_index);
     show();
-    QImage img;
-    int set_index = frame_index-1;
-    if(set_index < 0)
-        set_index = 0;
-    
-    if(playback_thread->getFrame(img, set_index)) {
-        disp_window->displayImage(img);
-    }
+    pressedGo();
 }
 
 void GotoWindow::pressedGo() {
