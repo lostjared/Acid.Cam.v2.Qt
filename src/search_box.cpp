@@ -51,7 +51,7 @@ void SearchWindow::search_filter() {
         std::string search_items = lowerString(filters->itemText(i).toStdString());
         for(unsigned q = 0; q < tokens.size(); ++q) {
             if(search_items.find(tokens[q]) != std::string::npos) {
-            	search_list->addItem(filters->itemText(i));
+                search_list->addItem(filters->itemText(i));
             }
         }
     }

@@ -2,7 +2,7 @@
  * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
  * (C) 2017 GPL
-*/
+ */
 
 
 #include"playback_thread.h"
@@ -112,7 +112,7 @@ void Playback::setOptions(bool n, int c) {
 void Playback::reset_filters() {
     mutex.lock();
     if(ac::reset_alpha == false) {
-    	ac::reset_alpha = true;
+        ac::reset_alpha = true;
     }
     ac::frames_released = true;
     mutex.unlock();
@@ -247,7 +247,7 @@ void Playback::run() {
             msleep(duration/2);
             mutex.unlock();
         } else if(cur.size()>0) {
-             mutex.lock();
+            mutex.lock();
             ac::in_custom = true;
             for(unsigned int i = 0; i < cur.size(); ++i) {
                 if(i == cur.size()-1)
@@ -308,8 +308,8 @@ bool Playback::getFrame(QImage &img, const int &index) {
     mutex.lock();
     cv::Mat frame;
     if(mode == MODE_VIDEO && capture.read(frame)) {
-    	cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
-    	img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
+        cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
+        img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
         mutex.unlock();
         setFrameIndex(index);
         return true;

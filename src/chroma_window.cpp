@@ -83,8 +83,8 @@ void ChromaWindow::createControls() {
     connect(low_b, SIGNAL(textChanged(const QString &)), this, SLOT(editSetLowB(const QString &)));
     connect(low_g, SIGNAL(textChanged(const QString &)), this, SLOT(editSetLowG(const QString &)));
     connect(low_r, SIGNAL(textChanged(const QString &)), this, SLOT(editSetLowR(const QString &)));
-
-   
+    
+    
     connect(high_b, SIGNAL(textChanged(const QString &)), this, SLOT(editSetHighB(const QString &)));
     connect(high_g, SIGNAL(textChanged(const QString &)), this, SLOT(editSetHighG(const QString &)));
     connect(high_r, SIGNAL(textChanged(const QString &)), this, SLOT(editSetHighR(const QString &)));
@@ -102,13 +102,13 @@ void ChromaWindow::createControls() {
     highButton->setGeometry(300, 90, 25, 20);
     
     select_mode = new QComboBox(this);
-    select_mode->setGeometry(15, 235, 290, 25);
+    select_mode->setGeometry(10, 235, 295, 25);
     
     select_mode->addItem("Replace with Filter");
     select_mode->addItem("Replace with Image");
     
     select_setimage = new QPushButton("Image", this);
-    select_setimage->setGeometry(20, 265, 60, 20);
+    select_setimage->setGeometry(15, 265, 60, 20);
     
     select_image_path = new QLabel("Test Path", this);
     select_image_path->setGeometry(85, 265, 400-85-25, 20);

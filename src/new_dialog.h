@@ -3,7 +3,7 @@
  * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
  * (C) 2017 GPL
-*/
+ */
 
 #ifndef _NEW_DIALOG_H_
 #define _NEW_DIALOG_H_
@@ -13,7 +13,7 @@
 class AC_MainWindow;
 
 class CaptureCamera : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 public:
     CaptureCamera(QWidget *parent = 0);
     void createControls();
@@ -24,7 +24,7 @@ public:
     QCheckBox *chk_record;
     QPushButton *btn_start, *btn_select;
     QComboBox *video_type;
-public slots:
+    public slots:
     void btn_Select();
     void btn_Start();
     
@@ -44,7 +44,7 @@ public:
     QCheckBox *chk_record;
     QComboBox *video_type;
     
-public slots:
+    public slots:
     void btn_SetSourceFile();
     void btn_SetOutputDir();
     void btn_Start();

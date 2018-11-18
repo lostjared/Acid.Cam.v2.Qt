@@ -3,7 +3,7 @@
  * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
  * (C) 2017 GPL
-*/
+ */
 
 
 #include "new_dialog.h"
@@ -36,7 +36,7 @@ void CaptureCamera::createControls() {
         stream << i;
         combo_device->addItem(*stream.string());
     }
-   	btn_select = new QPushButton(tr("Save Directory"), this);
+    btn_select = new QPushButton(tr("Save Directory"), this);
     btn_select->setGeometry(10, 65, 100, 20);
     output_dir = new QLineEdit("", this);
     output_dir->setGeometry(110, 65, 175, 20);
@@ -59,7 +59,7 @@ void CaptureCamera::setParent(AC_MainWindow *p) {
 }
 
 void CaptureCamera::btn_Select() {
- 
+    
     QString def_path = "";
 #if defined(__linux__)
     def_path = "/home";

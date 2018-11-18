@@ -2,11 +2,11 @@
  * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
  * (C) 2017 GPL
-*/
+ */
 
 #ifndef _QT_HEADERS__
 #define _QT_HEADERS__
-#define ac_version "v1.20.0"
+#define ac_version "v1.20.1"
 #include<QApplication>
 #include<QMainWindow>
 #include<QDialog>

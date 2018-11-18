@@ -28,7 +28,7 @@ private:
     QLineEdit *goto_sec, *goto_frame;
     QPushButton *goto_jump;
     Playback *playback_thread;
-public slots:
+    public slots:
     void pressedGo();
     void slideChanged(int pos);
     

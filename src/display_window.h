@@ -2,7 +2,7 @@
  * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
  * (C) 2017 GPL
-*/
+ */
 
 
 #ifndef __DISPLAY_WINDOW_H__

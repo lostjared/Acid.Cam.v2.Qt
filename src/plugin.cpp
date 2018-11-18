@@ -21,7 +21,7 @@ void add_directory(QDir &cdir, std::vector<std::string> &files) {
 #else
     platform = ".dll";
 #endif
-   	while(pos < list.size()) {
+    while(pos < list.size()) {
         QFileInfo info = list.at(pos);
         if(info.isDir() && info.fileName() != "." && info.fileName() != "..") {
             QDir cdir = info.dir();
@@ -45,7 +45,7 @@ void init_plugins() {
         for(unsigned int i = 0; i < files.size(); ++i) {
             Plugin *p = new Plugin();
             if(p->loadPlugin(files[i]))
-            plugins.plugin_list.push_back(p);
+                plugins.plugin_list.push_back(p);
         }
     }
 }
@@ -69,7 +69,7 @@ void draw_plugin(cv::Mat &frame, int filter) {
 
 
 void plugin_callback(cv::Mat &) {
-
+    
 }
 
 Plugin::Plugin() {
@@ -79,7 +79,7 @@ Plugin::Plugin() {
 Plugin::~Plugin() {
     if(library) delete library;
 }
-    
+
 bool Plugin::loadPlugin(const std::string &text) {
     library = new QLibrary(text.c_str());
     if(!library) {
@@ -120,7 +120,7 @@ PluginList::PluginList() {
 
 PluginList::~PluginList() {
     if(plugin_list.size() == 0) return;
-
+    
     for(auto i = plugin_list.begin(); i != plugin_list.end(); ++i)
         delete *i;
 }

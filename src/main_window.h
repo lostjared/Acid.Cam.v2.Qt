@@ -3,7 +3,7 @@
  * Acid Cam v2 - Qt/OpenCV Edition
  * written by Jared Bruni ( http://lostsidedead.com )
  * (C) 2017 GPL
-*/
+ */
 
 #ifndef __MAIN_WINDOW_H__
 #define __MAIN_WINDOW_H__
@@ -55,7 +55,7 @@ public:
     void updateList();
     void setSubFilter(const QString &num);
     void setFrameIndex(int i);
-public slots:
+    public slots:
     void addClicked();
     void rmvClicked();
     void upClicked();

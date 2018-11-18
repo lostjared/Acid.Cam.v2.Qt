@@ -37,7 +37,7 @@ void GotoWindow::createControls() {
     goto_frame->setGeometry(230,30,100,20);
     goto_jump = new QPushButton("Go", this);
     goto_jump->setGeometry(340, 30, 45, 20);
-
+    
     connect(goto_jump, SIGNAL(clicked()), this, SLOT(pressedGo()));
     connect(goto_pos, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
     
