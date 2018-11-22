@@ -5,6 +5,10 @@
 To watch all the videos I have created with this project checkout my YouTube playlist:
 https://www.youtube.com/playlist?list=PLUgo--lX2kmr6ikfz0hPlez1-jbGAYuTZ
 
+Program requires the Visual C++ 2015 Runtime.
+
+You can download it here: https://www.microsoft.com/en-us/download/details.aspx?id=48145
+
 Note: On Windows 10 make sure you create a directory you have full access to for the output directories for Webcam/Video mode. For me on my Windows 10 I have created a folder at C:\ProgramOutput for the output. 
 There is currently a bug that if you try to use a resolution higher than the maximum your webcam supports it will cause the file written to be corrupt. So make sure you use a resolution your webcam supports. I will try to fix this problem in future release.
 
@@ -72,8 +76,9 @@ The output from the program video file size can be very large. This is because O
 You also could use Handbrake of FFmpeg to adjust the file size for uploading to the internet.
 
 
-For the Windows version of this program requires the Visual Studio 2013 Runtime Redistributable:
-https://www.microsoft.com/en-us/download/confirmation.aspx?id=40784
+For the Windows version of this program requires the Visual Studio 2015 Runtime
+
+Download it here: https://www.microsoft.com/en-us/download/details.aspx?id=48145
 
 Currently program works best when ran in Video mode, I have not been able to test
 on host os of windows or linux, just a guest virtual machine.  But in the VM webcam 
