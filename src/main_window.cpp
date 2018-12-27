@@ -105,10 +105,10 @@ void AC_MainWindow::createControls() {
     custom_filters->show();
    
     menu_cat = new QComboBox(this);
-    menu_cat->setGeometry(10, 85, 380, 30);
+    menu_cat->setGeometry(10, 90, 380, 30);
     
-    menu_cat->addItem("All");
-    menu_cat->addItem("All Sorted");
+    menu_cat->addItem("All Filters");
+    menu_cat->addItem("All Filters Sorted");
     menu_cat->addItem("Blend");
     menu_cat->addItem("Distort");
     menu_cat->addItem("Pattern");
@@ -126,7 +126,7 @@ void AC_MainWindow::createControls() {
     menu_cat->setCurrentIndex(0);
     
     filters = new QComboBox(this);
-    filters->setGeometry(10, 110, 380, 30);
+    filters->setGeometry(10, 120, 380, 30);
     
     std::vector<std::string> fnames;
     for(int i = 0; i < ac::draw_max-5; ++i) {
@@ -174,8 +174,8 @@ void AC_MainWindow::createControls() {
     btn_remove->setGeometry(400, 215, 100, 20);
     btn_moveup->setGeometry(500, 215, 100, 20);
     btn_movedown->setGeometry(600, 215, 100, 20);
-    btn_sub->setGeometry(10, 145, 100, 20);
-    btn_clr->setGeometry(115, 145, 100, 20);
+    btn_sub->setGeometry(10, 165, 100, 20);
+    btn_clr->setGeometry(115, 165, 100, 20);
     
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
