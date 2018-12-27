@@ -33,7 +33,7 @@ public:
     QComboBox *combo_rgb;
     QSlider *slide_r, *slide_g, *slide_b, *slide_bright, *slide_gamma, *slide_saturation;
     QProgressBar *progress_bar;
-    QComboBox *color_maps, *filters;
+    QComboBox *color_maps, *filters, *menu_cat;
     QMenu *file_menu, *controls_menu, *help_menu, *options, *movement, *speed_menu;
     QAction *file_exit, *file_new_capture, *file_new_video;
     QAction *controls_snapshot, *controls_pause, *controls_step, *controls_stop, *controls_setimage,*controls_setkey,*controls_showvideo, *clear_images, *reset_filters;
@@ -105,6 +105,7 @@ public slots:
     void repeat_vid();
     void setFade();
     void openColorWindow();
+    void menuFilterChanged(int index);
 private:
     void createControls();
     void createMenu();

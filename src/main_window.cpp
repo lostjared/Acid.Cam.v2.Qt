@@ -100,17 +100,33 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 void AC_MainWindow::createControls() {
-    /*
-     filters = new QListWidget(this);
-     filters->setGeometry(10, 30, 390, 180);
-     filters->show();
-     */
     custom_filters = new QListWidget(this);
     custom_filters->setGeometry(400, 30, 390, 180);
     custom_filters->show();
+   
+    menu_cat = new QComboBox(this);
+    menu_cat->setGeometry(10, 85, 380, 30);
+    
+    menu_cat->addItem("All");
+    menu_cat->addItem("All Sorted");
+    menu_cat->addItem("Blend");
+    menu_cat->addItem("Distort");
+    menu_cat->addItem("Pattern");
+    menu_cat->addItem("Gradient");
+    menu_cat->addItem("Mirror");
+    menu_cat->addItem("Strobe");
+    menu_cat->addItem("Blur");
+    menu_cat->addItem("Image");
+    menu_cat->addItem("Square");
+    menu_cat->addItem("Other");
+    menu_cat->addItem("SubFilter");
+    menu_cat->addItem("Special");
+    menu_cat->addItem("User");
+    
+    menu_cat->setCurrentIndex(0);
     
     filters = new QComboBox(this);
-    filters->setGeometry(10, 105, 380, 30);
+    filters->setGeometry(10, 110, 380, 30);
     
     std::vector<std::string> fnames;
     for(int i = 0; i < ac::draw_max-5; ++i) {
@@ -135,6 +151,8 @@ void AC_MainWindow::createControls() {
     }
     
     connect(filters, SIGNAL(currentIndexChanged(int)), this, SLOT(comboFilterChanged(int)));
+    connect(menu_cat, SIGNAL(currentIndexChanged(int)), this, SLOT(menuFilterChanged(int)));
+    
     
     filter_single = new QRadioButton(tr("Single Filter"), this);
     filter_single->setGeometry(30, 40, 100, 15);
@@ -1235,4 +1253,8 @@ void AC_MainWindow::openSearch() {
 
 void AC_MainWindow::openColorWindow() {
     chroma_window->show();
+}
+
+void AC_MainWindow::menuFilterChanged(int index) {
+    
 }
