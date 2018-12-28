@@ -8,6 +8,10 @@ Q_OBJECT
 public:
     DefineWindow(QWidget *p);
     void createControls();
+public slots:
+    void setFilterName();
+    void clearFilterNames();
+    
 private:
     QComboBox *def_filters;
     QListWidget *def_list;
