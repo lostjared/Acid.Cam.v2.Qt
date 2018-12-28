@@ -112,27 +112,8 @@ void AC_MainWindow::createControls() {
     custom_filters = new QListWidget(this);
     custom_filters->setGeometry(400, 30, 390, 180);
     custom_filters->show();
-   
     menu_cat = new QComboBox(this);
     menu_cat->setGeometry(10, 90, 380, 30);
-    /*
-    menu_cat->addItem("All Filters");
-    menu_cat->addItem("All Filters Sorted");
-    menu_cat->addItem("Blend");
-    menu_cat->addItem("Distort");
-    menu_cat->addItem("Pattern");
-    menu_cat->addItem("Gradient");
-    menu_cat->addItem("Mirror");
-    menu_cat->addItem("Strobe");
-    menu_cat->addItem("Blur");
-    menu_cat->addItem("Image");
-    menu_cat->addItem("Square");
-    menu_cat->addItem("Other");
-    menu_cat->addItem("SubFilter");
-    menu_cat->addItem("Special");
-    menu_cat->addItem("User");
-    */
-    
     for(int i = 0; menuNames[i] != 0; ++i) {
         menu_cat->addItem(menuNames[i]);
     }
