@@ -15,6 +15,8 @@
 #include "search_box.h"
 #include "goto_window.h"
 #include "chroma_window.h"
+#include "user_define.h"
+
 
 class SearchWindow;
 
@@ -114,6 +116,7 @@ private:
     CaptureVideo *cap_video;
     SearchWindow *search_box;
     ChromaWindow *chroma_window;
+    DefineWindow *define_window;
     GotoWindow *goto_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;

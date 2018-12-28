@@ -105,6 +105,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     filters->setCurrentIndex(cindex);
     chroma_window = new ChromaWindow(this);
     chroma_window->hide();
+    define_window = new DefineWindow(this);
+    define_window->hide();
 }
 
 
