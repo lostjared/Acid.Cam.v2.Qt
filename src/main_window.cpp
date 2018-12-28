@@ -42,6 +42,7 @@ void generate_map() {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
         filter_map[name] = FilterValue(2, j, -1);
     }
+    
 }
 
 void custom_filter(cv::Mat &) {
@@ -60,6 +61,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     generate_map();
     ac::init_filter_menu_map();
     ac::SortFilters();
+    ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     setGeometry(100, 100, 800, 700);
     setFixedSize(800, 700);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
@@ -107,6 +109,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     chroma_window->hide();
     define_window = new DefineWindow(this);
     define_window->hide();
+    define_window->main_window = this;
 }
 
 
@@ -648,9 +651,7 @@ void AC_MainWindow::colorMapChanged(int pos) {
 }
 
 void AC_MainWindow::comboFilterChanged(int) {
-    
     if(loading == true) return;
-    
     playback->setIndexChanged(filters->currentText().toStdString());
     QString str;
     QTextStream stream(&str);
@@ -1258,8 +1259,8 @@ void AC_MainWindow::openColorWindow() {
 }
 
 void AC_MainWindow::menuFilterChanged(int index) {
-    loading = true;
-    if(index >= 0 && index < menu_cat->count()) {
+     if(index >= 0) {
+        loading = true;
         const char *menu_n = menuNames[index];
         filters->clear();
         auto v = ac::filter_menu_map[menu_n].menu_list;
@@ -1267,10 +1268,19 @@ void AC_MainWindow::menuFilterChanged(int index) {
             filters->addItem(in->c_str());
         }
         filters->setCurrentIndex(0);
+        loading = false;
     }
-    loading = false;
 }
 
 void AC_MainWindow::show_Favorites() {
     define_window->show();
+}
+
+void AC_MainWindow::resetMenu() {
+    int index = menu_cat->currentIndex();
+    if(menuNames[index] == std::string("User")) {
+    	menuFilterChanged(index);
+    	filters->setCurrentIndex(0);
+    	comboFilterChanged(index);
+    }
 }

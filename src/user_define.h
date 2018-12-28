@@ -3,15 +3,17 @@
 
 #include "qtheaders.h"
 
+class AC_MainWindow;
+
 class DefineWindow : public QMainWindow {
 Q_OBJECT
 public:
     DefineWindow(QWidget *p);
     void createControls();
+    AC_MainWindow *main_window;
 public slots:
     void setFilterName();
     void clearFilterNames();
-    
 private:
     QComboBox *def_filters;
     QListWidget *def_list;
