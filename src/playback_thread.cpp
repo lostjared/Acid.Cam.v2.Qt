@@ -217,6 +217,7 @@ void Playback::run() {
             stop = true;
             mutex.unlock();
             emit stopRecording();
+            ac::release_all_objects();
             return;
         }
         cv::Mat temp_frame;
