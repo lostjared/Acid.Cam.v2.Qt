@@ -281,6 +281,7 @@ void Playback::run() {
             emit frameIncrement();
         }
     }
+    ac::release_all_objects();
 }
 
 

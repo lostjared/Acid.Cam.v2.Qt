@@ -127,6 +127,7 @@ private:
     Playback *playback;
     VideoMode programMode;
     void buildVector(std::vector<FilterValue> &v);
+    bool loading;
 };
 
 extern const char *filer_names[];

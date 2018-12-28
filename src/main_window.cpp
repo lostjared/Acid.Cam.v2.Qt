@@ -23,6 +23,10 @@ const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
     "Vertical Average", "Circular Blend", "Average Blend", "~Divide", "Mix", "Random Number",
     "Gradient Repeat", 0 };
 
+
+const char *menuNames[] = {"All Filters", "All Filters Sorted", "Blend", "Distort", "Pattern", "Gradient", "Mirror", "Strobe", "Blur", "Image", "Square", "Other", "SubFilter", "Special", "User", 0};
+
+
 void generate_map() {
     for(int i = 0; i < ac::draw_max; ++i )
         filter_map[ac::draw_strings[i]] = FilterValue(0, i, -1);
@@ -54,11 +58,15 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     programMode = MODE_CAMERA;
     init_plugins();
     generate_map();
+    ac::init_filter_menu_map();
+    ac::SortFilters();
     setGeometry(100, 100, 800, 700);
     setFixedSize(800, 700);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
+    
+    loading = false;
     
     cap_camera = new CaptureCamera(this);
     cap_camera->setParent(this);
@@ -99,6 +107,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     chroma_window->hide();
 }
 
+
 void AC_MainWindow::createControls() {
     custom_filters = new QListWidget(this);
     custom_filters->setGeometry(400, 30, 390, 180);
@@ -106,7 +115,7 @@ void AC_MainWindow::createControls() {
    
     menu_cat = new QComboBox(this);
     menu_cat->setGeometry(10, 90, 380, 30);
-    
+    /*
     menu_cat->addItem("All Filters");
     menu_cat->addItem("All Filters Sorted");
     menu_cat->addItem("Blend");
@@ -122,7 +131,11 @@ void AC_MainWindow::createControls() {
     menu_cat->addItem("SubFilter");
     menu_cat->addItem("Special");
     menu_cat->addItem("User");
+    */
     
+    for(int i = 0; menuNames[i] != 0; ++i) {
+        menu_cat->addItem(menuNames[i]);
+    }
     menu_cat->setCurrentIndex(0);
     
     filters = new QComboBox(this);
@@ -284,14 +297,13 @@ void AC_MainWindow::createControls() {
     combo_rgb->addItem(tr("BGR"));
     combo_rgb->addItem(tr("BRG"));
     combo_rgb->addItem(tr("GRB"));
-    
     setWindowIcon(QPixmap(":/images/icon.png"));
-    
     progress_bar = new QProgressBar(this);
     progress_bar->setGeometry(0, 640, 800, 20);
     progress_bar->setMinimum(0);
     progress_bar->setMaximum(100);
     progress_bar->hide();
+    menu_cat->setCurrentIndex(1);
 }
 
 void AC_MainWindow::createMenu() {
@@ -649,6 +661,9 @@ void AC_MainWindow::colorMapChanged(int pos) {
 }
 
 void AC_MainWindow::comboFilterChanged(int) {
+    
+    if(loading == true) return;
+    
     playback->setIndexChanged(filters->currentText().toStdString());
     QString str;
     QTextStream stream(&str);
@@ -1256,5 +1271,15 @@ void AC_MainWindow::openColorWindow() {
 }
 
 void AC_MainWindow::menuFilterChanged(int index) {
-    
+    loading = true;
+    if(index >= 0 && index < menu_cat->count()) {
+        const char *menu_n = menuNames[index];
+        filters->clear();
+        auto v = ac::filter_menu_map[menu_n].menu_list;
+        for(auto in = v->begin(); in != v->end(); ++in) {
+            filters->addItem(in->c_str());
+        }
+        filters->setCurrentIndex(0);
+    }
+    loading = false;
 }
