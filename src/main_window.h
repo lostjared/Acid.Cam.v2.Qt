@@ -52,6 +52,7 @@ public:
     QAction *repeat_v;
     QAction *fade_on;
     QAction *select_key;
+    QAction *set_newnames;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -108,6 +109,7 @@ public slots:
     void setFade();
     void openColorWindow();
     void menuFilterChanged(int index);
+    void show_Favorites();
 private:
     void createControls();
     void createMenu();

@@ -4,5 +4,8 @@
 DefineWindow::DefineWindow(QWidget *p) : QMainWindow(p) {
     setFixedSize(640, 480);
     setWindowTitle("Filter Define");
+    createControls();
 }
 
+void DefineWindow::createControls() {
+}

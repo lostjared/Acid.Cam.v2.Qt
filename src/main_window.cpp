@@ -443,6 +443,10 @@ void AC_MainWindow::createMenu() {
     controls_pause->setEnabled(false);
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
+    
+    set_newnames = new QAction(tr("Set Favorites"), this);
+    connect(set_newnames, SIGNAL(triggered()), this, SLOT(show_Favorites()));
+    controls_menu->addAction(set_newnames);
 }
 
 void AC_MainWindow::resetIndex() {
@@ -1265,4 +1269,8 @@ void AC_MainWindow::menuFilterChanged(int index) {
         filters->setCurrentIndex(0);
     }
     loading = false;
+}
+
+void AC_MainWindow::show_Favorites() {
+    define_window->show();
 }
