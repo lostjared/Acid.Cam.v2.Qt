@@ -31,12 +31,14 @@ void generate_map() {
     for(int i = 0; i < ac::draw_max; ++i )
         filter_map[ac::draw_strings[i]] = FilterValue(0, i, -1);
     
+    
     int index = 0;
     while(filter_names[index] != 0) {
         std::string filter_n = "AF_";
         filter_n += filter_names[index];
         filter_map[filter_n] = FilterValue(1, index, -1);
         ++index;
+        ac::filter_menu_map["All Filters"].menu_list->push_back(filter_n);
     }
     for(unsigned int j = 0; j < plugins.plugin_list.size(); ++j) {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
@@ -58,8 +60,8 @@ AC_MainWindow::~AC_MainWindow() {
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     programMode = MODE_CAMERA;
     init_plugins();
-    generate_map();
     ac::init_filter_menu_map();
+    generate_map();
     ac::SortFilters();
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     setGeometry(100, 100, 800, 700);
