@@ -1043,7 +1043,7 @@ void AC_MainWindow::controls_Pause() {
 }
 
 void AC_MainWindow::controls_SetImage() {
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), "/home", tr("Image Files (*.png *.jpg)"));
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), "", tr("Image Files (*.png *.jpg)"));
     if(fileName != "") {
         cv::Mat tblend_image = cv::imread(fileName.toStdString());
         if(!tblend_image.empty()) {
@@ -1059,7 +1059,7 @@ void AC_MainWindow::controls_SetImage() {
 }
 
 void AC_MainWindow::controls_SetKey() {
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Color Key Image"), "/home", tr("Image Files (*.png)"));
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Color Key Image"), "", tr("Image Files (*.png)"));
     if(fileName != "") {
         cv::Mat tblend_image = cv::imread(fileName.toStdString());
         if(!tblend_image.empty()) {

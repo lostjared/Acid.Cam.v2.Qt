@@ -72,7 +72,9 @@ void DefineWindow::clearFilterNames() {
 }
 
 void DefineWindow::saveNames() {
-     QString fileName = QFileDialog::getSaveFileName(this,tr("Save List"), "/home", tr("Acid Cam List (*.acl)"));
+     QString fileName = QFileDialog::getSaveFileName(this,tr("Save List"), "", tr("Acid Cam List (*.acl)"));
+    if(fileName.length() <= 0)
+        return;
     std::fstream file;
     file.open(fileName.toStdString(), std::ios::out);
     if(!file.is_open()) {
@@ -89,10 +91,13 @@ void DefineWindow::saveNames() {
 }
 
 void DefineWindow::loadNames() {
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open List"), "/home", tr("Acid Cam List (*.acl)"));
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open List"), "", tr("Acid Cam List (*.acl)"));
+    if(fileName.length() <= 0)
+        return;
     std::fstream file(fileName.toStdString(), std::ios::in);
     if(!file.is_open()) {
         QMessageBox::information(this, tr("Could not open file"), tr("File could not be opened"));
+        return;
     }
     clearFilterNames();
     while(!file.eof()) {
