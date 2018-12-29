@@ -3,6 +3,7 @@
 
 #include "qtheaders.h"
 
+
 class AC_MainWindow;
 
 class DefineWindow : public QMainWindow {
@@ -14,11 +15,13 @@ public:
 public slots:
     void setFilterName();
     void clearFilterNames();
+    void saveNames();
+    void loadNames();
 private:
     QComboBox *def_filters;
     QListWidget *def_list;
     QLineEdit *def_newname;
-    QPushButton *def_set, *def_clear;
+    QPushButton *def_set, *def_clear, *def_save, *def_load;
 };
 
 

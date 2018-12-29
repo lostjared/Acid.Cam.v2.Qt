@@ -1,6 +1,9 @@
 
 #include "user_define.h"
 #include "main_window.h"
+#include<fstream>
+#include<cstdlib>
+#include<cstdio>
 
 DefineWindow::DefineWindow(QWidget *p) : QMainWindow(p) {
     setFixedSize(640, 320);
@@ -19,11 +22,18 @@ void DefineWindow::createControls() {
     def_set->setGeometry(10, 290, 100, 20);
     def_clear = new QPushButton("Clear", this);
     def_clear->setGeometry(120, 290, 100, 20);
+    def_save = new QPushButton("Save", this);
+    def_save->setGeometry(230, 290, 100, 20);
+    def_load = new QPushButton("Load", this);
+    def_load->setGeometry(340, 290, 100, 20);
+    
     for(auto &i : ac::svAllSorted) {
         def_filters->addItem(i.c_str());
     }
     connect(def_set, SIGNAL(clicked()), this, SLOT(setFilterName()));
     connect(def_clear, SIGNAL(clicked()), this, SLOT(clearFilterNames()));
+    connect(def_save, SIGNAL(clicked()), this, SLOT(saveNames()));
+    connect(def_load, SIGNAL(clicked()), this, SLOT(loadNames()));
 }
 
 void DefineWindow::setFilterName() {
@@ -60,3 +70,52 @@ void DefineWindow::clearFilterNames() {
         main_window->resetMenu();
     }
 }
+
+void DefineWindow::saveNames() {
+     QString fileName = QFileDialog::getSaveFileName(this,tr("Save List"), "/home", tr("Acid Cam List (*.acl)"));
+    std::fstream file;
+    file.open(fileName.toStdString(), std::ios::out);
+    if(!file.is_open()) {
+        QMessageBox::information(this, tr("Could not save file"), tr("Could not save file"));
+        return;
+    }
+    for(int index = 0; index < def_list->count(); ++index) {
+        QListWidgetItem *m = def_list->item(index);
+        std::string filter_name = m->text().toStdString();
+        FilterValue &v = filter_map[filter_name];
+        file << filter_name << ":" << v.filter << "\n";
+    }
+    file.close();
+}
+
+void DefineWindow::loadNames() {
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open List"), "/home", tr("Acid Cam List (*.acl)"));
+    std::fstream file(fileName.toStdString(), std::ios::in);
+    if(!file.is_open()) {
+        QMessageBox::information(this, tr("Could not open file"), tr("File could not be opened"));
+    }
+    clearFilterNames();
+    while(!file.eof()) {
+        std::string line;
+        std::getline(file, line);
+        if(file) {
+            std::string left, right;
+            auto pos = line.find(":");
+            if(pos == std::string::npos) {
+                QMessageBox::information(this, tr("Invalid File Format"), tr("Invalid"));
+                return;
+            }
+            left = line.substr(0, pos);
+            right = line.substr(pos+1, line.length()-pos);
+            std::cout << "Left: " << left << "\n";
+            std::cout << "Right: " << right << "\n";
+            filter_map[left].index = 0;
+            filter_map[left].subfilter = -1;
+            filter_map[left].filter = atoi(right.c_str());
+            def_list->addItem(left.c_str());
+            std::vector<std::string> *v = ac::filter_menu_map["User"].menu_list;
+            v->push_back(left);
+        }
+    }
+}
+
