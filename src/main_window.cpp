@@ -467,6 +467,7 @@ void AC_MainWindow::clear_subfilter() {
         item->setText(val.c_str());
         std::vector<FilterValue> v;
         buildVector(v);
+        playback->setVector(v);
         Log(tr("Cleared SubFilter"));
     }
     ac::setSubFilter(-1);
