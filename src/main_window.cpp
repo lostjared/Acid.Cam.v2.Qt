@@ -1321,8 +1321,8 @@ void AC_MainWindow::load_CustomFile() {
         }
         s_left = item.substr(0,pos);
         s_right = item.substr(pos+1, item.length());
-        int val1 = atoi(s_left.c_str());
-        int val2 = atoi(s_right.c_str());
+        int val1 = filter_map[s_left].filter;
+        int val2 = filter_map[s_right].filter;
         if(!(val1 >= 0 && val1 < ac::draw_max-4)) {
             QMessageBox::information(this,"Unsupported Value","Filter value out of range... wrong program revision?");
             return;
@@ -1338,10 +1338,12 @@ void AC_MainWindow::load_CustomFile() {
     for(unsigned int i = 0; i < values.size(); ++i) {
         std::string item = values[i];
         std::string s_left, s_right;
-        s_left = item.substr(0, item.find(";"));
+        s_left = item.substr(0, item.find(":"));
         s_right = item.substr(item.find(":")+1, item.length());
-        int value1 = atoi(s_left.c_str());
-        int value2 = atoi(s_right.c_str());
+        int value1 = filter_map[s_left].filter;
+        int value2 = filter_map[s_right].filter;
+        //int value1 = atoi(s_left.c_str());
+        //int value2 = atoi(s_right.c_str());
         std::ostringstream stream;
         stream << ac::draw_strings[value1];
         if(value2 != -1)
@@ -1383,7 +1385,13 @@ void AC_MainWindow::save_CustomFile() {
         if(v[i].index == 0) {
         	int value1 = v[i].filter;
         	int value2 = v[i].subfilter;
-        	file_n << value1 << ":" << value2 << "\n";
+            std::string v1, v2;
+            v1 = ac::draw_strings[value1];
+            if(value2 == -1)
+                v2 = "None";
+            else
+                v2 = ac::draw_strings[value2];
+        	file_n << v1 << ":" << v2 << "\n";
         }
     }
     std::ostringstream stream;
