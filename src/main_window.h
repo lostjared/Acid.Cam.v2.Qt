@@ -29,7 +29,7 @@ public:
     bool startCamera(int res, int dev, const QString &outdir, bool record, int type);
     bool startVideo(const QString &filename, const QString &outdir, bool record, int type);
     QListWidget /**filters,*/ *custom_filters;
-    QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown, *btn_sub, *btn_clr;
+    QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown,*btn_load, *btn_save, *btn_sub, *btn_clr;
     QTextEdit *log_text;
     QCheckBox *chk_negate;
     QComboBox *combo_rgb;
@@ -111,6 +111,8 @@ public slots:
     void openColorWindow();
     void menuFilterChanged(int index);
     void show_Favorites();
+    void load_CustomFile();
+    void save_CustomFile();
 private:
     void createControls();
     void createMenu();

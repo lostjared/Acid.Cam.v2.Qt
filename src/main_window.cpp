@@ -171,20 +171,24 @@ void AC_MainWindow::createControls() {
     btn_movedown = new QPushButton(tr("Move Down"), this);
     btn_sub = new QPushButton(tr("Subfilter"), this);
     btn_clr = new QPushButton(tr("Clear Sub"), this);
+    btn_load = new QPushButton(tr("Load"), this);
+    btn_save = new QPushButton(tr("Save"), this);
     btn_add->setGeometry(10, 215, 100, 20);
-    btn_remove->setGeometry(400, 215, 100, 20);
-    btn_moveup->setGeometry(500, 215, 100, 20);
-    btn_movedown->setGeometry(600, 215, 100, 20);
+    btn_remove->setGeometry(400, 215, 80, 20);
+    btn_moveup->setGeometry(485, 215, 80, 20);
+    btn_movedown->setGeometry(570, 215, 80, 20);
+    btn_load->setGeometry(655+20, 215, 55, 20);
+    btn_save->setGeometry(655+60+20, 215, 55, 20);
     btn_sub->setGeometry(10, 165, 100, 20);
     btn_clr->setGeometry(115, 165, 100, 20);
-    
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(btn_movedown, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(btn_sub, SIGNAL(clicked()), this, SLOT(setSub()));
     connect(btn_clr, SIGNAL(clicked()), this, SLOT(clear_subfilter()));
-    
+    connect(btn_load, SIGNAL(clicked()), this, SLOT(load_CustomFile()));
+    connect(btn_save, SIGNAL(clicked()), this, SLOT(save_CustomFile()));
     QLabel *r_label = new QLabel(tr("Red: "), this);
     r_label->setGeometry(10, 255, 50, 20);
     slide_r = new QSlider(Qt::Horizontal,this);
@@ -1286,4 +1290,11 @@ void AC_MainWindow::resetMenu() {
     	filters->setCurrentIndex(0);
     	comboFilterChanged(index);
     }
+}
+
+void AC_MainWindow::load_CustomFile() {
+    
+}
+void AC_MainWindow::save_CustomFile() {
+    
 }
