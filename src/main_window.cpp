@@ -1293,10 +1293,75 @@ void AC_MainWindow::resetMenu() {
 }
 
 void AC_MainWindow::load_CustomFile() {
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"),"",tr("Filter Files (*.filter)"));
+    if(file_name.length()==0)
+        return;
     
+    std::fstream file;
+    file.open(file_name.toStdString(), std::ios::in);
+    if(!file.is_open()) {
+        QMessageBox::information(this,"Could not open file", "Could not open file do i have rights to this folder?");
+        return;
+    }
+    std::vector<std::string> values;
+    while(!file.eof()) {
+        std::string item;
+        std::getline(file, item);
+        if(file)
+            values.push_back(item);
+    }
+    // check if data valid
+    for(unsigned int i = 0; i < values.size(); ++i ){
+        std::string item = values[i];
+        std::string s_left, s_right;
+        auto pos = item.find(":");
+        if(pos == std::string::npos) {
+            QMessageBox::information(this,"Incorrect File..\n", "Values in file incorrect");
+            return;
+        }
+        s_left = item.substr(0,pos);
+        s_right = item.substr(pos+1, item.length());
+        int val1 = atoi(s_left.c_str());
+        int val2 = atoi(s_right.c_str());
+        if(!(val1 >= 0 && val1 < ac::draw_max-4)) {
+            QMessageBox::information(this,"Unsupported Value","Filter value out of range... wrong program revision?");
+            return;
+        }
+        if(!(val2 == -1 || (val2 >= 0 && val2 < ac::draw_max-4))) {
+            QMessageBox::information(this, "Unsupported SubFilter value","Sub Filter value of range...");
+            return;
+        }
+    }
+    while(custom_filters->count() > 0) {
+        custom_filters->takeItem(0);
+    }
+    for(unsigned int i = 0; i < values.size(); ++i) {
+        std::string item = values[i];
+        std::string s_left, s_right;
+        s_left = item.substr(0, item.find(";"));
+        s_right = item.substr(item.find(":")+1, item.length());
+        int value1 = atoi(s_left.c_str());
+        int value2 = atoi(s_right.c_str());
+        std::ostringstream stream;
+        stream << ac::draw_strings[value1];
+        if(value2 != -1)
+            stream << ":" << ac::draw_strings[value2];
+        custom_filters->addItem(stream.str().c_str());
+    }
+    std::ostringstream sval;
+    sval << "Loaded Custom Filter: " << file_name.toStdString() << "\n";
+    std::vector<FilterValue> v;
+    buildVector(v);
+    playback->setVector(v);
+    file.close();
+    Log(sval.str().c_str());
 }
 void AC_MainWindow::save_CustomFile() {
     QString file_name = QFileDialog::getSaveFileName(this, tr("Save File"),"",                                            tr("Filter Save (*.filter)"));
+    
+    if(file_name.length()==0)
+        return;
+    
     std::fstream file_n;
     file_n.open(file_name.toStdString(),std::ios::out);
     if(!file_n.is_open()) {
@@ -1311,9 +1376,11 @@ void AC_MainWindow::save_CustomFile() {
     }
     
     for(unsigned int i = 0; i < v.size(); ++i) {
-        int value1 = v[i].filter;
-        int value2 = v[i].subfilter;
-        file_n << value1 << ":" << value2 << "\n";
+        if(v[i].index == 0) {
+        	int value1 = v[i].filter;
+        	int value2 = v[i].subfilter;
+        	file_n << value1 << ":" << value2 << "\n";
+        }
     }
     std::ostringstream stream;
     stream << "Wrote custom to: " << file_name.toStdString() << "\n";
