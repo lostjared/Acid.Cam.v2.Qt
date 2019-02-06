@@ -1341,7 +1341,11 @@ void AC_MainWindow::load_CustomFile() {
         s_left = item.substr(0, item.find(":"));
         s_right = item.substr(item.find(":")+1, item.length());
         int value1 = filter_map[s_left].filter;
-        int value2 = filter_map[s_right].filter;
+        int value2 = 0;
+        if(s_right == "None")
+            value2 = -1;
+        else
+        	value2 = filter_map[s_right].filter;
         //int value1 = atoi(s_left.c_str());
         //int value2 = atoi(s_right.c_str());
         std::ostringstream stream;
