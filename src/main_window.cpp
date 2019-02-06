@@ -1296,5 +1296,27 @@ void AC_MainWindow::load_CustomFile() {
     
 }
 void AC_MainWindow::save_CustomFile() {
+    QString file_name = QFileDialog::getSaveFileName(this, tr("Save File"),"",                                            tr("Filter Save (*.filter)"));
+    std::fstream file_n;
+    file_n.open(file_name.toStdString(),std::ios::out);
+    if(!file_n.is_open()) {
+        QMessageBox::information(this, "Error", "File could not be opened...");
+        return;
+    }
+    std::vector<FilterValue> v;
+    buildVector(v);
+    if(v.size()==0) {
+        QMessageBox::information(this, "No Filters", "Please Add Filters to Save");
+        return;
+    }
     
+    for(unsigned int i = 0; i < v.size(); ++i) {
+        int value1 = v[i].filter;
+        int value2 = v[i].subfilter;
+        file_n << value1 << ":" << value2 << "\n";
+    }
+    std::ostringstream stream;
+    stream << "Wrote custom to: " << file_name.toStdString() << "\n";
+    Log(stream.str().c_str());
+    file_n.close();
 }
