@@ -1357,6 +1357,10 @@ void AC_MainWindow::load_CustomFile() {
     Log(sval.str().c_str());
 }
 void AC_MainWindow::save_CustomFile() {
+    if(custom_filters->count() == 0) {
+        QMessageBox::information(this, "Seleect Filters", "You need to adds ome filters to be able to save...");
+        return;
+    }
     QString file_name = QFileDialog::getSaveFileName(this, tr("Save File"),"",                                            tr("Filter Save (*.filter)"));
     
     if(file_name.length()==0)
