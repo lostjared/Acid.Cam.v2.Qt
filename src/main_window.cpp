@@ -1321,6 +1321,23 @@ void AC_MainWindow::load_CustomFile() {
         }
         s_left = item.substr(0,pos);
         s_right = item.substr(pos+1, item.length());
+        
+        if(filter_map.find(s_left) == filter_map.end()) {
+            QString itext = "Filter: ";
+            itext += s_left.c_str();
+            itext += " Not found in this version... old version?";
+            QMessageBox::information(this, "Filter Not Found", itext);
+            return;
+        }
+
+        if(s_right != "None" && filter_map.find(s_right) == filter_map.end()) {
+            QString itext = "Filter: ";
+            itext += s_right.c_str();
+            itext += " Not found in this version... old version?";
+            QMessageBox::information(this, "Filter Not Found", itext);
+            return;
+        }
+        
         int val1 = filter_map[s_left].filter;
         int val2 = filter_map[s_right].filter;
         if(!(val1 >= 0 && val1 < ac::draw_max-4)) {
