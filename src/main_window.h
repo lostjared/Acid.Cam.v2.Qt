@@ -60,6 +60,8 @@ public:
     void setFrameIndex(int i);
     void resetMenu();
     void setSpeedIndex(int index);
+    void setOptionString(std::string op, std::string value);
+    void setProcMode(int index);
 public slots:
     void addClicked();
     void rmvClicked();

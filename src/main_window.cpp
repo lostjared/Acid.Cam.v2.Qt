@@ -1300,6 +1300,68 @@ void AC_MainWindow::resetMenu() {
     }
 }
 
+void AC_MainWindow::setOptionString(std::string op, std::string value) {
+    int num = atoi(value.c_str());
+    if(op == "=red") {
+        slide_r->setSliderPosition(num);
+        return;
+    }
+    if(op == "=green") {
+        slide_g->setSliderPosition(num);
+        return;
+    }
+    if(op == "=blue") {
+        slide_g->setSliderPosition(num);
+        return;
+    }
+    if(op == "=color_map") {
+        color_maps->setCurrentIndex(num);
+        return;
+    }
+    if(op == "=brightness") {
+        slide_bright->setSliderPosition(num);
+        return;
+    }
+    if(op == "=gamma") {
+        slide_gamma->setSliderPosition(num);
+        return;
+    }
+    if(op == "=sat") {
+        slide_saturation->setSliderPosition(num);
+        return;
+    }
+    if(op == "=negate") {
+        chk_negate->setChecked(num);
+        return;
+    }
+    if(op == "=color_order") {
+        combo_rgb->setCurrentIndex(num);
+        return;
+    }
+    if(op == "=proc") {
+        setProcMode(num);
+        return;
+    }
+    if(op == "=mvmnt") {
+        setSpeedIndex(num);
+        return;
+    }
+}
+
+void AC_MainWindow::setProcMode(int index) {
+    switch(index) {
+        case 0:
+            movementOption1();
+            break;
+        case 1:
+            movementOption2();
+            break;
+        case 2:
+            movementOption3();
+            break;
+    }
+}
+
 void AC_MainWindow::load_CustomFile() {
     QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"),"",tr("Filter Files (*.filter)"));
     if(file_name.length()==0)
@@ -1329,6 +1391,9 @@ void AC_MainWindow::load_CustomFile() {
         }
         s_left = item.substr(0,pos);
         s_right = item.substr(pos+1, item.length());
+
+        if(item[0] == '=')
+            continue;
         
         if(filter_map.find(s_left) == filter_map.end()) {
             QString itext = "Filter: ";
@@ -1337,7 +1402,6 @@ void AC_MainWindow::load_CustomFile() {
             QMessageBox::information(this, "Filter Not Found", itext);
             return;
         }
-
         if(s_right != "None" && filter_map.find(s_right) == filter_map.end()) {
             QString itext = "Filter: ";
             itext += s_right.c_str();
@@ -1365,6 +1429,12 @@ void AC_MainWindow::load_CustomFile() {
         std::string s_left, s_right;
         s_left = item.substr(0, item.find(":"));
         s_right = item.substr(item.find(":")+1, item.length());
+        if(s_left[0] == '=' && use_settings->isChecked() == true) {
+            setOptionString(s_left, s_right);
+            continue;
+        } else if(s_left[0] == '=') {
+            continue;
+        }
         int value1 = filter_map[s_left].filter;
         int value2 = 0;
         if(s_right == "None")
@@ -1379,6 +1449,9 @@ void AC_MainWindow::load_CustomFile() {
             stream << ":" << ac::draw_strings[value2];
         custom_filters->addItem(stream.str().c_str());
     }
+    slideChanged(0);
+    colorChanged(0);
+    colorMapChanged(color_maps->currentIndex());
     std::ostringstream sval;
     sval << "Loaded Custom Filter: " << file_name.toStdString() << "\n";
     std::vector<FilterValue> v;
