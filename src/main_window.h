@@ -59,6 +59,7 @@ public:
     void setSubFilter(const QString &num);
     void setFrameIndex(int i);
     void resetMenu();
+    void setSpeedIndex(int index);
 public slots:
     void addClicked();
     void rmvClicked();
@@ -136,6 +137,7 @@ private:
     VideoMode programMode;
     void buildVector(std::vector<FilterValue> &v);
     bool loading;
+    int speed_index;
 };
 
 extern const char *filer_names[];

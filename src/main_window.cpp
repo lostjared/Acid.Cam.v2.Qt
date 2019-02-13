@@ -69,7 +69,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
-    
+    speed_index = 0;
     loading = false;
     
     cap_camera = new CaptureCamera(this);
@@ -533,6 +533,7 @@ void AC_MainWindow::repeat_vid() {
 }
 
 void AC_MainWindow::speed1() {
+    speed_index = 0;
     ac::alpha_increase = speed_actions[0];
     QString text;
     QTextStream stream(&text);
@@ -545,6 +546,7 @@ void AC_MainWindow::speed1() {
     
 }
 void AC_MainWindow::speed2() {
+    speed_index = 1;
     QString text;
     QTextStream stream(&text);
     ac::alpha_increase = speed_actions[1];
@@ -554,9 +556,9 @@ void AC_MainWindow::speed2() {
         speed_action_items[i]->setChecked(false);
     }
     speed_action_items[1]->setChecked(true);
-    
 }
 void AC_MainWindow::speed3() {
+    speed_index = 2;
     ac::alpha_increase = speed_actions[2];
     QString text;
     QTextStream stream(&text);
@@ -569,6 +571,7 @@ void AC_MainWindow::speed3() {
     
 }
 void AC_MainWindow::speed4() {
+    speed_index = 3;
     ac::alpha_increase = speed_actions[3];
     QString text;
     QTextStream stream(&text);
@@ -580,6 +583,7 @@ void AC_MainWindow::speed4() {
     speed_action_items[3]->setChecked(true);
 }
 void AC_MainWindow::speed5() {
+    speed_index = 4;
     ac::alpha_increase = speed_actions[4];
     QString text;
     QTextStream stream(&text);
@@ -591,6 +595,7 @@ void AC_MainWindow::speed5() {
     speed_action_items[4]->setChecked(true);
 }
 void AC_MainWindow::speed6() {
+    speed_index = 5;
     ac::alpha_increase = speed_actions[5];
     QString text;
     QTextStream stream(&text);
@@ -603,6 +608,7 @@ void AC_MainWindow::speed6() {
 }
 
 void AC_MainWindow::speed7() {
+    speed_index = 6;
     QString text;
     QTextStream stream(&text);
     ac::alpha_increase = speed_actions[6];
@@ -1379,6 +1385,35 @@ void AC_MainWindow::load_CustomFile() {
     file.close();
     Log(sval.str().c_str());
 }
+
+// ugly way of doing this
+void AC_MainWindow::setSpeedIndex(int index) {
+    switch(index) {
+        case 0:
+            speed1();
+            break;
+        case 1:
+            speed2();
+            break;
+        case 2:
+            speed3();
+            break;
+        case 3:
+            speed4();
+            break;
+        case 4:
+            speed5();
+            break;
+        case 5:
+            speed6();
+            break;
+        case 6:
+            speed7();
+            break;
+            
+    }
+}
+
 void AC_MainWindow::save_CustomFile() {
     if(custom_filters->count() == 0) {
         QMessageBox::information(this, "Seleect Filters", "You need to adds ome filters to be able to save...");
@@ -1402,6 +1437,32 @@ void AC_MainWindow::save_CustomFile() {
         return;
     }
     
+    bool load_settings = true;
+    
+    if(load_settings == true) {
+        int rgb[] = { slide_r->sliderPosition(), slide_g->sliderPosition(), slide_b->sliderPosition()};
+        file_n << "=red:" << rgb[0] << "\n";
+        file_n << "=green:" << rgb[1] << "\n";
+        file_n << "=blue:" << rgb[2] << "\n";
+        int color_m = color_maps->currentIndex();
+        file_n << "=color_map:" << color_m << "\n";
+        int bright = slide_bright->sliderPosition();
+        file_n << "=brightness:" << bright << "\n";
+        int gam = slide_gamma->sliderPosition();
+        file_n << "=gamma:" << gam << "\n";
+        int sat = slide_saturation->sliderPosition();
+        file_n << "=sat:" << sat << "\n";
+        int chkNegate = chk_negate->isChecked();
+        file_n << "=negate:" << chkNegate << "\n";
+        int cord = combo_rgb->currentIndex();
+        file_n << "=color_order:" << cord << "\n";
+        int procM = ac::proc_mode;
+        file_n << "=proc:" << procM << "\n";
+        int mvmnt = speed_index;
+        file_n << "=mvmnt:"<< mvmnt << "\n";
+        //int src_amt = [blend_source_amt indexOfSelectedItem];
+        //file_n << "=bsrc:" << src_amt << "\n"; */
+    }
     for(unsigned int i = 0; i < v.size(); ++i) {
         if(v[i].index == 0) {
         	int value1 = v[i].filter;
