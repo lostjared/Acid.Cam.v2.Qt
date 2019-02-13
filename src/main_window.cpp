@@ -174,9 +174,9 @@ void AC_MainWindow::createControls() {
     btn_load = new QPushButton(tr("Load"), this);
     btn_save = new QPushButton(tr("Save"), this);
     btn_add->setGeometry(10, 215, 100, 20);
-    btn_remove->setGeometry(395, 215, 65, 20);
-    btn_moveup->setGeometry(465, 215, 65, 20);
-    btn_movedown->setGeometry(535, 215, 65, 20);
+    btn_remove->setGeometry(400, 215, 60, 20);
+    btn_moveup->setGeometry(465, 215, 60, 20);
+    btn_movedown->setGeometry(530, 215, 60, 20);
     btn_load->setGeometry(655+20, 215, 55, 20);
     btn_save->setGeometry(655+60+20, 215, 55, 20);
     btn_sub->setGeometry(10, 165, 100, 20);
@@ -1438,10 +1438,7 @@ void AC_MainWindow::save_CustomFile() {
         QMessageBox::information(this, "No Filters", "Please Add Filters to Save");
         return;
     }
-    
-    bool load_settings = true;
-    
-    if(load_settings == true) {
+    if(use_settings->isChecked() == 1) {
         int rgb[] = { slide_r->sliderPosition(), slide_g->sliderPosition(), slide_b->sliderPosition()};
         file_n << "=red:" << rgb[0] << "\n";
         file_n << "=green:" << rgb[1] << "\n";
