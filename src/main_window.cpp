@@ -167,16 +167,16 @@ void AC_MainWindow::createControls() {
     
     btn_add = new QPushButton(tr("Add"), this);
     btn_remove = new QPushButton(tr("Remove"), this);
-    btn_moveup = new QPushButton(tr("Move Up"), this);
-    btn_movedown = new QPushButton(tr("Move Down"), this);
+    btn_moveup = new QPushButton(tr("Up"), this);
+    btn_movedown = new QPushButton(tr("Down"), this);
     btn_sub = new QPushButton(tr("Subfilter"), this);
     btn_clr = new QPushButton(tr("Clear Sub"), this);
     btn_load = new QPushButton(tr("Load"), this);
     btn_save = new QPushButton(tr("Save"), this);
     btn_add->setGeometry(10, 215, 100, 20);
-    btn_remove->setGeometry(400, 215, 80, 20);
-    btn_moveup->setGeometry(485, 215, 80, 20);
-    btn_movedown->setGeometry(570, 215, 80, 20);
+    btn_remove->setGeometry(395, 215, 65, 20);
+    btn_moveup->setGeometry(465, 215, 65, 20);
+    btn_movedown->setGeometry(535, 215, 65, 20);
     btn_load->setGeometry(655+20, 215, 55, 20);
     btn_save->setGeometry(655+60+20, 215, 55, 20);
     btn_sub->setGeometry(10, 165, 100, 20);
@@ -280,7 +280,9 @@ void AC_MainWindow::createControls() {
     chk_negate = new QCheckBox(tr("Negate"), this);
     chk_negate->setGeometry(120,215,100, 20);
     chk_negate->setCheckState(Qt::Unchecked);
-    
+    use_settings = new QCheckBox(tr("Settings"), this);
+    use_settings->setCheckState(Qt::Checked);
+    use_settings->setGeometry(605, 215,80, 20);
     connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
     
     combo_rgb = new QComboBox(this);
@@ -1460,8 +1462,6 @@ void AC_MainWindow::save_CustomFile() {
         file_n << "=proc:" << procM << "\n";
         int mvmnt = speed_index;
         file_n << "=mvmnt:"<< mvmnt << "\n";
-        //int src_amt = [blend_source_amt indexOfSelectedItem];
-        //file_n << "=bsrc:" << src_amt << "\n"; */
     }
     for(unsigned int i = 0; i < v.size(); ++i) {
         if(v[i].index == 0) {

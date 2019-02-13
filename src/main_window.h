@@ -31,7 +31,7 @@ public:
     QListWidget /**filters,*/ *custom_filters;
     QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown,*btn_load, *btn_save, *btn_sub, *btn_clr;
     QTextEdit *log_text;
-    QCheckBox *chk_negate;
+    QCheckBox *chk_negate, *use_settings;
     QComboBox *combo_rgb;
     QSlider *slide_r, *slide_g, *slide_b, *slide_bright, *slide_gamma, *slide_saturation;
     QProgressBar *progress_bar;
