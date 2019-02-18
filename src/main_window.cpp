@@ -693,7 +693,6 @@ void AC_MainWindow::addClicked() {
     int row = filters->currentIndex();
     if(row != -1) {
         //QListWidgetItem *item = filters->item(row);
-        
         std::string sub_str = filters->currentText().toStdString();
         custom_filters->addItem(filters->currentText());
         //custom_filters->addItem(sub_str.c_str());
@@ -1311,7 +1310,7 @@ void AC_MainWindow::setOptionString(std::string op, std::string value) {
         return;
     }
     if(op == "=blue") {
-        slide_g->setSliderPosition(num);
+        slide_b->setSliderPosition(num);
         return;
     }
     if(op == "=color_map") {
