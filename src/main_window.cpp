@@ -1488,6 +1488,10 @@ void AC_MainWindow::setSpeedIndex(int index) {
     }
 }
 
+namespace ac {
+	extern int proc_mode;
+}
+
 void AC_MainWindow::save_CustomFile() {
     if(custom_filters->count() == 0) {
         QMessageBox::information(this, "Seleect Filters", "You need to adds ome filters to be able to save...");
