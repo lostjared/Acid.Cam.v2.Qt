@@ -28,10 +28,9 @@ const char *menuNames[] = {"All Filters", "All Filters Sorted", "Blend", "Distor
 
 
 void generate_map() {
+    ac::fill_filter_map();
     for(int i = 0; i < ac::draw_max; ++i )
         filter_map[ac::draw_strings[i]] = FilterValue(0, i, -1);
-    
-    
     int index = 0;
     while(filter_names[index] != 0) {
         std::string filter_n = "AF_";
@@ -44,7 +43,6 @@ void generate_map() {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
         filter_map[name] = FilterValue(2, j, -1);
     }
-    
 }
 
 void custom_filter(cv::Mat &) {

@@ -191,7 +191,8 @@ void Playback::drawEffects(cv::Mat &frame) {
 void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
     if(f.index == 0) {
         ac::setSubFilter(f.subfilter);
-        ac::draw_func[f.filter](frame);
+        //ac::draw_func[f.filter](frame);
+        ac::CallFilter(f.filter, frame);
         ac::setSubFilter(-1);
     } else if(current_filter.index == 1) {
         current_filterx = f.filter;
