@@ -38,7 +38,7 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
     writer = wr;
     recording = record;
     if(capture.isOpened()) {
-        frame_rate =  capture.get(CV_CAP_PROP_FPS);
+        frame_rate =  capture.get(cv::CAP_PROP_FPS);
         if(frame_rate <= 0) frame_rate = 24;
     }
     mutex.unlock();
@@ -81,13 +81,13 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
             res_h = 1080;
             break;
     }
-    bool cw = capture.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
-    bool ch = capture.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+    bool cw = capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
+    bool ch = capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
     if(cw == false || ch == false) {
         res_w = ores_w;
         res_h = ores_h;
-        capture.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
-        capture.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
+        capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
+        capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
     }
     mutex.unlock();
     return true;
@@ -269,7 +269,7 @@ void Playback::run() {
         mutex.unlock();
         if(video_shown == true) {
             if(frame.channels()==3) {
-                cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
+                cv::cvtColor(frame, rgb_frame, cv::COLOR_BGR2RGB);
                 img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
             } else {
                 img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
@@ -301,7 +301,7 @@ Playback::~Playback() {
 
 void Playback::setFrameIndex(const long &index) {
     mutex.lock();
-    capture.set(CV_CAP_PROP_POS_FRAMES, index);
+    capture.set(cv::CAP_PROP_POS_FRAMES, index);
     mutex.unlock();
 }
 
@@ -311,7 +311,7 @@ bool Playback::getFrame(QImage &img, const int &index) {
     mutex.lock();
     cv::Mat frame;
     if(mode == MODE_VIDEO && capture.read(frame)) {
-        cv::cvtColor(frame, rgb_frame, CV_BGR2RGB);
+        cv::cvtColor(frame, rgb_frame, cv::COLOR_BGR2RGB);
         img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
         mutex.unlock();
         setFrameIndex(index);
