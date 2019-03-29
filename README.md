@@ -26,7 +26,7 @@ Acid Cam's effects are created by using Acid Cam 'filters', or pieces of code th
 
 First download GCC/Automake/Autoconf with g++ compiler and make then compile on Debian install libqt4-dev and libopencv-dev via Terminal with
 
-	$ sudo apt-get install libqt4-dev libopencv-dev
+	$ sudo apt-get install libqt4-dev libopencv-dev git g++
 
 Also install pkg-config
 
