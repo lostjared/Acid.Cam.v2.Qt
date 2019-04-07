@@ -866,7 +866,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     
     if(recording) {
         video_file_name = output_name;
-        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? cv::VideoWriter::fourcc('m', 'p', '4', 'v') : cv::VideoWriter::fourcc('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
         
         if(!writer.isOpened()) {
             Log(tr("Could not create video writer..\n"));
@@ -906,11 +906,11 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     if(!capture_video.isOpened()) {
         return false;
     }
-    video_frames = capture_video.get(CV_CAP_PROP_FRAME_COUNT);
+    video_frames = capture_video.get(cv::CAP_PROP_FRAME_COUNT);
     if(video_frames <= 0) return false;
-    video_fps = capture_video.get(CV_CAP_PROP_FPS);
-    int res_w = capture_video.get(CV_CAP_PROP_FRAME_WIDTH);
-    int res_h = capture_video.get(CV_CAP_PROP_FRAME_HEIGHT);
+    video_fps = capture_video.get(cv::CAP_PROP_FPS);
+    int res_w = capture_video.get(cv::CAP_PROP_FRAME_WIDTH);
+    int res_h = capture_video.get(cv::CAP_PROP_FRAME_HEIGHT);
     QString str;
     QTextStream stream(&str);
     stream << "Opened capture device [Video] " << res_w << "x" << res_h << "\n";
@@ -941,7 +941,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     
     if(recording) {
         video_file_name = output_name;
-        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? CV_FOURCC('m', 'p', '4', 'v') : CV_FOURCC('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? cv::VideoWriter::fourcc('m', 'p', '4', 'v') : cv::VideoWriter::fourcc('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
         
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
@@ -1115,14 +1115,14 @@ cv::Mat QImage2Mat(QImage const& src)
 {
     cv::Mat tmp(src.height(),src.width(),CV_8UC3,(uchar*)src.bits(),src.bytesPerLine());
     cv::Mat result;
-    cvtColor(tmp, result,CV_BGR2RGB);
+    cvtColor(tmp, result,cv::COLOR_BGR2RGB);
     return result;
 }
 
 QImage Mat2QImage(cv::Mat const& src)
 {
     cv::Mat temp;
-    cvtColor(src, temp,CV_BGR2RGB);
+    cvtColor(src, temp,cv::COLOR_BGR2RGB);
     QImage dest((const uchar *) temp.data, temp.cols, temp.rows, temp.step, QImage::Format_RGB888);
     dest.bits();
     return dest;
