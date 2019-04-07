@@ -1540,10 +1540,12 @@ void AC_MainWindow::save_CustomFile() {
         	int value2 = v[i].subfilter;
             std::string v1, v2;
             v1 = ac::draw_strings[value1];
-            if(value2 == -1)
+            if(value2 == -1) {
                 v2 = "None";
-            else
+            }
+            else {
                 v2 = ac::draw_strings[value2];
+            }
         	file_n << v1 << ":" << v2 << "\n";
         }
     }
