@@ -1064,6 +1064,7 @@ void AC_MainWindow::controls_SetImage() {
             QTextStream stream(&text);
             stream << "Successfully Loaded Image: [" << fileName << "] Size: " << tblend_image.cols << "x" << tblend_image.rows << "\n";
             Log(text);
+            ac::pix.setInit(false);
         } else {
             QMessageBox::information(this, tr("Image Load failed"), tr("Could not load image"));
         }
