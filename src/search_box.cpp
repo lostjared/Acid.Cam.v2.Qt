@@ -38,20 +38,18 @@ void SearchWindow::createControls() {
 }
 
 void SearchWindow::search_filter() {
-    
     while(search_list->count() > 0) {
         search_list->takeItem(0);
     }
-    
     std::string search = lowerString(search_text->text().toStdString());
     std::vector<std::string> tokens;
     token::tokenize(search, std::string(" "), tokens);
-    
-    for(int i = 0; i < filters->count(); ++i) {
-        std::string search_items = lowerString(filters->itemText(i).toStdString());
-        for(unsigned q = 0; q < tokens.size(); ++q) {
-            if(search_items.find(tokens[q]) != std::string::npos) {
-                search_list->addItem(filters->itemText(i));
+    for(int i = 0; i < ac::draw_max-6; ++i) {
+        std::string search_value = lowerString(ac::draw_strings[i]);
+        for(unsigned int q = 0; q < tokens.size(); ++q) {
+            if(search_value.find(tokens[q]) != std::string::npos) {
+                search_list->addItem(ac::draw_strings[i].c_str());
+                break;
             }
         }
     }
