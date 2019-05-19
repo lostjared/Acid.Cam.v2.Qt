@@ -58,6 +58,8 @@ This is an application that will allow you to generate video files/images with l
 in different orders to produce different results. This program could be useful to you for generating basic artwork to be manipulated further. Also I have seen 
 it used to create video for music videos or just for fun. 
 
+NOTE: Some of the filters that contain either a 720 or 1080 at the end require a lot of ram if you do not have enough the program will exit.
+
 Cross platform version of Acid Cam written in C++11 
 
 To compile on Linux watch this video: https://youtu.be/ntsoGTglWzY
