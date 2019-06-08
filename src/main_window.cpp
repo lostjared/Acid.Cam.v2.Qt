@@ -274,6 +274,7 @@ void AC_MainWindow::createControls() {
     stream << tr("Acid Cam Filters v");
     stream << ac::version.c_str();
     stream << " loaded " << filters->count() << " filters.\n";
+    stream << "OpenCL Enabled: " << ((ac::OpenCL_Enabled() == true) ? "Yes" : "No") << "\n";
     log_text->setText(text);
     chk_negate = new QCheckBox(tr("Negate"), this);
     chk_negate->setGeometry(120,215,100, 20);
