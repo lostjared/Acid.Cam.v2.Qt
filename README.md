@@ -5,6 +5,8 @@
 To watch all the videos I have created with this project checkout my YouTube playlist:
 https://www.youtube.com/playlist?list=PLUgo--lX2kmr6ikfz0hPlez1-jbGAYuTZ
 
+To be able to use all the filters in this program your system should have at lest 8 GB of ram.
+
 Program requires the Visual C++ 2015 Runtime.
 
 You can download it here: https://www.microsoft.com/en-us/download/details.aspx?id=48145
