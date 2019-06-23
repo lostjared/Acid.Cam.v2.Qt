@@ -140,6 +140,7 @@ private:
     void buildVector(std::vector<FilterValue> &v);
     bool loading;
     int speed_index;
+    cv::ocl::Context context;
 };
 
 extern const char *filer_names[];

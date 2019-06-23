@@ -276,7 +276,6 @@ void AC_MainWindow::createControls() {
     stream << ac::version.c_str();
     stream << " loaded " << filters->count() << " filters.\n";
     std::ostringstream s_stream;
-    cv::ocl::Context context;
     if(!context.create(cv::ocl::Device::TYPE_ALL))
         s_stream << "Could not create OpenCL Context\n";
     else {
