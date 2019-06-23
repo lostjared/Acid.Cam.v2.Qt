@@ -9,6 +9,7 @@
 #include<mutex>
 #include"plugin.h"
 #include<sys/stat.h>
+#include <opencv2/core/ocl.hpp>
 
 std::unordered_map<std::string, FilterValue> filter_map;
 void custom_filter(cv::Mat &);
@@ -274,7 +275,18 @@ void AC_MainWindow::createControls() {
     stream << tr("Acid Cam Filters v");
     stream << ac::version.c_str();
     stream << " loaded " << filters->count() << " filters.\n";
-    stream << "OpenCL Enabled: " << ((ac::OpenCL_Enabled() == true) ? "Yes" : "No") << "\n";
+    std::ostringstream s_stream;
+    cv::ocl::Context context;
+    if(!context.create(cv::ocl::Device::TYPE_ALL))
+        s_stream << "Could not create OpenCL Context\n";
+    else {
+        for(unsigned int i = 0; i < context.ndevices(); ++i) {
+            cv::ocl::Device device = context.device(i);
+            s_stream << "Name: " << device.name() << "\n"  << "OpenCL version: " << device.OpenCL_C_Version() << "\n";
+        }
+        cv::ocl::Device(context.device(0));
+    }
+    stream << s_stream.str().c_str();
     log_text->setText(text);
     chk_negate = new QCheckBox(tr("Negate"), this);
     chk_negate->setGeometry(120,215,100, 20);
