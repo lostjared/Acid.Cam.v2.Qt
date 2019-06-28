@@ -1156,7 +1156,7 @@ void AC_MainWindow::updateFrame(QImage img) {
         } else {
             struct stat buf;
             stat(video_file_name.toStdString().c_str(), &buf);
-            frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1024)/1024) <<  " MB) ";
+            frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1000)/1000) <<  " MB) ";
         }
         if(programMode == MODE_VIDEO) {
             
@@ -1251,7 +1251,7 @@ void AC_MainWindow::frameInc() {
     } else {
         struct stat buf;
         stat(video_file_name.toStdString().c_str(), &buf);
-        frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1024)/1024)  <<  " MB) ";
+        frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" << (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1000)/1000)  <<  " MB) ";
         
     }
     if(programMode == MODE_VIDEO) {
