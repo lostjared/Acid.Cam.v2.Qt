@@ -115,6 +115,23 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     QString arg = "http://lostsidedead.com/ac/version.txt";
     QUrl url = QUrl::fromEncoded(arg.toLocal8Bit());
     dl.doDownload(url);
+    
+    std::string v_info = ac_version;
+    std::fstream file;
+    file.open("version.txt", std::ios::in);
+    if(!file.is_open()) {
+        std::cerr << "Error could not open file..\n";
+        return;
+    }
+    std::stringstream buf;
+    buf << file.rdbuf();
+    if(buf.str().find(v_info) != std::string::npos) {
+        std::cout << "Match...\n";
+    } else {
+        if(QMessageBox::question(this, "New version available?", "Do you wish to open the download page for a new version?") == QMessageBox::Yes) {
+            QDesktopServices::openUrl(QUrl("https://github.com/lostjared/Acid.Cam.v2.Qt/releases"));
+        }
+    }
 }
 
 
@@ -182,8 +199,8 @@ void AC_MainWindow::createControls() {
     btn_movedown->setGeometry(530, 215, 80, 25);
     btn_load->setGeometry(655+20, 215, 60, 25);
     btn_save->setGeometry(655+60+20, 215, 60, 25);
-    btn_sub->setGeometry(10, 165, 100, 20);
-    btn_clr->setGeometry(115, 165, 100, 20);
+    btn_sub->setGeometry(10, 165, 100, 25);
+    btn_clr->setGeometry(115, 165, 100, 25);
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
