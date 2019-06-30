@@ -111,6 +111,10 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     define_window = new DefineWindow(this);
     define_window->hide();
     define_window->main_window = this;
+    
+    QString arg = "http://lostsidedead.com/ac/version.txt";
+    QUrl url = QUrl::fromEncoded(arg.toLocal8Bit());
+    dl.doDownload(url);
 }
 
 
@@ -155,9 +159,9 @@ void AC_MainWindow::createControls() {
     
     
     filter_single = new QRadioButton(tr("Single Filter"), this);
-    filter_single->setGeometry(30, 40, 100, 15);
+    filter_single->setGeometry(30, 40, 200, 15);
     filter_custom = new QRadioButton(tr("Custom Filter"), this);
-    filter_custom->setGeometry(30, 65, 100, 15);
+    filter_custom->setGeometry(30, 65, 200, 15);
     
     filter_single->setChecked(true);
     
@@ -172,12 +176,12 @@ void AC_MainWindow::createControls() {
     btn_clr = new QPushButton(tr("Clear Sub"), this);
     btn_load = new QPushButton(tr("Load"), this);
     btn_save = new QPushButton(tr("Save"), this);
-    btn_add->setGeometry(10, 215, 100, 20);
-    btn_remove->setGeometry(400, 215, 60, 20);
-    btn_moveup->setGeometry(465, 215, 60, 20);
-    btn_movedown->setGeometry(530, 215, 60, 20);
-    btn_load->setGeometry(655+20, 215, 55, 20);
-    btn_save->setGeometry(655+60+20, 215, 55, 20);
+    btn_add->setGeometry(10, 215, 100, 25);
+    btn_remove->setGeometry(390, 215, 80, 25);
+    btn_moveup->setGeometry(460, 215, 80, 25);
+    btn_movedown->setGeometry(530, 215, 80, 25);
+    btn_load->setGeometry(655+20, 215, 60, 25);
+    btn_save->setGeometry(655+60+20, 215, 60, 25);
     btn_sub->setGeometry(10, 165, 100, 20);
     btn_clr->setGeometry(115, 165, 100, 20);
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));

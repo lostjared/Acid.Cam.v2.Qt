@@ -16,7 +16,7 @@
 #include "goto_window.h"
 #include "chroma_window.h"
 #include "user_define.h"
-
+#include "dl-man.h"
 
 class SearchWindow;
 
@@ -141,6 +141,7 @@ private:
     bool loading;
     int speed_index;
     cv::ocl::Context context;
+    DownloadManager dl;
 };
 
 extern const char *filer_names[];
