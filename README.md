@@ -46,11 +46,17 @@ Then (on Linux) use ldconfig
 
 Next download this project via git clone or zip enter the src directory
 
-	$ qmake
+For compiling with OpenCV 4 use:
 
+	$ qmake Acid.Cam.v2.OpenCV4.pro
+    
+For compiling with OpenCV 3 use:
+    
+    $ qmake Acid.Cam.v3.OpenCV4.pro
+    
 Then to build project
 
-	$ make 
+	$ make -j4
 
 Then Run the program
 
