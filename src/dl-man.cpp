@@ -14,10 +14,8 @@ void DownloadManager::doDownload(const QUrl &url)
     QNetworkRequest request(url);
     QNetworkReply *reply = manager.get(request);
     
-#if QT_CONFIG(ssl)
     connect(reply, SIGNAL(sslErrors(QList<QSslError>)),
             SLOT(sslErrors(QList<QSslError>)));
-#endif
     
     currentDownloads.append(reply);
 }
@@ -29,16 +27,6 @@ QString DownloadManager::saveFileName(const QUrl &url)
     
     if (basename.isEmpty())
         basename = "download";
-    /*
-    if (QFile::exists(basename)) {
-        // already exists, don't overwrite
-        int i = 0;
-        basename += '.';
-        while (QFile::exists(basename + QString::number(i)))
-            ++i;
-        
-        basename += QString::number(i);
-    }*/
     
     return basename;
 }
@@ -66,29 +54,12 @@ bool DownloadManager::isHttpRedirect(QNetworkReply *reply)
     || statusCode == 305 || statusCode == 307 || statusCode == 308;
 }
 
-void DownloadManager::execute()
-{
-    QStringList args = QCoreApplication::instance()->arguments();
-    args.takeFirst();           // skip the first argument, which is the program's name
-    if (args.isEmpty()) {
-        QCoreApplication::instance()->quit();
-        return;
-    }
-    
-    for (const QString &arg : qAsConst(args)) {
-        QUrl url = QUrl::fromEncoded(arg.toLocal8Bit());
-        doDownload(url);
-    }
-}
+void DownloadManager::execute() {}
 
 void DownloadManager::sslErrors(const QList<QSslError> &sslErrors)
 {
-#if QT_CONFIG(ssl)
     for (const QSslError &error : sslErrors)
-        fprintf(stderr, "SSL error: %s\n", qPrintable(error.errorString()));
-#else
-    Q_UNUSED(sslErrors);
-#endif
+        fprintf(stderr, "SSL error: %s\n", qPrintable(error.errorString()));*/
 }
 
 void DownloadManager::downloadFinished(QNetworkReply *reply)
@@ -109,8 +80,6 @@ void DownloadManager::downloadFinished(QNetworkReply *reply)
             }
         }
     }
-    
-    currentDownloads.removeAll(reply);
     reply->deleteLater();
 }
 
