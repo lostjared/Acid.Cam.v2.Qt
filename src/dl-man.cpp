@@ -59,7 +59,7 @@ void DownloadManager::execute() {}
 void DownloadManager::sslErrors(const QList<QSslError> &sslErrors)
 {
     for (const QSslError &error : sslErrors)
-        fprintf(stderr, "SSL error: %s\n", qPrintable(error.errorString()));*/
+        fprintf(stderr, "SSL error: %s\n", qPrintable(error.errorString()));
 }
 
 void DownloadManager::downloadFinished(QNetworkReply *reply)
