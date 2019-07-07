@@ -114,6 +114,7 @@ void Playback::reset_filters() {
     if(ac::reset_alpha == false) {
         ac::reset_alpha = true;
     }
+    ac::image_matrix_reset = true;
     ac::frames_released = true;
     mutex.unlock();
 }
@@ -171,6 +172,7 @@ void Playback::drawEffects(cv::Mat &frame) {
     if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
     ac::frames_released = false;
     ac::reset_alpha = false;
+    ac::image_matrix_reset = false;
     if(bright_ > 0) {
         ac::setBrightness(frame, 1.0, bright_);
     }

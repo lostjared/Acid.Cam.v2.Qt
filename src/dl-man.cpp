@@ -40,10 +40,8 @@ bool DownloadManager::saveToDisk(const QString &filename, QIODevice *data)
                 qPrintable(file.errorString()));
         return false;
     }
-    
     file.write(data->readAll());
     file.close();
-    
     return true;
 }
 
