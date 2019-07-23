@@ -455,6 +455,13 @@ void AC_MainWindow::createMenu() {
     controls_showvideo = new QAction(tr("Hide Display Video"), this);
     controls_showvideo->setShortcut(tr("Ctrl+V"));
     controls_menu->addAction(controls_showvideo);
+    
+    show_fullscreen = new QAction(tr("Enter Full Screen"), this);
+    controls_menu->addAction(show_fullscreen);
+    
+    connect(show_fullscreen, SIGNAL(triggered()), this, SLOT(showFull()));
+    
+    
     reset_filters = new QAction(tr("Reset Filters"), this);
     reset_filters->setShortcut(tr("Ctrl+R"));
     controls_menu->addAction(reset_filters);
@@ -490,6 +497,11 @@ void AC_MainWindow::createMenu() {
     connect(set_newnames, SIGNAL(triggered()), this, SLOT(show_Favorites()));
     controls_menu->addAction(set_newnames);
 }
+
+void AC_MainWindow::showFull() {
+    disp->showMax();
+}
+
 
 void AC_MainWindow::resetIndex() {
     frame_index = 0;

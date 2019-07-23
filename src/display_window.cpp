@@ -14,6 +14,11 @@ DisplayWindow::DisplayWindow(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Acid Cam v2 - Display Window"));
     hide();
 }
+
+void DisplayWindow::showMax() {
+    showFullScreen();
+}
+
 void DisplayWindow::createControls() {
     img_label = new QLabel(this);
     img_label->setGeometry(0,0,640, 480);

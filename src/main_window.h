@@ -53,6 +53,7 @@ public:
     QAction *fade_on;
     QAction *select_key;
     QAction *set_newnames;
+    QAction *show_fullscreen;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -116,6 +117,7 @@ public slots:
     void show_Favorites();
     void load_CustomFile();
     void save_CustomFile();
+    void showFull();
 private:
     void createControls();
     void createMenu();

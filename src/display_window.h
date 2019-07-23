@@ -19,6 +19,7 @@ public:
     void paintEvent(QPaintEvent *paint);
     void keyPressEvent(QKeyEvent *ke);
     void keyReleaseEvent(QKeyEvent *ke);
+    void showMax();
 private:
     QLabel *img_label;
 };
