@@ -39,6 +39,7 @@
 #include<QLineEdit>
 #include<QColorDialog>
 #include<QDesktopServices>
+#include<QKeyEvent>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

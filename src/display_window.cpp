@@ -38,8 +38,11 @@ void DisplayWindow::paintEvent(QPaintEvent *) {
     painter.fillRect(QRect(QPoint(0, 0), size()), QColor(0,0,0));
 }
 
-void DisplayWindow::keyPressEvent(QKeyEvent *) {
-    
+void DisplayWindow::keyPressEvent(QKeyEvent *keys) {
+    int c = keys->key();
+    if(c == Qt::Key_Escape || c == 'Q' || c == 'q') {
+        showNormal();
+    }
 }
 
 void DisplayWindow::keyReleaseEvent(QKeyEvent *) {
