@@ -666,7 +666,7 @@ void AC_MainWindow::speed7() {
 }
 
 void AC_MainWindow::movementOption1() {
-    ac::setProcMode(0);
+    ac::setProcMode(ac::PROC_MODE_TYPE(0));
     in_out_increase->setChecked(true);
     in_out->setChecked(false);
     out_reset->setChecked(false);
@@ -676,7 +676,7 @@ void AC_MainWindow::movementOption2() {
     in_out_increase->setChecked(false);
     in_out->setChecked(true);
     out_reset->setChecked(false);
-    ac::setProcMode(1);
+    ac::setProcMode(ac::PROC_MODE_TYPE(1));
     Log(tr("Proc Mode set to: 1\n"));
 }
 
@@ -684,7 +684,7 @@ void AC_MainWindow::movementOption3() {
     in_out_increase->setChecked(false);
     in_out->setChecked(false);
     out_reset->setChecked(true);
-    ac::setProcMode(2);
+    ac::setProcMode(ac::PROC_MODE_TYPE(2));
     Log(tr("Proc Mode set to: 2\n"));
 }
 
