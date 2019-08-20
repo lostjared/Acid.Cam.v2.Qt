@@ -1575,7 +1575,7 @@ void AC_MainWindow::save_CustomFile() {
         file_n << "=negate:" << chkNegate << "\n";
         int cord = combo_rgb->currentIndex();
         file_n << "=color_order:" << cord << "\n";
-        int procM = ac::proc_mode;
+        int procM = static_cast<int>(ac::getProcMode());
         file_n << "=proc:" << procM << "\n";
         int mvmnt = speed_index;
         file_n << "=mvmnt:"<< mvmnt << "\n";
