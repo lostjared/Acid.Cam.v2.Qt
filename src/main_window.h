@@ -17,6 +17,7 @@
 #include "chroma_window.h"
 #include "user_define.h"
 #include "dl-man.h"
+#include "image_window.h"
 
 class SearchWindow;
 
@@ -54,6 +55,7 @@ public:
     QAction *select_key;
     QAction *set_newnames;
     QAction *show_fullscreen;
+    QAction *show_image_window;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -118,6 +120,7 @@ public slots:
     void load_CustomFile();
     void save_CustomFile();
     void showFull();
+    void showImageWindow();
 private:
     void createControls();
     void createMenu();
@@ -127,6 +130,7 @@ private:
     SearchWindow *search_box;
     ChromaWindow *chroma_window;
     DefineWindow *define_window;
+    ImageWindow  *image_window;
     GotoWindow *goto_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;

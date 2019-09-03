@@ -329,6 +329,7 @@ void AC_MainWindow::createControls() {
     progress_bar->setMaximum(100);
     progress_bar->hide();
     menu_cat->setCurrentIndex(1);
+    image_window = new ImageWindow(this);
 }
 
 void AC_MainWindow::createMenu() {
@@ -457,11 +458,12 @@ void AC_MainWindow::createMenu() {
     controls_menu->addAction(controls_showvideo);
     
     show_fullscreen = new QAction(tr("Enter Full Screen"), this);
+    show_image_window = new QAction(tr("Show Image Window"), this);
     controls_menu->addAction(show_fullscreen);
-    
     connect(show_fullscreen, SIGNAL(triggered()), this, SLOT(showFull()));
-    
-    
+    controls_menu->addAction(show_image_window);
+    connect(show_image_window, SIGNAL(triggered()), this, SLOT(showImageWindow()));
+
     reset_filters = new QAction(tr("Reset Filters"), this);
     reset_filters->setShortcut(tr("Ctrl+R"));
     controls_menu->addAction(reset_filters);
@@ -502,6 +504,9 @@ void AC_MainWindow::showFull() {
     disp->showMax();
 }
 
+void AC_MainWindow::showImageWindow() {
+    image_window->show();
+}
 
 void AC_MainWindow::resetIndex() {
     frame_index = 0;
