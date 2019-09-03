@@ -8,11 +8,18 @@ Q_OBJECT
 public:
     ImageWindow(QWidget *parent);
     void createControls();
+    
+public slots:
+    void image_AddFiles();
+    void image_RmvFile();
+    void Image_SetFile();
+    
 private:
     QListWidget *image_files;
     QPushButton *add_files, *rmv_file, *set_file;
     QComboBox *image_cycle;
     QCheckBox *image_cycle_on;
+    QLabel *image_pic;
 };
 
 #endif
