@@ -52,7 +52,7 @@ For compiling with OpenCV 4 use:
     
 For compiling with OpenCV 3 use:
     
-    $ qmake Acid.Cam.v3.OpenCV4.pro
+    $ qmake Acid.Cam.v2.OpenCV3.pro
     
 Then to build project
 
