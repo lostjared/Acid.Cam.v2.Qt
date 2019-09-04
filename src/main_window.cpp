@@ -92,6 +92,9 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     goto_window->setPlayback(playback);
     goto_window->setMainWindow(this);
     
+    image_window = new ImageWindow(this);
+    image_window->setPlayback(playback);
+    
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
     QObject::connect(playback, SIGNAL(frameIncrement()), this, SLOT(frameInc()));
@@ -329,7 +332,7 @@ void AC_MainWindow::createControls() {
     progress_bar->setMaximum(100);
     progress_bar->hide();
     menu_cat->setCurrentIndex(1);
-    image_window = new ImageWindow(this);
+
 }
 
 void AC_MainWindow::createMenu() {

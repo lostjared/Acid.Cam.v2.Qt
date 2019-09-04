@@ -49,7 +49,16 @@ void ImageWindow::image_RmvFile() {
 }
 
 void ImageWindow::image_SetFile() {
-    
+    int index = image_files->currentRow();
+    if(index >= 0) {
+        QListWidgetItem *i = image_files->item(index);
+        std::string file_name = i->text().toStdString();
+        cv::Mat image_value;
+        image_value = cv::imread(file_name);
+        if(!image_value.empty()) {
+            playback->setImage(image_value);
+        }
+    }
 }
 
 void ImageWindow::image_RowChanged(int index) {
@@ -60,4 +69,8 @@ void ImageWindow::image_RowChanged(int index) {
         int h = image_pic->height();
         image_pic->setPixmap(p.scaled(w,h,Qt::KeepAspectRatio));
     }
+}
+
+void ImageWindow::setPlayback(Playback *play) {
+    playback = play;
 }
