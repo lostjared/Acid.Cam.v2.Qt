@@ -117,12 +117,16 @@ void Playback::setCycle(int type, int frame_skip, std::vector<std::string> &v) {
     cycle_on = type;
     if(!cycle_values.empty())
         cycle_values.erase(cycle_values.begin(), cycle_values.end());
-    for(auto &i : v) {
-        cv::Mat value = cv::imread(i);
-        cycle_values.push_back(value);
+    if(v.size() > 1) {
+        for(auto &i : v) {
+            cv::Mat value = cv::imread(i);
+            cycle_values.push_back(value);
+        }
+        cycle_index = 0;
+        frame_num = frame_skip;
+        blend_image = cv::imread(v[0]);
+        blend_set = true;
     }
-    cycle_index = 0;
-    frame_num = frame_skip;
     mutex.unlock();
 }
 
@@ -130,9 +134,9 @@ void Playback::setCycle(int type) {
     mutex.lock();
     cycle_on = type;
     cycle_index = 0;
+    blend_set = false;
     mutex.unlock();
 }
-
 
 void Playback::reset_filters() {
     mutex.lock();

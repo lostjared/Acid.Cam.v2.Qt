@@ -79,7 +79,7 @@ void ImageWindow::image_RowChanged(int index) {
 void ImageWindow::image_SetCycle() {
     QString text_value;
     QTextStream stream(&text_value);
-    if(image_files->count() < 0 || !image_cycle_on->isChecked()) {
+    if(image_files->count() < 2 || !image_cycle_on->isChecked()) {
         playback->setCycle(0);
         stream << "Cycle Turned Off.\n";
         blend_set = false;
@@ -96,9 +96,7 @@ void ImageWindow::image_SetCycle() {
         } else {
             QString im_cycle = image_cycle->itemText(type);
             stream << "Image Frames: " << text_items.size() << " Cycle Type: " << im_cycle << " every " << val << " frames.\n";
-            blend_image = cv::imread(text_items[0]);
             playback->setCycle(type+1, val, text_items);
-            blend_set = true;
         }
     }
     QMessageBox::information(this, "Image Cycle", text_value);
