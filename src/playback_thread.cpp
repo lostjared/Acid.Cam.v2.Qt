@@ -19,6 +19,9 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     flip_frame2 = false;
     repeat_video = false;
     fadefilter = true;
+    cycle_on = 0;
+    cycle_index = 0;
+    frame_num = 0;
 }
 
 void Playback::Play() {
@@ -108,6 +111,28 @@ void Playback::setOptions(bool n, int c) {
     ac::in_custom = true;
     mutex.unlock();
 }
+
+void Playback::setCycle(int type, int frame_skip, std::vector<std::string> &v) {
+    mutex.lock();
+    cycle_on = type;
+    if(!cycle_values.empty())
+        cycle_values.erase(cycle_values.begin(), cycle_values.end());
+    for(auto &i : v) {
+        cv::Mat value = cv::imread(i);
+        cycle_values.push_back(value);
+    }
+    cycle_index = 0;
+    frame_num = frame_skip;
+    mutex.unlock();
+}
+
+void Playback::setCycle(int type) {
+    mutex.lock();
+    cycle_on = type;
+    cycle_index = 0;
+    mutex.unlock();
+}
+
 
 void Playback::reset_filters() {
     mutex.lock();
@@ -239,6 +264,43 @@ void Playback::run() {
         cur = current;
         mutex_shown.unlock();
         ac::orig_frame = frame.clone();
+        mutex.lock();
+        if(cycle_on > 0) {
+            cv::Mat *cycle_image = 0;
+            static int frame_count = 0;
+            ++frame_count;
+            if(frame_count > frame_num) {
+                frame_count = 0;
+                switch(cycle_on) {
+                    case 0:
+                        break;
+                    case 1:
+                        cycle_image = &cycle_values[rand()%cycle_values.size()];
+                        break;
+                    case 2:
+                        cycle_image = &cycle_values[cycle_index];
+                        ++cycle_index;
+                        if(cycle_index > static_cast<int>(cycle_values.size()-1))
+                            cycle_index = 0;
+                        
+                        break;
+                    case 3:
+                        cycle_image = &cycle_values[cycle_index];
+                        ++cycle_index;
+                        if(cycle_index > static_cast<int>(cycle_values.size()-1)) {
+                            cycle_index = 0;
+                            static std::random_device r;
+                            static auto rng = std::default_random_engine(r());
+                            std::shuffle(cycle_values.begin(), cycle_values.end(), rng);
+                        }
+                        break;
+                }
+                if(blend_set == true && cycle_image != 0)
+                    blend_image = cycle_image->clone();
+            }
+        }
+        mutex.unlock();
+        
         if(single_mode == true && alpha > 0) {
             if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
             drawEffects(frame);

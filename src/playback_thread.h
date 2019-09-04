@@ -40,6 +40,10 @@ private:
     bool flip_frame1, flip_frame2;
     bool repeat_video;
     bool fadefilter;
+    std::vector<cv::Mat> cycle_values;
+    int cycle_on;
+    int cycle_index;
+    int frame_num;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -73,6 +77,8 @@ public:
     void reset_filters();
     void setSubFilter(int index);
     void enableRepeat(bool re);
+    void setCycle(int type, int frame_skip, std::vector<std::string> &val);
+    void setCycle(int type);
 signals:
     void procImage(const QImage image);
     void stopRecording();

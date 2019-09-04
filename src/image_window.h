@@ -15,12 +15,15 @@ public slots:
     void image_RmvFile();
     void image_SetFile();
     void image_RowChanged(int index);
+    void image_SetCycle();
 private:
     QListWidget *image_files;
     QPushButton *add_files, *rmv_file, *set_file;
     QComboBox *image_cycle;
     QCheckBox *image_cycle_on;
     QLabel *image_pic;
+    QLineEdit *image_frames;
+    QPushButton *image_set_cycle;
     Playback *playback;
 };
 
