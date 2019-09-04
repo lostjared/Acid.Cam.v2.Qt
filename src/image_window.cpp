@@ -41,6 +41,6 @@ void ImageWindow::image_RmvFile() {
     
 }
 
-void ImageWindow::Image_SetFile() {
+void ImageWindow::image_SetFile() {
     
 }

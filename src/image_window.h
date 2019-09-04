@@ -12,7 +12,7 @@ public:
 public slots:
     void image_AddFiles();
     void image_RmvFile();
-    void Image_SetFile();
+    void image_SetFile();
     
 private:
     QListWidget *image_files;
