@@ -53,5 +53,11 @@ void ImageWindow::image_SetFile() {
 }
 
 void ImageWindow::image_RowChanged(int index) {
-    
+    if(index >= 0) {
+        QListWidgetItem *i = image_files->item(index);
+        QPixmap p(i->text());
+        int w = image_pic->width();
+        int h = image_pic->height();
+        image_pic->setPixmap(p.scaled(w,h,Qt::KeepAspectRatio));
+    }
 }
