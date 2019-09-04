@@ -34,7 +34,10 @@ void ImageWindow::createControls() {
 }
 
 void ImageWindow::image_AddFiles() {
-    
+    QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open","/home","Images (*.png *.jpg)");
+    for(int i = 0; i < files.size(); ++i) {
+        image_files->addItem(files.at(i));
+    }
 }
 
 void ImageWindow::image_RmvFile() {
