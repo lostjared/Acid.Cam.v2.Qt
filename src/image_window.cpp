@@ -30,6 +30,7 @@ void ImageWindow::createControls() {
     connect(add_files, SIGNAL(clicked()), this, SLOT(image_AddFiles()));
     connect(rmv_file, SIGNAL(clicked()), this, SLOT(image_RmvFile()));
     connect(set_file, SIGNAL(clicked()), this, SLOT(image_SetFile()));
+    connect(image_files, SIGNAL(currentRowChanged(int)), this, SLOT(image_RowChanged(int)));
     //image_files->addItem("TEST!!");
 }
 
@@ -41,9 +42,16 @@ void ImageWindow::image_AddFiles() {
 }
 
 void ImageWindow::image_RmvFile() {
-    
+    int index = image_files->currentRow();
+    if(index >= 0) {
+        image_files->takeItem(index);
+    }
 }
 
 void ImageWindow::image_SetFile() {
+    
+}
+
+void ImageWindow::image_RowChanged(int index) {
     
 }

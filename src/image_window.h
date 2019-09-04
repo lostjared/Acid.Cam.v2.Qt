@@ -13,6 +13,7 @@ public slots:
     void image_AddFiles();
     void image_RmvFile();
     void image_SetFile();
+    void image_RowChanged(int index);
     
 private:
     QListWidget *image_files;
