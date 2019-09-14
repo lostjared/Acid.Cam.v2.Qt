@@ -126,6 +126,9 @@ void Playback::setCycle(int type, int frame_skip, std::vector<std::string> &v) {
         frame_num = frame_skip;
         blend_image = cv::imread(v[0]);
         blend_set = true;
+        static std::random_device r;
+        static auto rng = std::default_random_engine(r());
+        std::shuffle(cycle_values.begin(), cycle_values.end(), rng);
     }
     mutex.unlock();
 }
@@ -160,6 +163,13 @@ void Playback::setColorOptions(int b, int g, int s) {
     bright_ = b;
     gamma_ = g;
     saturation_ = s;
+    mutex.unlock();
+}
+
+void Playback::setPref(int thread_count, int intense) {
+    mutex.lock();
+    ac::setThreadCount(thread_count);
+    ac::setPixelCollection(intense);
     mutex.unlock();
 }
 

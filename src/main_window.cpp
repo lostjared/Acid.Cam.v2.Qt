@@ -95,6 +95,9 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     image_window = new ImageWindow(this);
     image_window->setPlayback(playback);
     
+    pref_window = new OptionsWindow(this);
+    pref_window->setPlayback(playback);
+    
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
     QObject::connect(playback, SIGNAL(frameIncrement()), this, SLOT(frameInc()));
@@ -354,6 +357,11 @@ void AC_MainWindow::createMenu() {
     file_exit->setShortcut(tr("Ctrl+X"));
     file_menu->addAction(file_exit);
     
+    show_options_window = new QAction(tr("Show Preferences"), this);
+    options->addAction(show_options_window);
+    
+    connect(show_options_window, SIGNAL(triggered()), this, SLOT(showPrefWindow()));
+    
     movement = options->addMenu(tr("Movement"));
     in_out_increase = new QAction(tr("Move In, Move Out, Increase"), this);
     in_out_increase->setCheckable(true);
@@ -414,6 +422,7 @@ void AC_MainWindow::createMenu() {
     fade_on->setChecked(true);
     options->addAction(fade_on);
     options->addAction(repeat_v);
+    
     
     connect(fade_on, SIGNAL(triggered()), this, SLOT(setFade()));
     connect(repeat_v, SIGNAL(triggered()), this, SLOT(repeat_vid()));
@@ -575,6 +584,9 @@ void AC_MainWindow::noflip_action() {
     
 }
 
+void AC_MainWindow::showPrefWindow() {
+    pref_window->show();
+}
 void AC_MainWindow::repeat_vid() {
     bool val = repeat_v->isChecked();
     playback->enableRepeat(val);

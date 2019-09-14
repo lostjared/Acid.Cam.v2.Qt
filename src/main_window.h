@@ -18,6 +18,7 @@
 #include "user_define.h"
 #include "dl-man.h"
 #include "image_window.h"
+#include "options_window.h"
 
 class SearchWindow;
 
@@ -56,6 +57,7 @@ public:
     QAction *set_newnames;
     QAction *show_fullscreen;
     QAction *show_image_window;
+    QAction *show_options_window;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -121,6 +123,7 @@ public slots:
     void save_CustomFile();
     void showFull();
     void showImageWindow();
+    void showPrefWindow();
 private:
     void createControls();
     void createMenu();
@@ -132,6 +135,7 @@ private:
     DefineWindow *define_window;
     ImageWindow  *image_window;
     GotoWindow *goto_window;
+    OptionsWindow *pref_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
     unsigned long video_frames;

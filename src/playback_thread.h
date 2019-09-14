@@ -79,6 +79,7 @@ public:
     void enableRepeat(bool re);
     void setCycle(int type, int frame_skip, std::vector<std::string> &val);
     void setCycle(int type);
+    void setPref(int thread_count, int intense);
 signals:
     void procImage(const QImage image);
     void stopRecording();
