@@ -18,6 +18,7 @@ private:
     QLineEdit *op_intensity;
     QPushButton *op_setpref;
     Playback *playback;
+    QLineEdit *op_max_frames;
 };
 
 #endif
