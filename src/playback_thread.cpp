@@ -252,7 +252,7 @@ void Playback::run() {
         if(ac::release_frames) {
             std::cout << "Cleared Frames...\n";
             ac::release_all_objects();
-            release_frames = false;
+            ac::release_frames = false;
         }
         if(!capture.read(frame)) {
             if(repeat_video && mode == MODE_VIDEO) {
