@@ -85,6 +85,11 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     take_snapshot = false;
     goto_window = new GotoWindow(this);
     disp = new DisplayWindow(this);
+    disp2 = new DisplayWindow(this);
+    disp2->setFixedSize(640, 480);
+    disp2->setGeometry(100, 100, 640, 480);
+    disp2->hide();
+    disp2->setWindowTitle("View Window");
     playback = new Playback();
     
     goto_window->setParent(this);
@@ -475,6 +480,9 @@ void AC_MainWindow::createMenu() {
     connect(show_fullscreen, SIGNAL(triggered()), this, SLOT(showFull()));
     controls_menu->addAction(show_image_window);
     connect(show_image_window, SIGNAL(triggered()), this, SLOT(showImageWindow()));
+    show_control_window = new QAction(tr("Show View Window"), this);
+    connect(show_control_window, SIGNAL(triggered()), this, SLOT(controls_ShowDisp2()));
+    controls_menu->addAction(show_control_window);
 
     reset_filters = new QAction(tr("Reset Filters"), this);
     reset_filters->setShortcut(tr("Ctrl+R"));
@@ -896,7 +904,11 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     struct tm *m;
     m = localtime(&t);
     QString ext;
-    ext = (type == 0) ? ".mov" : ".avi";
+    if(type >= 0 && type < 3)
+        ext = ".mp4";
+    else
+        ext = ".avi";
+    //ext = (type == 0) ? ".mov" : ".avi";
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
@@ -931,7 +943,22 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     
     if(recording) {
         video_file_name = output_name;
-        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? cv::VideoWriter::fourcc('m', 'p', '4', 'v') : cv::VideoWriter::fourcc('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+        int c_type = 0;
+        switch(type) {
+            case 0:
+                c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+                break;
+            case 1:
+                c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '3');
+                break;
+            case 2:
+                c_type = cv::VideoWriter::fourcc('h', 'e', 'v', '1');
+                break;
+            case '3':
+                c_type = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
+                break;
+        }
+        writer = cv::VideoWriter(output_name.toStdString(), c_type, video_fps, cv::Size(res_w, res_h), true);
         
         if(!writer.isOpened()) {
             Log(tr("Could not create video writer..\n"));
@@ -998,7 +1025,11 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     struct tm *m;
     m = localtime(&t);
     QString ext;
-    ext = (type == 0) ? ".mov" : ".avi";
+    if(type >= 0 && type < 3)
+        ext = ".mp4";
+    else
+        ext = ".avi";
+    //ext = (type == 0) ? ".mov" : ".avi";
     std::ostringstream time_stream;
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
     stream_ << outdir << "/" << "Video" << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
@@ -1006,7 +1037,22 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     
     if(recording) {
         video_file_name = output_name;
-        writer = cv::VideoWriter(output_name.toStdString(), (type == 0) ? cv::VideoWriter::fourcc('m', 'p', '4', 'v') : cv::VideoWriter::fourcc('X','V','I','D'), video_fps, cv::Size(res_w, res_h), true);
+        int c_type = 0;
+        switch(type) {
+            case 0:
+                c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+                break;
+            case 1:
+                c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
+                break;
+            case 2:
+                c_type = cv::VideoWriter::fourcc('h', 'e', 'v', '1');
+                break;
+            case '3':
+                c_type = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
+                break;
+        }
+        writer = cv::VideoWriter(output_name.toStdString(), c_type, video_fps, cv::Size(res_w, res_h), true);
         
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
@@ -1075,6 +1121,17 @@ void AC_MainWindow::controls_ShowVideo() {
         controls_showvideo->setText("Hide Display Video");
         playback->setDisplayed(true);
         disp->show();
+    }
+}
+
+void AC_MainWindow::controls_ShowDisp2() {
+    QString st = show_control_window->text();
+    if(st == "Hide Control Window") {
+        disp2->hide();
+        show_control_window->setText("Show View Window");
+    } else {
+        show_control_window->setText("Hide Control Window");
+        disp2->show();
     }
 }
 
@@ -1201,6 +1258,7 @@ void AC_MainWindow::setFrameIndex(int index) {
 void AC_MainWindow::updateFrame(QImage img) {
     if(playback->isStopped() == false) {
         disp->displayImage(img);
+        disp2->displayImage(img);
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);

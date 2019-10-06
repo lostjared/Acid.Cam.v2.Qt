@@ -58,6 +58,7 @@ public:
     QAction *show_fullscreen;
     QAction *show_image_window;
     QAction *show_options_window;
+    QAction *show_control_window;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -84,6 +85,7 @@ public slots:
     void controls_ShowVideo();
     void controls_SetKey();
     void controls_Reset();
+    void controls_ShowDisp2();
     void help_About();
     void updateFrame(QImage img);
     void stopRecording();
@@ -128,6 +130,7 @@ private:
     void createControls();
     void createMenu();
     DisplayWindow *disp;
+    DisplayWindow *disp2;
     CaptureCamera *cap_camera;
     CaptureVideo *cap_video;
     SearchWindow *search_box;

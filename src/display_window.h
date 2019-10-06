@@ -10,6 +10,7 @@
 
 #include"qtheaders.h"
 
+
 class DisplayWindow : public QDialog {
     Q_OBJECT
 public:
