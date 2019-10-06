@@ -904,7 +904,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     struct tm *m;
     m = localtime(&t);
     QString ext;
-    if(type >= 0 && type < 3)
+    if(type == 0)
         ext = ".mp4";
     else
         ext = ".avi";
@@ -948,13 +948,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
             case 0:
                 c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
                 break;
-            case 1:
-                c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '3');
-                break;
-            case 2:
-                c_type = cv::VideoWriter::fourcc('h', 'e', 'v', '1');
-                break;
-            case '3':
+            case '1':
                 c_type = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
                 break;
         }
@@ -1025,7 +1019,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     struct tm *m;
     m = localtime(&t);
     QString ext;
-    if(type >= 0 && type < 3)
+    if(type == 0)
         ext = ".mp4";
     else
         ext = ".avi";
@@ -1042,16 +1036,11 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
             case 0:
                 c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
                 break;
-            case 1:
-                c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
-                break;
-            case 2:
-                c_type = cv::VideoWriter::fourcc('h', 'e', 'v', '1');
-                break;
-            case '3':
+            case '1':
                 c_type = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
                 break;
         }
+
         writer = cv::VideoWriter(output_name.toStdString(), c_type, video_fps, cv::Size(res_w, res_h), true);
         
         if(!writer.isOpened()) {
