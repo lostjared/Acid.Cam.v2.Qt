@@ -1,7 +1,7 @@
 #include "image_window.h"
 
 ImageWindow::ImageWindow(QWidget *parent) : QDialog(parent) {
-    setFixedSize(800, 360);
+    setFixedSize(800, 400);
     setWindowTitle(tr("Acid Cam v2 - Image Manager"));
     createControls();
 }
@@ -37,6 +37,18 @@ void ImageWindow::createControls() {
     connect(image_set_cycle, SIGNAL(clicked()), this, SLOT(image_SetCycle()));
     connect(image_files, SIGNAL(currentRowChanged(int)), this, SLOT(image_RowChanged(int)));
     //image_files->addItem("TEST!!");
+    btn_setvideo = new QPushButton(tr("Set Video"), this);
+    btn_setvideo->setGeometry(15, 360, 100, 25);
+    
+    btn_clear = new QPushButton(tr("Clear Video"), this);
+    btn_clear->setGeometry(115, 360, 100, 25);
+    
+    lbl_video = new QLabel(tr("Video Not Set "), this);
+    lbl_video->setGeometry(215, 360, 800-360, 25);
+    
+    connect(btn_setvideo, SIGNAL(clicked()), this, SLOT(video_Set()));
+    connect(btn_clear, SIGNAL(clicked()), this, SLOT(video_Clr()));
+    
 }
 
 void ImageWindow::image_AddFiles() {
@@ -104,4 +116,23 @@ void ImageWindow::image_SetCycle() {
 
 void ImageWindow::setPlayback(Playback *play) {
     playback = play;
+}
+
+void ImageWindow::video_Set() {
+    QString file_name = QFileDialog::getOpenFileName(this,"Select A video file to open","/home","Video (*.mov *.mp4 *.mkv *.m4v)");
+    
+    std::string vname = file_name.toStdString();
+    ac::v_cap.open(vname);
+    if(ac::v_cap.isOpened() == false) {
+        QMessageBox::information(this, "Error could not open file", "File not supported");
+        return;
+    }
+    lbl_video->setText("File Opened and Active");
+}
+
+void ImageWindow::video_Clr() {
+    if(ac::v_cap.isOpened()) {
+        ac::v_cap.release();
+        lbl_video->setText("Video closed..");
+    }
 }
