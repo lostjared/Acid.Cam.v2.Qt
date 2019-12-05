@@ -154,7 +154,6 @@ private:
     bool loading;
     int speed_index;
     cv::ocl::Context context;
-    DownloadManager dl;
 };
 
 extern const char *filer_names[];

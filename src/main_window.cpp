@@ -123,6 +123,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     define_window->hide();
     define_window->main_window = this;
     
+    /*
     QString arg = "http://lostsidedead.com/ac/version.txt";
     QUrl url = QUrl::fromEncoded(arg.toLocal8Bit());
     dl.doDownload(url);
@@ -143,6 +144,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
             QDesktopServices::openUrl(QUrl("https://github.com/lostjared/Acid.Cam.v2.Qt/releases"));
         }
     }
+*/
+    
 }
 
 
@@ -324,7 +327,7 @@ void AC_MainWindow::createControls() {
     chk_negate->setCheckState(Qt::Unchecked);
     use_settings = new QCheckBox(tr("Settings"), this);
     use_settings->setCheckState(Qt::Checked);
-    use_settings->setGeometry(605, 215,80, 20);
+    use_settings->setGeometry(615, 215,80, 20);
     connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
     
     combo_rgb = new QComboBox(this);
