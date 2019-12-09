@@ -59,6 +59,7 @@ public:
     QAction *show_image_window;
     QAction *show_options_window;
     QAction *show_control_window;
+    QAction *select_random_filter;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -126,6 +127,7 @@ public slots:
     void showFull();
     void showImageWindow();
     void showPrefWindow();
+    void setRandomFilterValue();
 private:
     void createControls();
     void createMenu();

@@ -521,6 +521,12 @@ void AC_MainWindow::createMenu() {
     set_newnames = new QAction(tr("Set Favorites"), this);
     connect(set_newnames, SIGNAL(triggered()), this, SLOT(show_Favorites()));
     controls_menu->addAction(set_newnames);
+    
+    select_random_filter = new QAction(tr("Set Random Filter"), this);
+    connect(select_random_filter, SIGNAL(triggered()), this, SLOT(setRandomFilterValue()));
+    select_random_filter->setShortcut(tr("Space"));
+    controls_menu->addAction(select_random_filter);
+    
 }
 
 void AC_MainWindow::showFull() {
@@ -1669,4 +1675,10 @@ void AC_MainWindow::save_CustomFile() {
     stream << "Wrote custom to: " << file_name.toStdString() << "\n";
     Log(stream.str().c_str());
     file_n.close();
+}
+
+void AC_MainWindow::setRandomFilterValue() {
+    menu_cat->setCurrentIndex(0);
+    std::string filter_name = ac::solo_filter[rand()%ac::solo_filter.size()-1];
+    filters->setCurrentIndex(ac::filter_map[filter_name]);
 }
