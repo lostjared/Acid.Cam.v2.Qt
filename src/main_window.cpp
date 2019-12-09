@@ -397,7 +397,7 @@ void AC_MainWindow::createMenu() {
         speed_action_items[i]->setCheckable(true);
         speed_menu->addAction(speed_action_items[i]);
     }
-    image_menu = options->addMenu(tr("Image"));
+    image_menu = options->addMenu(tr("Image/Video"));
     noflip = new QAction(tr("Normal"), this);
     noflip->setCheckable(true);
     noflip->setChecked(true);
@@ -1395,7 +1395,7 @@ void AC_MainWindow::openColorWindow() {
 void AC_MainWindow::menuFilterChanged(int index) {
      if(index >= 0) {
         loading = true;
-        const char *menu_n = menuNames[index];
+        std::string menu_n = menuNames[index];
         filters->clear();
         auto v = ac::filter_menu_map[menu_n].menu_list;
         for(auto in = v->begin(); in != v->end(); ++in) {
@@ -1412,7 +1412,7 @@ void AC_MainWindow::show_Favorites() {
 
 void AC_MainWindow::resetMenu() {
     int index = menu_cat->currentIndex();
-    if(menuNames[index] == std::string("User")) {
+    if(index > 0 && menuNames[index] == std::string("User")) {
     	menuFilterChanged(index);
     	filters->setCurrentIndex(0);
     	comboFilterChanged(index);
@@ -1678,10 +1678,10 @@ void AC_MainWindow::save_CustomFile() {
 }
 
 void AC_MainWindow::setRandomFilterValue() {
-    menu_cat->setCurrentIndex(0);
+    /*menu_cat->setCurrentIndex(0);
     resetMenu();
     int index = rand()%ac::solo_filter.size();
     std::string filter_name = ac::solo_filter[index];
     int filter_index = ac::filter_map[filter_name];
-    filters->setCurrentIndex(filter_index);
+    filters->setCurrentIndex(filter_index); */
 }
