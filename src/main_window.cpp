@@ -25,7 +25,7 @@ const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
     "Gradient Repeat", 0 };
 
 
-const char *menuNames[] = {"All Filters", "All Filters Sorted", "Blend", "Distort", "Pattern", "Gradient", "Mirror", "Strobe", "Blur", "Image", "Square", "Other", "SubFilter", "Special", "User", 0};
+const char *menuNames[] = {"All Filters", "All Filters Sorted", "Blend", "Distort", "Pattern", "Gradient", "Mirror", "Strobe", "Blur", "Image/Video", "Square", "Other", "SubFilter", "Special", "User", 0};
 
 
 void generate_map() {
@@ -397,7 +397,7 @@ void AC_MainWindow::createMenu() {
         speed_action_items[i]->setCheckable(true);
         speed_menu->addAction(speed_action_items[i]);
     }
-    image_menu = options->addMenu(tr("Image/Video"));
+    image_menu = options->addMenu(tr("Image"));
     noflip = new QAction(tr("Normal"), this);
     noflip->setCheckable(true);
     noflip->setChecked(true);
