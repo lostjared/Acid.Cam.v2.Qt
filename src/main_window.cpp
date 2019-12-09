@@ -1679,7 +1679,9 @@ void AC_MainWindow::save_CustomFile() {
 
 void AC_MainWindow::setRandomFilterValue() {
     menu_cat->setCurrentIndex(0);
-    int index = rand()%solo_filter.size();
+    resetMenu();
+    int index = rand()%ac::solo_filter.size();
     std::string filter_name = ac::solo_filter[index];
-    filters->setCurrentIndex(ac::filter_map[filter_name]);
+    int filter_index = ac::filter_map[filter_name];
+    filters->setCurrentIndex(filter_index);
 }
