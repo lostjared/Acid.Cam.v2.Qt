@@ -51,13 +51,13 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
     mode = MODE_CAMERA;
     device_num = device;
     mutex.lock();
-#if defined(__linux__) || defined(__APPLE__)
+//#if defined(__linux__) || defined(__APPLE__)
     capture.open(device);
     if(!capture.isOpened()) {
         mutex.unlock();
         return false;
     }
-#else
+/*#else
     if(!capture.isOpened()) {
         capture.open(device);
         if(!capture.isOpened()) {
@@ -65,8 +65,7 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
             return false;
         }
     }
-#endif
-    
+#endif*/
     recording = record;
     writer = wr;
     int res_w = 0, res_h = 0, ores_w = 640, ores_h = 480;
