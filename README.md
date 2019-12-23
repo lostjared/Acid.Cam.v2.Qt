@@ -1,5 +1,7 @@
 # Acid.Cam.v2.Qt
 
+![scr2](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/screenshot.jpg "screenshot")
+
 ![scr1](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acid.cam.img1.jpg "screenshot")
 
 To watch all the videos I have created with this project checkout my YouTube playlist:
