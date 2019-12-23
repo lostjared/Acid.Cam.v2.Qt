@@ -58,6 +58,12 @@ Then to build project
 
 	$ make -j4
 
+
+If you are using a high resolution the program outputs very high quality video. To be able to play it back you can load it into Final Cut and export as H.264, use Handbrake to lower the bitrate, or use ffmpeg. The command I use to compress 4K Acid Cam videos is:
+
+    $ ffmpeg -i "input.file.mp4" -c:v libx265 -tag:v hvc1 -crf 18 output.file.mp4
+
+
 Then Run the program
 
 For sample videos and updates about this software view the Facebook page: http://facebook.com/AcidCam
