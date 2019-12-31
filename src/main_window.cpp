@@ -916,7 +916,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     if(type == 0)
         ext = ".mp4";
     else
-        ext = ".avi";
+        ext = ".mp4";
     //ext = (type == 0) ? ".mov" : ".avi";
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
@@ -958,7 +958,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
                 c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
                 break;
             case '1':
-                c_type = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
+                c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
                 break;
         }
         writer = cv::VideoWriter(output_name.toStdString(), c_type, video_fps, cv::Size(res_w, res_h), true);
@@ -1046,7 +1046,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
                 c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
                 break;
             case '1':
-                c_type = cv::VideoWriter::fourcc('X', 'V', 'I', 'D');
+                c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
                 break;
         }
 

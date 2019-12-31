@@ -51,7 +51,7 @@ void CaptureCamera::createControls() {
     video_type = new QComboBox(this);
     video_type->setGeometry(80, 90, 90, 25);
     video_type->addItem("MP4 - MPEG-4");
-    video_type->addItem("AVI - XviD");
+    video_type->addItem("MP4 - AVC/H.264");
 }
 
 void CaptureCamera::setParent(AC_MainWindow *p) {
@@ -120,7 +120,7 @@ void CaptureVideo::createControls() {
     video_type = new QComboBox(this);
     video_type->setGeometry(180, 55, 120, 25);
     video_type->addItem("MP4 - MPEG-4");
-    video_type->addItem("AVI - XviD");
+    video_type->addItem("MP4 - AVC/H.264");
     connect(btn_setedit, SIGNAL(clicked()), this, SLOT(btn_SetSourceFile()));
     connect(btn_setout, SIGNAL(clicked()), this, SLOT(btn_SetOutputDir()));
     connect(btn_start, SIGNAL(clicked()), this, SLOT(btn_Start()));
