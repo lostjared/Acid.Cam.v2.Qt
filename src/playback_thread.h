@@ -44,6 +44,9 @@ private:
     int cycle_on;
     int cycle_index;
     int frame_num;
+    bool _custom_cycle;
+    int _custom_cycle_index;
+    int fps_delay;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -80,6 +83,8 @@ public:
     void setCycle(int type, int frame_skip, std::vector<std::string> &val);
     void setCycle(int type);
     void setPref(int thread_count, int intense);
+    void setCustomCycle(bool b);
+    void setCustomCycleDelay(int delay);
 signals:
     void procImage(const QImage image);
     void stopRecording();

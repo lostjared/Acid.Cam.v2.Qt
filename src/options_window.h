@@ -19,6 +19,7 @@ private:
     QPushButton *op_setpref;
     Playback *playback;
     QLineEdit *op_max_frames;
+    QLineEdit *fps_delay;
 };
 
 #endif

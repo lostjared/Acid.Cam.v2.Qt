@@ -2,7 +2,7 @@
 
 
 OptionsWindow::OptionsWindow(QWidget *parent) : QDialog(parent) {
-    setFixedSize(170, 150);
+    setFixedSize(170, 180);
     createControls();
 }
 
@@ -19,9 +19,17 @@ void OptionsWindow::createControls() {
     label_z->setGeometry(10, 70, 100, 25);
     op_max_frames = new QLineEdit("1500", this);
     op_max_frames->setGeometry(110,70, 50, 25);
+
+    QLabel *label_q = new QLabel(tr("Delay: "), this);
+    label_q->setGeometry(10, 100, 100, 25);
+    
+    fps_delay = new QLineEdit("60", this);
+    fps_delay->setGeometry(110, 100, 50, 25);
+
     op_setpref = new QPushButton(tr("Set"), this);
-    op_setpref->setGeometry(10, 110, 100, 25);
+    op_setpref->setGeometry(10, 140, 100, 25);
     connect(op_setpref, SIGNAL(clicked()), this, SLOT(setValues()));
+    
 }
 
 void OptionsWindow::setValues() {
@@ -41,10 +49,15 @@ void OptionsWindow::setValues() {
         QMessageBox::information(this, tr("Error Requires Max"), tr("Required Max Frames must be greater than 300"));
         return;
     }
+    
+    int delay_value = atoi(fps_delay->text().toStdString().c_str());
+    if(delay_value > 0)
+        playback->setCustomCycleDelay(delay_value);
+    
     ac::setMaxAllocated(max_frames);
     QString text;
     QTextStream stream(&text);
-    stream << tr("Thread Count set to: ") << thread_count << tr(" and Intensity set to: ") << intensity << tr("\nMaximum Stored Frames: ") << max_frames << tr("\n");
+    stream << tr("Thread Count set to: ") << thread_count << tr(" and Intensity set to: ") << intensity << tr("\nMaximum Stored Frames: ") << max_frames << tr("\n") << tr("Delay: ") << delay_value << "\n";;
     QMessageBox::information(this, tr("Pref Value Set"), text);
 }
 

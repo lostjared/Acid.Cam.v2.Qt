@@ -425,13 +425,17 @@ void AC_MainWindow::createMenu() {
     repeat_v->setCheckable(true);
     repeat_v->setChecked(false);
     
+    cycle_custom = new QAction(tr("Cycle Custom"), this);
+    cycle_custom->setCheckable(true);
+    cycle_custom->setChecked(false);
+    
     fade_on = new QAction(tr("Fade"), this);
     fade_on->setCheckable(true);
     fade_on->setChecked(true);
     options->addAction(fade_on);
     options->addAction(repeat_v);
-    
-    
+    options->addAction(cycle_custom);
+    connect(cycle_custom, SIGNAL(triggered()), this, SLOT(setCustomCycle_Menu()));
     connect(fade_on, SIGNAL(triggered()), this, SLOT(setFade()));
     connect(repeat_v, SIGNAL(triggered()), this, SLOT(repeat_vid()));
     connect(clear_image, SIGNAL(triggered()), this, SLOT(clear_img()));
@@ -1684,4 +1688,9 @@ void AC_MainWindow::setRandomFilterValue() {
     std::string filter_name = ac::solo_filter[index];
     int filter_index = ac::filter_map[filter_name];
     filters->setCurrentIndex(filter_index);
+}
+
+void AC_MainWindow::setCustomCycle_Menu() {
+    bool chk = cycle_custom->isChecked();
+    playback->setCustomCycle(chk);
 }

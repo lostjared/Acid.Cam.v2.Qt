@@ -22,6 +22,18 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     cycle_on = 0;
     cycle_index = 0;
     frame_num = 0;
+    _custom_cycle = false;
+    _custom_cycle_index = 0;
+    fps_delay = 60;
+}
+
+void Playback::setCustomCycle(bool b) {
+    _custom_cycle = b;
+    _custom_cycle_index = 0;
+}
+
+void Playback::setCustomCycleDelay(int delay) {
+    fps_delay = delay;
 }
 
 void Playback::Play() {
@@ -333,13 +345,29 @@ void Playback::run() {
         } else if(cur.size()>0) {
             mutex.lock();
             ac::in_custom = true;
-            for(unsigned int i = 0; i < cur.size(); ++i) {
-                if(i == cur.size()-1)
-                    ac::in_custom = false;
-                drawFilter(frame, cur[i]);
+            if(_custom_cycle == false) {
+                for(unsigned int i = 0; i < cur.size(); ++i) {
+                    if(i == cur.size()-1)
+                        ac::in_custom = false;
+                    drawFilter(frame, cur[i]);
+                    msleep(duration/2);
+                }
+            } else {
+                if(_custom_cycle_index > static_cast<int>(cur.size()))
+                    _custom_cycle_index = 0;
+
+                drawFilter(frame, cur[_custom_cycle_index]);
                 msleep(duration/2);
             }
             drawEffects(frame);
+            static int delay_counter = 0;
+            ++delay_counter;
+            if(delay_counter > (fps_delay * static_cast<int>(ac::fps))) {
+                delay_counter = 0;
+                ++_custom_cycle_index;
+                if(_custom_cycle_index > static_cast<int>(cur.size()))
+                    _custom_cycle_index = 0;
+            }
             mutex.unlock();
         } else {
             msleep(duration);
