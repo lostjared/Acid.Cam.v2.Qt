@@ -353,11 +353,13 @@ void Playback::run() {
                     msleep(duration/2);
                 }
             } else {
-                if(_custom_cycle_index > static_cast<int>(cur.size()))
+                if(_custom_cycle_index > static_cast<int>(cur.size()-1))
                     _custom_cycle_index = 0;
-
-                drawFilter(frame, cur[_custom_cycle_index]);
-                msleep(duration/2);
+                
+                if(_custom_cycle_index >= 0 && _custom_cycle_index < cur.size()) {
+                    drawFilter(frame, cur[_custom_cycle_index]);
+                    msleep(duration/2);
+                }
             }
             drawEffects(frame);
             static int delay_counter = 0;
@@ -365,7 +367,7 @@ void Playback::run() {
             if(delay_counter > (fps_delay * static_cast<int>(ac::fps))) {
                 delay_counter = 0;
                 ++_custom_cycle_index;
-                if(_custom_cycle_index > static_cast<int>(cur.size()))
+                if(_custom_cycle_index > static_cast<int>(cur.size()-1))
                     _custom_cycle_index = 0;
             }
             mutex.unlock();
