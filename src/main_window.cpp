@@ -1440,19 +1440,18 @@ void AC_MainWindow::openColorWindow() {
 }
 
 void AC_MainWindow::menuFilterChanged(int index) {
-     if(index >= 0) {
+    if(index >= 0) {
         loading = true;
         std::string menu_n = menuNames[index];
         filters->clear();
-         std::vector<std::string> &v = *ac::filter_menu_map[menu_n].menu_list;
-         
-         std::unordered_map<std::string, std::string> map_values;
+        std::vector<std::string> &v = *ac::filter_menu_map[menu_n].menu_list;
+        std::unordered_map<std::string, std::string> map_values;
         for(int i = 0; i < static_cast<int>(v.size()); ++i) {
-             if(map_values.find(v[i]) == map_values.end()) {
-                 map_values[v[i]] = v[i];
-                 filters->addItem(v[i].c_str());
-             }
-         }
+            if(map_values.find(v[i]) == map_values.end()) {
+                map_values[v[i]] = v[i];
+                filters->addItem(v[i].c_str());
+            }
+        }
         filters->setCurrentIndex(0);
         loading = false;
     }
