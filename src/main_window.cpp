@@ -9,6 +9,7 @@
 #include<mutex>
 #include"plugin.h"
 #include<sys/stat.h>
+#include<unordered_map>
 #include <opencv2/core/ocl.hpp>
 
 std::unordered_map<std::string, FilterValue> filter_map;
@@ -1443,15 +1444,15 @@ void AC_MainWindow::menuFilterChanged(int index) {
         loading = true;
         std::string menu_n = menuNames[index];
         filters->clear();
-         std::vector<std::string> *v = ac::filter_menu_map[menu_n].menu_list;
+         std::vector<std::string> &v = *ac::filter_menu_map[menu_n].menu_list;
          
-        auto end = v->end();
-        for(auto it = v->begin(); it != end; ++it) {
-             end = std::remove(it + 1, end, *it);
-        }
-        for(auto in = v->begin(); in != v->end(); ++in) {
-                 filters->addItem(in->c_str());
-        }
+         std::unordered_map<std::string, std::string> map_values;
+        for(int i = 0; i < static_cast<int>(v.size()); ++i) {
+             if(map_values.find(v[i]) == map_values.end()) {
+                 map_values[v[i]] = v[i];
+                 filters->addItem(v[i].c_str());
+             }
+         }
         filters->setCurrentIndex(0);
         loading = false;
     }
