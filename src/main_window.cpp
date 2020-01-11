@@ -15,13 +15,39 @@ std::unordered_map<std::string, FilterValue> filter_map;
 void custom_filter(cv::Mat &);
 
 const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
-    "Opposite Self AlphaBlend", "AC2 Distort", "Reverse Distort", "Opposite Distort",
-    "Full Distort", "A New One", "AC NewOne", "AC Thought Filter", "Line Draw",
-    "Gradient Square", "Color Wave", "Pixelated Gradient", "Combined Gradient",
-    "Diagonal", "Average", "Average Divide", "Cos/Sin Multiply", "Modulus Multiply",
-    "Positive/Negative", "z+1 Blend", "Diamond Pattern", "Pixelated Shift","Pixelated Mix",
-    "Color Accumulate", "Color Accumulate #2", "Color Accumulate #3", "Angle",
-    "Vertical Average", "Circular Blend", "Average Blend", "~Divide", "Mix", "Random Number",
+    "Opposite Self AlphaBlend",
+    "AC2 Distort",
+    "Reverse Distort",
+    "Opposite Distort",
+    "Full Distort",
+    "A New One",
+    "AC NewOne",
+    "AC Thought Filter",
+    "Line Draw",
+    "Gradient Square",
+    "Color Wave",
+    "Pixelated Gradient",
+    "Combined Gradient",
+    "Diagonal",
+    "Average",
+    "Average Divide",
+    "Cos/Sin Multiply",
+    "Modulus Multiply",
+    "Positive/Negative",
+    "z+1 Blend",
+    "Diamond Pattern",
+    "Pixelated Shift",
+    "Pixelated Mix",
+    "Color Accumulate",
+    "Color Accumulate #2",
+    "Color Accumulate #3",
+    "Angle",
+    "Vertical Average",
+    "Circular Blend",
+    "Average Blend",
+    "~Divide",
+    "Mix",
+    "Random Number",
     "Gradient Repeat", 0 };
 
 
@@ -40,6 +66,7 @@ void generate_map() {
         ++index;
         ac::filter_menu_map["All Filters"].menu_list->push_back(filter_n);
     }
+    std::cout << "index: " << index << "\n";
     for(unsigned int j = 0; j < plugins.plugin_list.size(); ++j) {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
         filter_map[name] = FilterValue(2, j, -1);
@@ -310,7 +337,7 @@ void AC_MainWindow::createControls() {
     QTextStream stream(&text);
     stream << tr("Acid Cam Filters v");
     stream << ac::version.c_str();
-    stream << " loaded " << filters->count() << " filters.\n";
+    stream << " loaded " << ac::getFilterCount() << " filters.\n";
     std::ostringstream s_stream;
     if(!context.create(cv::ocl::Device::TYPE_ALL))
         s_stream << "Could not create OpenCL Context\n";
