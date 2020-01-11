@@ -356,7 +356,7 @@ void Playback::run() {
                 if(_custom_cycle_index > static_cast<int>(cur.size()-1))
                     _custom_cycle_index = 0;
                 
-                if(_custom_cycle_index >= 0 && _custom_cycle_index < cur.size()) {
+                if(_custom_cycle_index >= 0 && _custom_cycle_index < static_cast<int>(cur.size())) {
                     drawFilter(frame, cur[_custom_cycle_index]);
                     msleep(duration/2);
                 }

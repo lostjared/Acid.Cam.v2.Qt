@@ -170,6 +170,7 @@ void AC_MainWindow::createControls() {
     
     std::sort(fnames.begin(), fnames.end());
     
+    /*
     for(unsigned long i = 0; i < fnames.size(); ++i) {
         filters->addItem(fnames[i].c_str());
     }
@@ -183,7 +184,7 @@ void AC_MainWindow::createControls() {
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
         std::string name = "plugin " + plugins.plugin_list[i]->name();
         filters->addItem(name.c_str());
-    }
+    }*/
     
     connect(filters, SIGNAL(currentIndexChanged(int)), this, SLOT(comboFilterChanged(int)));
     connect(menu_cat, SIGNAL(currentIndexChanged(int)), this, SLOT(menuFilterChanged(int)));
@@ -529,7 +530,21 @@ void AC_MainWindow::createMenu() {
     select_random_filter = new QAction(tr("Set Random Filter"), this);
     connect(select_random_filter, SIGNAL(triggered()), this, SLOT(setRandomFilterValue()));
     select_random_filter->setShortcut(tr("Space"));
+    
     controls_menu->addAction(select_random_filter);
+    select_next_filter = new QAction(tr("Next Filter"), this);
+    
+    connect(select_next_filter, SIGNAL(triggered()), this, SLOT(next_filter()));
+    
+    select_next_filter->setShortcut(tr("Ctrl+I"));
+    controls_menu->addAction(select_next_filter);
+    
+    select_prev_filter = new QAction(tr("Prev Filter"), this);
+    
+    connect(select_prev_filter, SIGNAL(triggered()), this, SLOT(prev_filter()));
+    
+    select_prev_filter->setShortcut(tr("Ctrl+O"));
+    controls_menu->addAction(select_prev_filter);
     
 }
 
@@ -1401,9 +1416,14 @@ void AC_MainWindow::menuFilterChanged(int index) {
         loading = true;
         std::string menu_n = menuNames[index];
         filters->clear();
-        auto v = ac::filter_menu_map[menu_n].menu_list;
+         std::vector<std::string> *v = ac::filter_menu_map[menu_n].menu_list;
+         
+        auto end = v->end();
+        for(auto it = v->begin(); it != end; ++it) {
+             end = std::remove(it + 1, end, *it);
+        }
         for(auto in = v->begin(); in != v->end(); ++in) {
-            filters->addItem(in->c_str());
+                 filters->addItem(in->c_str());
         }
         filters->setCurrentIndex(0);
         loading = false;
@@ -1693,4 +1713,17 @@ void AC_MainWindow::setRandomFilterValue() {
 void AC_MainWindow::setCustomCycle_Menu() {
     bool chk = cycle_custom->isChecked();
     playback->setCustomCycle(chk);
+}
+
+void AC_MainWindow::next_filter() {
+    int count = filters->count();
+    int index = filters->currentIndex();
+    if(index < count) {
+        ++index;
+        filters->setCurrentIndex(index);
+    }
+}
+
+void AC_MainWindow::prev_filter() {
+    
 }
