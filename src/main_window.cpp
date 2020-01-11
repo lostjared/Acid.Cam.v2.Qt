@@ -536,14 +536,14 @@ void AC_MainWindow::createMenu() {
     
     connect(select_next_filter, SIGNAL(triggered()), this, SLOT(next_filter()));
     
-    select_next_filter->setShortcut(tr("Ctrl+I"));
+    select_next_filter->setShortcut(tr("Ctrl+K"));
     controls_menu->addAction(select_next_filter);
     
     select_prev_filter = new QAction(tr("Prev Filter"), this);
     
     connect(select_prev_filter, SIGNAL(triggered()), this, SLOT(prev_filter()));
     
-    select_prev_filter->setShortcut(tr("Ctrl+O"));
+    select_prev_filter->setShortcut(tr("Ctrl+L"));
     controls_menu->addAction(select_prev_filter);
     
 }
