@@ -1725,5 +1725,9 @@ void AC_MainWindow::next_filter() {
 }
 
 void AC_MainWindow::prev_filter() {
-    
+    int index = filters->currentIndex();
+    if(index > 0) {
+        --index;
+        filters->setCurrentIndex(index);
+    }
 }
