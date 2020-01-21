@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Exec=/usr/bin/acidcam
+Icon=/usr/share/acidcam/acicon.xpm
+Type=Application
+Terminal=false
+Comment=Acid Cam video software
+Name=Acid-Cam for Linux
+GenericName=acidcam.0.4-beta
+StartupNotify=false
+Categories=AudioVideo;

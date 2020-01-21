@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Exec=/usr/bin/acidcam
+Icon=/usr/share/acidcam/acicon.xpm
+Type=Application
+Terminal=false
+Comment=Acid Cam Video Editing Software
+Name=Acid Cam Qt
+GenericName=AcidCam-0.4.1
+StartupNotify=false
+Categories=Graphics;Video;
+
