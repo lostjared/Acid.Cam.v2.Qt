@@ -12,6 +12,7 @@ public:
     bool checkEdit(QLineEdit *edit);
     void setEditFromColor(int val, QColor color);
     void enableKey(bool op);
+    void showGL();
 public slots:
     void openColorSelectRange();
     void openColorSelectTolerance();

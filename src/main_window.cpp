@@ -150,8 +150,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     define_window = new DefineWindow(this);
     define_window->hide();
     define_window->main_window = this;
-    gl_display = new glDisplayWindow();
-    /*
+     /*
     QString arg = "http://lostsidedead.com/ac/version.txt";
     QUrl url = QUrl::fromEncoded(arg.toLocal8Bit());
     dl.doDownload(url);
@@ -1304,10 +1303,11 @@ void AC_MainWindow::setFrameIndex(int index) {
     frame_index = index;
 }
 
+
 void AC_MainWindow::updateFrame(QImage img) {
     if(playback->isStopped() == false) {
         disp->displayImage(img);
-        disp2->displayImage(img);
+        //disp2->displayImage(img);
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
@@ -1764,5 +1764,5 @@ void AC_MainWindow::prev_filter() {
 }
 
 void AC_MainWindow::showGLDisplay() {
-    gl_display->show();
+    disp->showGL();
 }

@@ -1,4 +1,8 @@
 
+
+#ifndef __GL_DISPLAY___H
+#define __GL_DISPLAY___H
+
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
 
@@ -17,11 +21,11 @@ public:
 
     virtual void render(QPainter *painter);
     virtual void render();
-
     virtual void initialize();
 
     void setAnimating(bool animating);
-
+    void setNewFrame(const QImage &image);
+    
 public slots:
     void renderLater();
     void renderNow();
@@ -33,8 +37,10 @@ protected:
 
 private:
     bool m_animating;
-
+    QImage frame_copy;
     QOpenGLContext *m_context;
     QOpenGLPaintDevice *m_device;
 };
+
+#endif
 

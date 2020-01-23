@@ -148,7 +148,6 @@ private:
     DefineWindow *define_window;
     ImageWindow  *image_window;
     GotoWindow *goto_window;
-    glDisplayWindow *gl_display;
     OptionsWindow *pref_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;

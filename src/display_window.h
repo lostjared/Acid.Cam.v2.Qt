@@ -9,7 +9,7 @@
 #define __DISPLAY_WINDOW_H__
 
 #include"qtheaders.h"
-
+#include "gl_display.h"
 
 class DisplayWindow : public QDialog {
     Q_OBJECT
@@ -21,8 +21,12 @@ public:
     void keyPressEvent(QKeyEvent *ke);
     void keyReleaseEvent(QKeyEvent *ke);
     void showMax();
+    void showGL();
+    
+    glDisplayWindow *gl_display;
 private:
     QLabel *img_label;
+    
 };
 
 #endif
