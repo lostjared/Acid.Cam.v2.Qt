@@ -45,6 +45,7 @@ void glDisplayWindow::render() {
     if (!m_device)
         m_device = new QOpenGLPaintDevice;
     if(frame_copy.width()>100 && isVisible()) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         float aspect=(float)width()/(float)height();
@@ -53,8 +54,6 @@ void glDisplayWindow::render() {
             glOrtho ( -5.0, 5.0, -5.0/aspect, 5.0/aspect, -5.0, 5.0);
         else
             glOrtho (-5.0*aspect, 5.0*aspect, -5.0, 5.0, -5.0, 5.0);
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if(frame_copy.width() > 25 && frame_copy.height() > 25) {
             glMatrixMode(GL_MODELVIEW);
             glLoadIdentity();
