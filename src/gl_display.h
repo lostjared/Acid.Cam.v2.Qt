@@ -8,13 +8,12 @@ class QOpenGLContext;
 class QOpenGLPaintDevice;
 QT_END_NAMESPACE
 
-//! [1]
-class OpenGLWindow : public QWindow, protected QOpenGLFunctions
-{
+
+class glDisplayWindow : public QWindow, protected QOpenGLFunctions {
     Q_OBJECT
 public:
-    explicit OpenGLWindow(QWindow *parent = 0);
-    ~OpenGLWindow();
+    explicit glDisplayWindow(QWindow *parent = 0);
+    ~glDisplayWindow();
 
     virtual void render(QPainter *painter);
     virtual void render();
@@ -38,4 +37,4 @@ private:
     QOpenGLContext *m_context;
     QOpenGLPaintDevice *m_device;
 };
-//! [1]
+

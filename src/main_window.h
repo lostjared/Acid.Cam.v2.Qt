@@ -19,6 +19,7 @@
 #include "dl-man.h"
 #include "image_window.h"
 #include "options_window.h"
+#include "gl_display.h"
 
 class SearchWindow;
 
@@ -62,6 +63,7 @@ public:
     QAction *select_random_filter;
     QAction *select_next_filter, *select_prev_filter;
     QAction *cycle_custom;
+    QAction *show_glDisplay;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -113,6 +115,7 @@ public slots:
     void speed5();
     void speed6();
     void speed7();
+    void showGLDisplay();
     void flip1_action();
     void flip2_action();
     void flip3_action();
@@ -145,6 +148,7 @@ private:
     DefineWindow *define_window;
     ImageWindow  *image_window;
     GotoWindow *goto_window;
+    glDisplayWindow *gl_display;
     OptionsWindow *pref_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
