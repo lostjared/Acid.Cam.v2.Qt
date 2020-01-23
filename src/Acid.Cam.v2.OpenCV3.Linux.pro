@@ -8,10 +8,10 @@ QT += core gui widgets opengl network
 CONFIG += c++11
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/ /usr/local/include
-LIBS += `pkg-config acidcam opencv4 --libs` -framework OpenGL
+LIBS += `pkg-config acidcam opencv --libs` -lGL -lGLU
 #LIBS += -lopencv_contrib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
 #LIBS += -L/usr/local/lib -lopencv_world
-QMAKE_CXXFLAGS += `pkg-config acidcam opencv4 --cflags`
+QMAKE_CXXFLAGS += -pkg-config acidcam opencv --cflags`
 RESOURCES += qresource.qrc
 QMAKE_CFLAGS_ISYSTEM = -I
 # Input
