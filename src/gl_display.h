@@ -24,8 +24,8 @@ public:
     virtual void initialize();
 
     void setAnimating(bool animating);
-    void setNewFrame(const QImage &image);
-    
+    void setNewFrame(QImage image);
+    void updateTexture(QImage image);
 public slots:
     void renderLater();
     void renderNow();
@@ -37,9 +37,11 @@ protected:
 
 private:
     bool m_animating;
-    QImage frame_copy;
     QOpenGLContext *m_context;
     QOpenGLPaintDevice *m_device;
+    GLuint tex;
+    QImage frame;
+    bool updated;
 };
 
 #endif
