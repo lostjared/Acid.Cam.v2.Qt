@@ -42,6 +42,8 @@ void glDisplayWindow::updateTexture(QImage) {
 }
 
 void glDisplayWindow::render() {
+    
+    glViewport(0, 0, width(), height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (!m_device)
         m_device = new QOpenGLPaintDevice;
@@ -53,8 +55,8 @@ void glDisplayWindow::render() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glDrawPixels(frame.width(), frame.height(), GL_RGB, GL_UNSIGNED_BYTE, frame.bits());
-    m_device->setSize(size() * devicePixelRatio());
-    m_device->setDevicePixelRatio(devicePixelRatio());
+    //m_device->setSize(size() * devicePixelRatio());
+    //m_device->setDevicePixelRatio(devicePixelRatio());
     QPainter painter(m_device);
     render(&painter);
 }
