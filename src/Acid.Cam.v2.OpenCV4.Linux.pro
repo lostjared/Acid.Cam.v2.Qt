@@ -4,7 +4,8 @@
 
 TEMPLATE = app
 TARGET = Acid_Cam_v2_Qt
-QT += core gui widgets opengl network
+QT += core gui opengl network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/ /usr/local/include
