@@ -30,13 +30,13 @@ void DisplayWindow::createControls() {
     img_label->setGeometry(0,0,640, 480);
 }
 void DisplayWindow::displayImage(const QImage &img) {
-    gl_display->setNewFrame(img.copy());
-    /*QRect src(QPoint(0, 0), size());
+ /*   QRect src(QPoint(0, 0), size());
     QPixmap p = QPixmap::fromImage(img).scaled(size(),Qt::KeepAspectRatio, Qt::FastTransformation);
     QRect dst(QPoint(0,0),p.size());
     dst.moveCenter(src.center());
-    img_label->setGeometry(dst);
-    img_label->setPixmap(p); */
+    //img_label->setGeometry(dst);
+    //img_label->setPixmap(p); */
+    gl_display->setNewFrame(img.copy());
 }
 
 void DisplayWindow::paintEvent(QPaintEvent *) {

@@ -6,6 +6,18 @@
 #include <QtGui/QOpenGLPaintDevice>
 #include <QtGui/QPainter>
 #include <iostream>
+#include<cmath>
+
+
+
+void _gluPerspective( GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar )
+{
+    const GLdouble pi = 3.1415926535897932384626433832795;
+    GLdouble fW, fH;
+    fH = tan( fovY / 360 * pi ) * zNear;
+    fW = fH * aspect;
+    glFrustum( -fW, fW, -fH, fH, zNear, zFar );
+}
 
 glDisplayWindow::glDisplayWindow(QWindow *parent)
     : QWindow(parent)
@@ -33,8 +45,12 @@ void glDisplayWindow::initialize() {
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glClearColor(0.0, 0.0, 0.0, 0.0);}
 
-void glDisplayWindow::setNewFrame(QImage image) {
-    frame = image.mirrored();
+void glDisplayWindow::setNewFrame(QImage img) {
+    QRect src(QPoint(0, 0), size());
+    QPixmap p = QPixmap::fromImage(img).scaled(size(),Qt::KeepAspectRatio, Qt::FastTransformation);
+    QRect dst(QPoint(0,0),p.size());
+    dst.moveCenter(src.center());
+    frame = p.toImage().mirrored();
     updated = true;
 }
 
@@ -50,11 +66,15 @@ void glDisplayWindow::render() {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    glViewport(0, 0, width(), height());
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    _gluPerspective(45.0, 16.0/9.0*float(width())/float(height()), 0.1, 100.0);
     glDisable(GL_DEPTH_TEST);
     glOrtho(0, 1, 1, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glDrawPixels(frame.width(), frame.height(), GL_RGB, GL_UNSIGNED_BYTE, frame.bits());
+    glDrawPixels(frame.width(), frame.height(), GL_BGRA, GL_UNSIGNED_BYTE, frame.bits());
     //m_device->setSize(size() * devicePixelRatio());
     //m_device->setDevicePixelRatio(devicePixelRatio());
     QPainter painter(m_device);
