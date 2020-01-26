@@ -3,6 +3,7 @@
 #ifndef __GL_DISPLAY___H
 #define __GL_DISPLAY___H
 
+
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
 
