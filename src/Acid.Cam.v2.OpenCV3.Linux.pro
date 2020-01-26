@@ -11,7 +11,7 @@ INCLUDEPATH += . /usr/include/ /usr/local/include
 LIBS += `pkg-config acidcam opencv --libs` -lGL -lGLU
 #LIBS += -lopencv_contrib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
 #LIBS += -L/usr/local/lib -lopencv_world
-QMAKE_CXXFLAGS += -pkg-config acidcam opencv --cflags`
+QMAKE_CXXFLAGS += `pkg-config acidcam opencv --cflags`
 RESOURCES += qresource.qrc
 QMAKE_CFLAGS_ISYSTEM = -I
 # Input
