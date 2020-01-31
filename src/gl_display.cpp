@@ -7,7 +7,7 @@
 #include <QtGui/QPainter>
 #include <iostream>
 #include<cmath>
-
+#include<ctime>
 
 
 void _gluPerspective( GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar )
@@ -40,7 +40,7 @@ void glDisplayWindow::initialize() {
     glClearDepth(1.0f);
     glEnable(GL_DEPTH_TEST);
     resize(1280, 720);
-    srand((unsigned int)time(0));
+    srand((unsigned int)std::time(0));
     glEnable(GL_TEXTURE_2D);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glClearColor(0.0, 0.0, 0.0, 0.0);}
