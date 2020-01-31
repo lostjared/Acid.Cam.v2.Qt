@@ -509,10 +509,10 @@ void AC_MainWindow::createMenu() {
     controls_showvideo->setShortcut(tr("Ctrl+V"));
     controls_menu->addAction(controls_showvideo);
     
-    show_glDisplay = new QAction(tr("Show OpenGL Display"), this);
-    show_glDisplay->setShortcut(tr("Ctrl+G"));
-    connect(show_glDisplay, SIGNAL(triggered()), this, SLOT(showGLDisplay()));
-    controls_menu->addAction(show_glDisplay);
+    //show_glDisplay = new QAction(tr("Show OpenGL Display"), this);
+    //show_glDisplay->setShortcut(tr("Ctrl+G"));
+    //connect(show_glDisplay, SIGNAL(triggered()), this, SLOT(showGLDisplay()));
+    //controls_menu->addAction(show_glDisplay);
     show_fullscreen = new QAction(tr("Enter Full Screen"), this);
     show_image_window = new QAction(tr("Show Image Window"), this);
     controls_menu->addAction(show_fullscreen);
