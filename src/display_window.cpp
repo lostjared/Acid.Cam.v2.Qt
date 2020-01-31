@@ -30,7 +30,7 @@ void DisplayWindow::createControls() {
     img_label->setGeometry(0,0,640, 480);
 }
 void DisplayWindow::displayImage(const QImage &img) {
-    if(gl_display.isVisible() == false) {
+    if(gl_display->isVisible() == false) {
         QRect src(QPoint(0, 0), size());
         QPixmap p = QPixmap::fromImage(img).scaled(size(),Qt::KeepAspectRatio, Qt::FastTransformation);
         QRect dst(QPoint(0,0),p.size());
