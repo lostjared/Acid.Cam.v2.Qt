@@ -967,8 +967,6 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     //ext = (type == 0) ? ".mov" : ".avi";
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
-    time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
-    stream_ << outdir << "/" << "Video" << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
     switch(res) {
         case 0:
             res_w = 640;
@@ -981,10 +979,26 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         case 2:
             res_w = 1920;
             res_h = 1080;
-            
             break;
     }
     
+    QString out_type;
+    switch(type) {
+        case 0:
+            out_type = "MPEG-4";
+            break;
+        case 1:
+            out_type = "AVC";
+            break;
+        case 2:
+            out_type = "HEVC";
+            break;
+    }
+    
+    std::ostringstream index_val;
+    index_val << std::setw(4) << std::setfill('0') << (++index);
+    time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
+    stream_ << outdir << "/" << "Acid.Cam.Video" << "." << out_type << time_stream.str().c_str() << "." << res_w << "x" << res_h << "." "AC2.Output." << index_val.str().c_str() << ext;
     /*
      bool cw = capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
      bool ch = capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
@@ -1081,10 +1095,24 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     ext = ".mp4";
     //ext = (type == 0) ? ".mov" : ".avi";
     std::ostringstream time_stream;
+    QString out_type;
+    switch(type) {
+        case 0:
+            out_type = "MPEG-4";
+            break;
+        case 1:
+            out_type = "AVC";
+            break;
+        case 2:
+            out_type = "HEVC";
+            break;
+    }
+    
+    std::ostringstream index_val;
+    index_val << std::setw(4) << std::setfill('0') << (++index);
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
-    stream_ << outdir << "/" << "Video" << time_stream.str().c_str() << "AC2.Output." << (++index) << ext;
-    
-    
+    stream_ << outdir << "/" << "Acid.Cam.Video" << "." << out_type << time_stream.str().c_str() << "." << res_w << "x" << res_h << "." "AC2.Output." << index_val.str().c_str() << ext;
+
     if(recording) {
         video_file_name = output_name;
         int c_type = 0;
