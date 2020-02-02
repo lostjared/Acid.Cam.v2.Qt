@@ -69,37 +69,33 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
         mutex.unlock();
         return false;
     }
-/*#else
-    if(!capture.isOpened()) {
-        capture.open(device);
-        if(!capture.isOpened()) {
-            mutex.unlock();
-            return false;
-        }
-    }
-#endif*/
     recording = record;
     writer = wr;
     int res_w = 640, res_h = 480;
     switch(res) {
         case 0:
+        break;
+        case 1:
             res_w = 640;
             res_h = 480;
             break;
-        case 1:
+        case 2:
             res_w = 1280;
             res_h = 720;
             break;
-        case 2:
+        case 3:
             res_w = 1920;
             res_h = 1080;
             break;
     }
-    capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
-    capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
-    double fps = capture.get(cv::CAP_PROP_FPS);
-    res_w = capture.get(cv::CAP_PROP_FRAME_WIDTH);
-    res_h = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
+
+    if(res != 0) {
+        capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
+        capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
+    }
+   double fps = capture.get(cv::CAP_PROP_FPS);
+   res_w = capture.get(cv::CAP_PROP_FRAME_WIDTH);
+   res_h = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
     if(name.size()>0) {
         writer = cv::VideoWriter(name, type, fps, cv::Size(res_w, res_h), true);
         if(!writer.isOpened()) {
@@ -258,9 +254,9 @@ void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
 }
 
 void Playback::run() {
-    
+
     int duration = 1000/ac::fps;
-    
+
     while(!stop) {
         mutex.lock();
         if(ac::release_frames) {
@@ -290,7 +286,7 @@ void Playback::run() {
             cv::flip(frame, temp_frame, 0);
             frame = temp_frame;
         }
-        
+
         mutex.unlock();
         static std::vector<FilterValue> cur;
         mutex_shown.lock();
@@ -315,7 +311,7 @@ void Playback::run() {
                         ++cycle_index;
                         if(cycle_index > static_cast<int>(cycle_values.size()-1))
                             cycle_index = 0;
-                        
+
                         break;
                     case 3:
                         cycle_image = &cycle_values[cycle_index];
@@ -333,7 +329,7 @@ void Playback::run() {
             }
         }
         mutex.unlock();
-        
+
         if(single_mode == true && alpha > 0) {
             if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
             drawEffects(frame);
@@ -358,7 +354,7 @@ void Playback::run() {
             } else {
                 if(_custom_cycle_index > static_cast<int>(cur.size()-1))
                     _custom_cycle_index = 0;
-                
+
                 if(_custom_cycle_index >= 0 && _custom_cycle_index < static_cast<int>(cur.size())) {
                     drawFilter(frame, cur[_custom_cycle_index]);
                     msleep(duration/2);

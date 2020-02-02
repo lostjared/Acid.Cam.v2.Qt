@@ -968,15 +968,17 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
     switch(res) {
-        case 0:
+    case 0:
+        break;
+        case 1:
             res_w = 640;
             res_h = 480;
             break;
-        case 1:
+        case 2:
             res_w = 1280;
             res_h = 720;
             break;
-        case 2:
+        case 3:
             res_w = 1920;
             res_h = 1080;
             break;
@@ -998,7 +1000,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     std::ostringstream index_val;
     index_val << std::setw(4) << std::setfill('0') << (++index);
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
-    stream_ << outdir << "/" << "Acid.Cam.Video" << "." << out_type << time_stream.str().c_str() << "." << res_w << "x" << res_h << "." "AC2.Output." << index_val.str().c_str() << ext;
+    stream_ << outdir << "/" << "Acid.Cam.Video" << "." << out_type << time_stream.str().c_str() << "." << "AC2.Output." << index_val.str().c_str() << ext;
     /*
      bool cw = capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
      bool ch = capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
