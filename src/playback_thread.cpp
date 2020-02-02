@@ -95,13 +95,11 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
             res_h = 1080;
             break;
     }
-    bool cw = capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
-    bool ch = capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
-    int fps = capture.get(cv::CAP_PROP_FPS);
-    if(cw == false || ch == false) {
-        res_w = capture.get(cv::CAP_PROP_FRAME_WIDTH);
-        res_h = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
-    }
+    capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
+    capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
+    double fps = capture.get(cv::CAP_PROP_FPS);
+    res_w = capture.get(cv::CAP_PROP_FRAME_WIDTH);
+    res_h = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
     if(name.size()>0) {
         writer = cv::VideoWriter(name, type, fps, cv::Size(res_w, res_h), true);
         if(!writer.isOpened()) {
