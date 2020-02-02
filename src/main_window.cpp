@@ -1010,10 +1010,9 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
      capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
      capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
      } */
-    
+    int c_type = 0;
     if(recording) {
         video_file_name = output_name;
-        int c_type = 0;
         switch(type) {
             case 0:
                 c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
@@ -1025,23 +1024,24 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
                 c_type = cv::VideoWriter::fourcc('h', 'v', 'c', '1');
                 break;
         }
-        writer = cv::VideoWriter(output_name.toStdString(), c_type, video_fps, cv::Size(res_w, res_h), true);
-        
-        if(!writer.isOpened()) {
-            Log(tr("Could not create video writer..\n"));
-            QMessageBox::information(this, tr("Error"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
-            return false;
-        }
+      
         QString out_s;
         QTextStream out_stream(&out_s);
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
+    } else {
+        output_name = "";
     }
     // if successful
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
-    bool rt_val = playback->setVideoCamera(dev, res, writer, recording);
+    bool rt_val = playback->setVideoCamera(output_name.toStdString(), c_type, dev, res, writer, recording);
+    
+    if(rt_val == false) {
+        QMessageBox::information(this, tr("Error Could not create output file"), tr("Output file"));
+    }
+    
     if(rt_val == false) return false;
     playback->Play();
     disp->show();

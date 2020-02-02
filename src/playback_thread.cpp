@@ -59,7 +59,7 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
     mutex.unlock();
 }
 
-bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool record) {
+bool Playback::setVideoCamera(std::string name, int type, int device, int res, cv::VideoWriter wr, bool record) {
     mode = MODE_CAMERA;
     device_num = device;
     mutex.lock();
@@ -80,7 +80,7 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
 #endif*/
     recording = record;
     writer = wr;
-    int res_w = 0, res_h = 0, ores_w = 640, ores_h = 480;
+    int res_w = 640, res_h = 480;
     switch(res) {
         case 0:
             res_w = 640;
@@ -98,10 +98,14 @@ bool Playback::setVideoCamera(int device, int res, cv::VideoWriter wr, bool reco
     bool cw = capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
     bool ch = capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
     if(cw == false || ch == false) {
-        res_w = ores_w;
-        res_h = ores_h;
-        capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
-        capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
+        res_w = capture.get(cv::CAP_PROP_FRAME_WIDTH);
+        res_h = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
+    }
+    if(name.size()>0) {
+        writer = cv::VideoWriter(name, type, 24, cv::Size(res_w, res_h), true);
+        if(!writer.isOpened()) {
+            return false;
+        }
     }
     mutex.unlock();
     return true;
