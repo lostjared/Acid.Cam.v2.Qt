@@ -90,7 +90,6 @@ signals:
     void stopRecording();
     void frameIncrement();
     void resetIndex();
-    
 };
 
 #endif

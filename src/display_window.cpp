@@ -15,6 +15,7 @@ DisplayWindow::DisplayWindow(QWidget *parent) : QDialog(parent) {
     hide();
     gl_display = new glDisplayWindow();
     gl_display->setAnimating(true);
+    //gl_display->show();
 }
 
 void DisplayWindow::showMax() {

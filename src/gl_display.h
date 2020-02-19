@@ -6,7 +6,7 @@
 
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
-
+#include"ac.h"
 QT_BEGIN_NAMESPACE
 class QPainter;
 class QOpenGLContext;
@@ -42,6 +42,7 @@ private:
     QOpenGLPaintDevice *m_device;
     GLuint tex;
     QImage frame;
+    cv::Mat copy_mat;
     bool updated;
 };
 

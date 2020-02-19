@@ -20,6 +20,7 @@ private:
     Playback *playback;
     QLineEdit *op_max_frames;
     QLineEdit *fps_delay;
+    QLineEdit *level, *fwait;
 };
 
 #endif

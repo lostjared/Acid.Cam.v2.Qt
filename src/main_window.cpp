@@ -150,6 +150,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     define_window = new DefineWindow(this);
     define_window->hide();
     define_window->main_window = this;
+ 
      /*
     QString arg = "http://lostsidedead.com/ac/version.txt";
     QUrl url = QUrl::fromEncoded(arg.toLocal8Bit());

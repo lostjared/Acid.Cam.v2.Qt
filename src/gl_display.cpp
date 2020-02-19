@@ -19,6 +19,7 @@ void _gluPerspective( GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble z
     glFrustum( -fW, fW, -fH, fH, zNear, zFar );
 }
 
+
 glDisplayWindow::glDisplayWindow(QWindow *parent)
     : QWindow(parent)
     , m_animating(false)
