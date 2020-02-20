@@ -1816,11 +1816,49 @@ void AC_MainWindow::showGLDisplay() {
 void AC_MainWindow::chk_Joystick() {
     SDL_Event e;
     while(SDL_PollEvent(&e)) {
+        static int speed = 0;
         if(controller.button(1)) {
             prev_filter();
         }
         if(controller.button(0)) {
             next_filter();
+        }
+        auto change = [](AC_MainWindow *window, int index) {
+            switch(index) {
+                case 0:
+                    window->speed1();
+                    break;
+                case 1:
+                    window->speed2();
+                    break;
+                case 2:
+                    window->speed3();
+                    break;
+                case 3:
+                    window->speed4();
+                    break;
+                case 4:
+                    window->speed5();
+                    break;
+                case 5:
+                    window->speed6();
+                    break;
+                case 7:
+                    window->speed7();
+                    break;
+            }
+        };
+        if(controller.button(3)) {
+            if(speed < 6) {
+                ++speed;
+                change(this, speed);
+            }
+        }
+        if(controller.button(4)) {
+            if(speed > 0) {
+                --speed;
+                change(this, speed);
+            }
         }
     }
 }
