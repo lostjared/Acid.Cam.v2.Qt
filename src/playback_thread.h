@@ -11,6 +11,7 @@
 #include "qtheaders.h"
 #include<atomic>
 
+
 enum VideoMode { MODE_CAMERA = 0, MODE_VIDEO };
 
 class Playback : public QThread {

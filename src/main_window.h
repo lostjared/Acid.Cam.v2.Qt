@@ -20,6 +20,7 @@
 #include "image_window.h"
 #include "options_window.h"
 #include "gl_display.h"
+#include "controller.h"
 
 class SearchWindow;
 
@@ -64,6 +65,7 @@ public:
     QAction *select_next_filter, *select_prev_filter;
     QAction *cycle_custom;
     QAction *show_glDisplay;
+    QTimer *joy_timer;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
     void updateList();
@@ -74,6 +76,7 @@ public:
     void setOptionString(std::string op, std::string value);
     void setProcMode(int index);
 public slots:
+    void chk_Joystick();
     void addClicked();
     void rmvClicked();
     void upClicked();
@@ -164,6 +167,7 @@ private:
     bool loading;
     int speed_index;
     cv::ocl::Context context;
+    Controller controller;
 };
 
 extern const char *filer_names[];

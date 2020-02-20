@@ -173,7 +173,9 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
         }
     }
 */
-    
+    Controller::init();
+    joy_timer = new QTimer(this);
+    connect(joy_timer, SIGNAL(timeout()), this, SLOT(chk_Joystick()));
 }
 
 
@@ -1048,6 +1050,13 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     if(rt_val == false) return false;
     playback->Play();
     disp->show();
+    if(controller.open(0)) {
+        std::cout << "Controller connected...\n";
+        joy_timer->start();
+        
+    } else {
+        std::cout << "No controller detected...\n";
+    }
     return true;
 }
 
@@ -1146,6 +1155,12 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     playback->setVideo(capture_video,writer,recording);
     playback->Play();
     disp->show();
+    if(controller.open(0)) {
+        std::cout << "Controller connected...\n";
+        joy_timer->start();
+    } else {
+        std::cout << "No controller detected...\n";
+    }
     return true;
 }
 
@@ -1796,4 +1811,16 @@ void AC_MainWindow::prev_filter() {
 
 void AC_MainWindow::showGLDisplay() {
     disp->showGL();
+}
+
+void AC_MainWindow::chk_Joystick() {
+    SDL_Event e;
+    while(SDL_PollEvent(&e)) {
+        if(controller.button(1)) {
+            prev_filter();
+        }
+        if(controller.button(0)) {
+            next_filter();
+        }
+    }
 }

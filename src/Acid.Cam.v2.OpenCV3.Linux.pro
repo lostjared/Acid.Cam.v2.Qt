@@ -9,12 +9,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++11
 DEPENDPATH += .
 INCLUDEPATH += . /usr/include/ /usr/local/include
-LIBS += `pkg-config acidcam opencv --libs` -lGL
+LIBS += `pkg-config acidcam opencv sdl2 --libs` -lGL
 #LIBS += -lopencv_contrib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_video 
 #LIBS += -L/usr/local/lib -lopencv_world
-QMAKE_CXXFLAGS += `pkg-config acidcam opencv --cflags`
+QMAKE_CXXFLAGS += `pkg-config acidcam opencv sdl2 --cflags`
 RESOURCES += qresource.qrc
 QMAKE_CFLAGS_ISYSTEM = -I
 # Input
-HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h display_window.h playback_thread.h search_box.h goto_window.h chroma_window.h user_define.h dl-man.h image_window.h options_window.h gl_display.h
-SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp display_window.cpp playback_thread.cpp search_box.cpp goto_window.cpp chroma_window.cpp user_define.cpp dl-man.cpp image_window.cpp options_window.cpp gl_display.cpp
+HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h display_window.h playback_thread.h search_box.h goto_window.h chroma_window.h user_define.h dl-man.h image_window.h options_window.h gl_display.h controller.h
+SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp display_window.cpp playback_thread.cpp search_box.cpp goto_window.cpp chroma_window.cpp user_define.cpp dl-man.cpp image_window.cpp options_window.cpp gl_display.cpp controller.cpp
