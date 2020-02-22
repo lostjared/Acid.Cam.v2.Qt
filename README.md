@@ -18,7 +18,7 @@ There is currently a bug that if you try to use a resolution higher than the max
 
 Projects requires OpenCV, Qt5, libsdl2, and libacidcam are compiled and pkg-config files are configured to compile
 
-You will need to modify the desired pro file with paths to OpenCV/SDL2 on Windows for qmake for it to compile correctly.
+You will need to modify the desired pro file with paths to OpenCV on Windows (no libSDL2)  for qmake for it to compile correctly.
 
 Acid Cam distorts video to create art. It is designed to bo used with other software or on its own. There are multiple versions of the program for macOS, Linux, and Windows as well as a command line version of the program.
 
