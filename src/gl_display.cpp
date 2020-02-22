@@ -1,6 +1,7 @@
 
 #include "gl_display.h"
 
+#include<QtOpenGL>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLPaintDevice>
