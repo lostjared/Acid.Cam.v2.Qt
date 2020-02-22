@@ -1061,6 +1061,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     
     if(rt_val == false) return false;
     playback->Play();
+    disp->show();
     QString out_text;
 #ifndef _WIN32
     QTextStream stream(&out_text);
