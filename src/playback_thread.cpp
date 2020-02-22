@@ -272,9 +272,9 @@ void Playback::run() {
                 continue;
             }
             stop = true;
+            ac::release_all_objects();
             mutex.unlock();
             emit stopRecording();
-            ac::release_all_objects();
             return;
         }
         cv::Mat temp_frame;
@@ -394,7 +394,9 @@ void Playback::run() {
             emit frameIncrement();
         }
     }
+    mutex.lock();
     ac::release_all_objects();
+    mutex.unlock();
 }
 
 
