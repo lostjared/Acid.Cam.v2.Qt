@@ -167,7 +167,10 @@ private:
     bool loading;
     int speed_index;
     cv::ocl::Context context;
+#ifndef _WIN32
     Controller controller;
+#endif
+    
 };
 
 extern const char *filer_names[];
