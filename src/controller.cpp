@@ -2,6 +2,7 @@
 #include"controller.h"
 #include<iostream>
 
+#ifndef _WIN32
 
 bool Controller::open(int index) {
     stick = SDL_JoystickOpen(index);
@@ -38,3 +39,6 @@ int Controller::axis(int index) {
         return SDL_JoystickGetAxis(stick, index);
     return 0;
 }
+
+#endif
+

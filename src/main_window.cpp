@@ -173,6 +173,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
         }
     }
 */
+#ifndef _WIN32
     Controller::init();
     joy_timer = new QTimer(this);
     connect(joy_timer, SIGNAL(timeout()), this, SLOT(chk_Joystick()));
@@ -185,6 +186,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
         stream << "No controller detected...\n";
     }
     Log(out_text);
+#endif
+    
 }
 
 
@@ -1059,6 +1062,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     if(rt_val == false) return false;
     playback->Play();
     QString out_text;
+#ifndef _WIN32
     QTextStream stream(&out_text);
     if(controller.open(0)) {
         stream << "Controller: " << controller.getControllerName() << " connected...\n";
@@ -1067,6 +1071,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         stream << "No controller detected...\n";
     }
     Log(out_text);
+#endif
     return true;
 }
 
@@ -1165,6 +1170,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     playback->setVideo(capture_video,writer,recording);
     playback->Play();
     disp->show();
+#ifndef _WIN32
     QString out_text;
     QTextStream streamx(&out_text);
     if(controller.open(0)) {
@@ -1174,6 +1180,8 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         streamx << "No controller detected...\n";
     }
     Log(out_text);
+#endif
+    
     return true;
 }
 
@@ -1827,6 +1835,7 @@ void AC_MainWindow::showGLDisplay() {
 }
 
 void AC_MainWindow::chk_Joystick() {
+#ifndef _WIN32
     SDL_Event e;
     while(SDL_PollEvent(&e)) {
         static int speed = 0;
@@ -1919,4 +1928,5 @@ void AC_MainWindow::chk_Joystick() {
         }
         
     }
+#endif
 }

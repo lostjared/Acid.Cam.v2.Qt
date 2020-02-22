@@ -2,6 +2,8 @@
 #ifndef __CONTROLLER_H__
 #define __CONTROLLER_H__
 
+#ifndef _WIN32
+
 #include "SDL.h"
 
 class Controller {
@@ -22,6 +24,9 @@ private:
     SDL_Joystick *stick;
 
 };
+
+#endif
+
 
 #endif
 
