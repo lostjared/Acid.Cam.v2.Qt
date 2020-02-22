@@ -11,6 +11,11 @@ bool Controller::open(int index) {
     return true;
 }
 
+const char *Controller::getControllerName() {
+    const char *text = SDL_JoystickName(stick);
+    return text;
+}
+
 void Controller::close() {
     if(stick != 0)
         SDL_JoystickClose(stick);

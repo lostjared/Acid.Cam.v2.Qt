@@ -16,6 +16,7 @@ public:
     bool button(int index);
     Uint8 hat(int h);
     int axis(int index);
+    const char *getControllerName();
     
 private:
     SDL_Joystick *stick;

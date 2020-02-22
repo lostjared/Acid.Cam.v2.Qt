@@ -176,12 +176,15 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     Controller::init();
     joy_timer = new QTimer(this);
     connect(joy_timer, SIGNAL(timeout()), this, SLOT(chk_Joystick()));
+    QString out_text;
+    QTextStream stream(&out_text);
     if(controller.open(0)) {
-        std::cout << "Controller connected...\n";
+        stream << "Controller: " << controller.getControllerName() << " connected...\n";
         joy_timer->start();
     } else {
-        std::cout << "No controller detected...\n";
+        stream << "No controller detected...\n";
     }
+    Log(out_text);
 }
 
 
@@ -1055,14 +1058,15 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     
     if(rt_val == false) return false;
     playback->Play();
-    disp->show();
+    QString out_text;
+    QTextStream stream(&out_text);
     if(controller.open(0)) {
-        std::cout << "Controller connected...\n";
+        stream << "Controller: " << controller.getControllerName() << " connected...\n";
         joy_timer->start();
-        
     } else {
-        std::cout << "No controller detected...\n";
+        stream << "No controller detected...\n";
     }
+    Log(out_text);
     return true;
 }
 
@@ -1161,12 +1165,15 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     playback->setVideo(capture_video,writer,recording);
     playback->Play();
     disp->show();
+    QString out_text;
+    QTextStream streamx(&out_text);
     if(controller.open(0)) {
-        std::cout << "Controller connected...\n";
+        streamx << "Controller: " << controller.getControllerName() << " connected...\n";
         joy_timer->start();
     } else {
-        std::cout << "No controller detected...\n";
+        streamx << "No controller detected...\n";
     }
+    Log(out_text);
     return true;
 }
 
