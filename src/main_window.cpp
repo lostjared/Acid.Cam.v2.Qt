@@ -176,6 +176,12 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     Controller::init();
     joy_timer = new QTimer(this);
     connect(joy_timer, SIGNAL(timeout()), this, SLOT(chk_Joystick()));
+    if(controller.open(0)) {
+        std::cout << "Controller connected...\n";
+        joy_timer->start();
+    } else {
+        std::cout << "No controller detected...\n";
+    }
 }
 
 
@@ -1823,6 +1829,49 @@ void AC_MainWindow::chk_Joystick() {
         if(controller.button(0)) {
             next_filter();
         }
+        
+        static int movement_index = 0;
+        
+        if(controller.button(7)) {
+            if(movement_index < 2)
+                movement_index++;
+            
+            switch(movement_index) {
+                case 0:
+                    movementOption1();
+                    break;
+                case 1:
+                    movementOption2();
+                    break;
+                case 2:
+                    movementOption3();
+                    break;
+            }
+        }
+
+        if(controller.button(6)) {
+            if(movement_index > 0)
+                --movement_index;
+            
+            switch(movement_index) {
+                case 0:
+                    movementOption1();
+                    break;
+                case 1:
+                    movementOption2();
+                    break;
+                case 2:
+                    movementOption3();
+                    break;
+            }
+        }
+        /*
+        for(int i = 0; i < 8; ++i) {
+            if(controller.button(i)) {
+                std::cout << "button: " << i << "\n";
+            }
+        }*/
+        
         auto change = [](AC_MainWindow *window, int index) {
             switch(index) {
                 case 0:
@@ -1848,6 +1897,7 @@ void AC_MainWindow::chk_Joystick() {
                     break;
             }
         };
+        
         if(controller.button(3)) {
             if(speed < 6) {
                 ++speed;
@@ -1860,5 +1910,6 @@ void AC_MainWindow::chk_Joystick() {
                 change(this, speed);
             }
         }
+        
     }
 }
