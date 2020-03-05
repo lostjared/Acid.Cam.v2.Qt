@@ -1,6 +1,8 @@
 
 #include "gl_display.h"
+#ifndef __APPLE__
 #include<GL/gl.h>
+#endif
 #include<QtOpenGL>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QOpenGLContext>
