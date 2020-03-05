@@ -75,7 +75,7 @@ void glDisplayWindow::render() {
     glOrtho(0, 1, 1, 0, -1, 1);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glDrawPixels(frame.width(), frame.height(), GL_BGRA, GL_UNSIGNED_BYTE, frame.bits());
+    //glDrawPixels(frame.width(), frame.height(), GL_BGRA, GL_UNSIGNED_BYTE, frame.bits());
     //m_device->setSize(size() * devicePixelRatio());
     //m_device->setDevicePixelRatio(devicePixelRatio());
     QPainter painter(m_device);
