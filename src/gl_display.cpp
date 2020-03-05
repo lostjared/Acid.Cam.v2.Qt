@@ -1,5 +1,6 @@
 
 #include "gl_display.h"
+#include<GL/gl.h>
 #include<QtOpenGL>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QOpenGLContext>
