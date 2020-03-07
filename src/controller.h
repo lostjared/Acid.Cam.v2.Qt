@@ -2,6 +2,8 @@
 #ifndef __CONTROLLER_H__
 #define __CONTROLLER_H__
 
+#include"qtheaders.h"
+
 #ifndef JOYSTICK_ENABLED
 
 #include "SDL.h"
