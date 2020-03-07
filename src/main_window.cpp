@@ -74,6 +74,11 @@ void generate_map() {
     }
 }
 
+
+void AC_MainWindow::showRange() {
+    color_range_window->show();
+}
+
 void custom_filter(cv::Mat &) {
     
 }
@@ -131,6 +136,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     pref_window = new OptionsWindow(this);
     pref_window->setPlayback(playback);
     
+    color_range_window = new ColorRangeWindow(this);
+    
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
     QObject::connect(playback, SIGNAL(frameIncrement()), this, SLOT(frameInc()));
@@ -173,7 +180,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
         }
     }
 */
-#ifndef _WIN32
+#ifndef JOYSTICK_ENABLED
     Controller::init();
     joy_timer = new QTimer(this);
     connect(joy_timer, SIGNAL(timeout()), this, SLOT(chk_Joystick()));
@@ -504,6 +511,8 @@ void AC_MainWindow::createMenu() {
     controls_stop = new QAction(tr("Sto&p"), this);
     controls_stop->setShortcut(tr("Ctrl+C"));
     controls_menu->addAction(controls_stop);
+    
+
     controls_stop->setEnabled(false);
     controls_snapshot = new QAction(tr("Take &Snapshot"), this);
     controls_snapshot->setShortcut(tr("Ctrl+A"));
@@ -538,6 +547,12 @@ void AC_MainWindow::createMenu() {
     connect(show_control_window, SIGNAL(triggered()), this, SLOT(controls_ShowDisp2()));
     controls_menu->addAction(show_control_window);
 
+    show_range = new QAction(tr("Show Range"), this);
+    show_range->setShortcut(tr("Ctrl+1"));
+    controls_menu->addAction(show_range);
+
+    connect(show_range, SIGNAL(triggered()), this, SLOT(showRange()));
+    
     reset_filters = new QAction(tr("Reset Filters"), this);
     reset_filters->setShortcut(tr("Ctrl+R"));
     controls_menu->addAction(reset_filters);
@@ -1063,7 +1078,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     playback->Play();
     disp->show();
     QString out_text;
-#ifndef _WIN32
+#ifndef JOYSTICK_ENABLED
     QTextStream stream(&out_text);
     if(controller.open(0)) {
         stream << "Controller: " << controller.getControllerName() << " connected...\n";
@@ -1171,7 +1186,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     playback->setVideo(capture_video,writer,recording);
     playback->Play();
     disp->show();
-#ifndef _WIN32
+#ifndef JOYSTICK_ENABLED
     QString out_text;
     QTextStream streamx(&out_text);
     if(controller.open(0)) {
@@ -1836,7 +1851,7 @@ void AC_MainWindow::showGLDisplay() {
 }
 
 void AC_MainWindow::chk_Joystick() {
-#ifndef _WIN32
+#ifndef JOYSTICK_ENABLED
     SDL_Event e;
     while(SDL_PollEvent(&e)) {
         static int speed = 0;

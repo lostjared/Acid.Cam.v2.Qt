@@ -2,7 +2,7 @@
 #include"controller.h"
 #include<iostream>
 
-#ifndef _WIN32
+#ifndef JOYSTICK_ENABLED
 
 bool Controller::open(int index) {
     stick = SDL_JoystickOpen(index);

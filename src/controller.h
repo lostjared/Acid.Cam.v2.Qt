@@ -2,7 +2,7 @@
 #ifndef __CONTROLLER_H__
 #define __CONTROLLER_H__
 
-#ifndef _WIN32
+#ifndef JOYSTICK_ENABLED
 
 #include "SDL.h"
 

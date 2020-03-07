@@ -6,7 +6,8 @@
 
 #ifndef _QT_HEADERS__
 #define _QT_HEADERS__
-#define ac_version "v1.58.0"
+#define JOYSTICK_ENABLED
+#define ac_version "v1.59.0"
 #include<QApplication>
 #include<QMainWindow>
 #include<QDialog>

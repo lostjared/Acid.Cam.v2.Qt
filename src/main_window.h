@@ -21,6 +21,7 @@
 #include "options_window.h"
 #include "gl_display.h"
 #include "controller.h"
+#include "color_range.h"
 
 class SearchWindow;
 
@@ -65,6 +66,7 @@ public:
     QAction *select_next_filter, *select_prev_filter;
     QAction *cycle_custom;
     QAction *show_glDisplay;
+    QAction *show_range;
     QTimer *joy_timer;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
@@ -76,6 +78,7 @@ public:
     void setOptionString(std::string op, std::string value);
     void setProcMode(int index);
 public slots:
+    void showRange();
     void chk_Joystick();
     void addClicked();
     void rmvClicked();
@@ -152,6 +155,7 @@ private:
     ImageWindow  *image_window;
     GotoWindow *goto_window;
     OptionsWindow *pref_window;
+    ColorRangeWindow *color_range_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
     unsigned long video_frames;
@@ -167,7 +171,7 @@ private:
     bool loading;
     int speed_index;
     cv::ocl::Context context;
-#ifndef _WIN32
+#ifndef JOYSTICK_ENABLED
     Controller controller;
 #endif
     
