@@ -16,5 +16,5 @@ QMAKE_CXXFLAGS += `pkg-config acidcam opencv sdl2 --cflags`
 RESOURCES += qresource.qrc
 QMAKE_CFLAGS_ISYSTEM = -I
 # Input
-HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h display_window.h playback_thread.h search_box.h goto_window.h chroma_window.h user_define.h dl-man.h image_window.h options_window.h gl_display.h controller.h
-SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp display_window.cpp playback_thread.cpp search_box.cpp goto_window.cpp chroma_window.cpp user_define.cpp dl-man.cpp image_window.cpp options_window.cpp gl_display.cpp controller.cpp
+HEADERS += main_window.h new_dialog.h plugin.h qtheaders.h select_image.h display_window.h playback_thread.h search_box.h goto_window.h chroma_window.h user_define.h dl-man.h image_window.h options_window.h gl_display.h controller.h color_range.h slitscan_win.h
+SOURCES += main.cpp main_window.cpp new_dialog.cpp plugin.cpp select_image.cpp display_window.cpp playback_thread.cpp search_box.cpp goto_window.cpp chroma_window.cpp user_define.cpp dl-man.cpp image_window.cpp options_window.cpp gl_display.cpp controller.cpp color_range.cpp slitscan_win.cpp

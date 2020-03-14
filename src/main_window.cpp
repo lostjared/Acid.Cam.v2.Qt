@@ -137,6 +137,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     pref_window->setPlayback(playback);
     
     color_range_window = new ColorRangeWindow(this);
+    slit_win = new SlitScanWindow(this);
     
     QObject::connect(playback, SIGNAL(procImage(QImage)), this, SLOT(updateFrame(QImage)));
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
@@ -550,8 +551,15 @@ void AC_MainWindow::createMenu() {
     show_range = new QAction(tr("Show Range"), this);
     show_range->setShortcut(tr("Ctrl+1"));
     controls_menu->addAction(show_range);
+    
+    show_slit = new QAction(tr("Show SlitScan"), this);
+    show_slit->setShortcut(tr("Ctrl+2"));
+    controls_menu->addAction(show_slit);
 
     connect(show_range, SIGNAL(triggered()), this, SLOT(showRange()));
+
+    connect(show_slit, SIGNAL(triggered()), this, SLOT(showSlit()));
+
     
     reset_filters = new QAction(tr("Reset Filters"), this);
     reset_filters->setShortcut(tr("Ctrl+R"));
@@ -619,6 +627,10 @@ void AC_MainWindow::showImageWindow() {
 
 void AC_MainWindow::resetIndex() {
     frame_index = 0;
+}
+
+void AC_MainWindow::showSlit() {
+    slit_win->show();
 }
 
 void AC_MainWindow::clear_subfilter() {

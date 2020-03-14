@@ -22,6 +22,7 @@
 #include "gl_display.h"
 #include "controller.h"
 #include "color_range.h"
+#include "slitscan_win.h"
 
 class SearchWindow;
 
@@ -67,6 +68,7 @@ public:
     QAction *cycle_custom;
     QAction *show_glDisplay;
     QAction *show_range;
+    QAction *show_slit;
     QTimer *joy_timer;
     double speed_actions[7];
     QRadioButton *filter_single, *filter_custom;
@@ -142,6 +144,7 @@ public slots:
     void setCustomCycle_Menu();
     void next_filter();
     void prev_filter();
+    void showSlit();
 private:
     void createControls();
     void createMenu();
@@ -155,6 +158,7 @@ private:
     ImageWindow  *image_window;
     GotoWindow *goto_window;
     OptionsWindow *pref_window;
+    SlitScanWindow *slit_win;
     ColorRangeWindow *color_range_window;
     cv::VideoCapture capture_camera, capture_video;
     cv::VideoWriter writer;
