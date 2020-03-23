@@ -30,9 +30,11 @@ Acid Cam's effects are created by using Acid Cam 'filters', or pieces of code th
 
 ![AnimatedImage](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/jaredpeace.gif "screenshot")
 
+Now uses Qt5
+
 First download GCC/Automake/Autoconf with g++ compiler and make then compile on Debian install libqt4-dev and libopencv-dev via Terminal with
 
-	$ sudo apt-get install libqt4-dev libopencv-dev g++ git autoconf automake libtool libsdl2-dev
+	$ sudo apt-get install qt5-default libopencv-dev g++ git autoconf automake libtool libsdl2-dev
 
 Also install pkg-config
 
