@@ -4,7 +4,7 @@
 
 #include"qtheaders.h"
 
-#ifndef JOYSTICK_ENABLED
+#ifndef DISABLE_JOYSTICK
 
 #include "SDL.h"
 

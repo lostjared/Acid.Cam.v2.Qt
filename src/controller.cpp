@@ -2,7 +2,7 @@
 #include"controller.h"
 #include<iostream>
 
-#ifndef JOYSTICK_ENABLED
+#ifndef DISABLE_JOYSTICK
 
 bool Controller::open(int index) {
     stick = SDL_JoystickOpen(index);

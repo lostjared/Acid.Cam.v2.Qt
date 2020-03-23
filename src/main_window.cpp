@@ -181,7 +181,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
         }
     }
 */
-#ifndef JOYSTICK_ENABLED
+#ifndef DISABLE_JOYSTICK
     Controller::init();
     joy_timer = new QTimer(this);
     connect(joy_timer, SIGNAL(timeout()), this, SLOT(chk_Joystick()));
@@ -1090,7 +1090,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     playback->Play();
     disp->show();
     QString out_text;
-#ifndef JOYSTICK_ENABLED
+#ifndef DISABLE_JOYSTICK
     QTextStream stream(&out_text);
     if(controller.open(0)) {
         stream << "Controller: " << controller.getControllerName() << " connected...\n";
@@ -1198,7 +1198,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     playback->setVideo(capture_video,writer,recording);
     playback->Play();
     disp->show();
-#ifndef JOYSTICK_ENABLED
+#ifndef DISABLE_JOYSTICK
     QString out_text;
     QTextStream streamx(&out_text);
     if(controller.open(0)) {
@@ -1863,7 +1863,7 @@ void AC_MainWindow::showGLDisplay() {
 }
 
 void AC_MainWindow::chk_Joystick() {
-#ifndef JOYSTICK_ENABLED
+#ifndef DISABLE_JOYSTICK
     SDL_Event e;
     while(SDL_PollEvent(&e)) {
         static int speed = 0;

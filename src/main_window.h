@@ -175,7 +175,7 @@ private:
     bool loading;
     int speed_index;
     cv::ocl::Context context;
-#ifndef JOYSTICK_ENABLED
+#ifndef DISABLE_JOYSTICK
     Controller controller;
 #endif
     
