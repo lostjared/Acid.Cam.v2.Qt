@@ -69,6 +69,9 @@ If you are using a high resolution the program outputs very high bitrate for MPE
 
     $ ffmpeg -i "input.file.mp4" -c:v libx265 -tag:v hvc1 -crf 18 output.file.mp4
 
+or
+    
+    $ ffmpeg -i "input.file.mp4" -c:v libx264 -crf 18 output_file.mp4
 
 Then Run the program
 
