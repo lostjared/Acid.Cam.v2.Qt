@@ -32,7 +32,7 @@ Acid Cam's effects are created by using Acid Cam 'filters', or pieces of code th
 
 Now uses Qt5
 
-First download GCC/Automake/Autoconf with g++ compiler and make then compile on Debian install libqt4-dev and libopencv-dev via Terminal with
+First download GCC/Automake/Autoconf with g++ compiler and make then compile on Debian install build tools, QT5 and OpenCV development libraries via Terminal with
 
 	$ sudo apt-get install qt5-default libopencv-dev g++ git cmake autoconf automake libtool pkg-config libsdl2-dev
 
