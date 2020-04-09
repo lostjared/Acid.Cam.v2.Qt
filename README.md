@@ -32,6 +32,7 @@ Acid Cam's effects are created by using Acid Cam 'filters', or pieces of code th
 
 Now uses Qt5
 
+
 First download GCC/Automake/Autoconf with g++ compiler and make then compile on Debian install build tools, QT5 and OpenCV development libraries via Terminal with
 
 	$ sudo apt-get install qt5-default libopencv-dev g++ git cmake autoconf automake libtool pkg-config libsdl2-dev
@@ -42,23 +43,22 @@ You will also need libacidcam
 
 Download libacidcam from: https://github.com/lostjared/libacidcam
 
-Compile and install the library
-
-$ ./autogen.sh && ./configure && make && sudo make install
-
-Then (on Linux) use ldconfig 
-
-	$ sudo ldconfig
+Compile and install the library libacidcam
+instructions here: https://github.com/lostjared/libacidcam/blob/master/README.md
 
 Next download this project via git clone or zip enter the src directory
 
-For compiling with OpenCV 4 use:
+For compiling with macOS and OpenCV 4 use:
 
 	$ qmake Acid.Cam.v2.OpenCV4.pro
     
-For compiling with OpenCV 3 use:
+For compiling with macOS and OpenCV 3 use:
     
-    $ qmake Acid.Cam.v2.OpenCV3.pro
+   	 $ qmake Acid.Cam.v2.OpenCV3.pro
+
+For compiling on Linux with OpenCV 4 use:
+
+	$ qmake Acid.Cam.v2.OpenCV4.Linux.pro
     
 Then to build project
 
