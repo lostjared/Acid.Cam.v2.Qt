@@ -159,28 +159,6 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     define_window->hide();
     define_window->main_window = this;
  
-     /*
-    QString arg = "http://lostsidedead.com/ac/version.txt";
-    QUrl url = QUrl::fromEncoded(arg.toLocal8Bit());
-    dl.doDownload(url);
-    
-    std::string v_info = ac_version;
-    std::fstream file;
-    file.open("version.txt", std::ios::in);
-    if(!file.is_open()) {
-        std::cerr << "Error could not open file..\n";
-        return;
-    }
-    std::stringstream buf;
-    buf << file.rdbuf();
-    if(buf.str().find(v_info) != std::string::npos) {
-        std::cout << "Match...\n";
-    } else {
-        if(QMessageBox::question(this, "New version available?", "Do you wish to open the download page for a new version?") == QMessageBox::Yes) {
-            QDesktopServices::openUrl(QUrl("https://github.com/lostjared/Acid.Cam.v2.Qt/releases"));
-        }
-    }
-*/
 #ifndef DISABLE_JOYSTICK
     Controller::init();
     joy_timer = new QTimer(this);
