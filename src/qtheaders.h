@@ -7,7 +7,7 @@
 #ifndef _QT_HEADERS__
 #define _QT_HEADERS__
 //#define DISABLE_JOYSTICK
-#define ac_version "v1.61.0"
+#define ac_version "v1.66.0"
 #include<QApplication>
 #include<QMainWindow>
 #include<QDialog>
