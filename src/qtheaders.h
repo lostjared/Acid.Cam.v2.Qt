@@ -6,6 +6,7 @@
 
 #ifndef _QT_HEADERS__
 #define _QT_HEADERS__
+// uncomment below to disable Joystick with libsdl2
 //#define DISABLE_JOYSTICK
 #define ac_version "v1.66.0"
 #include<QApplication>
