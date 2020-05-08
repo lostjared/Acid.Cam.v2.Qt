@@ -983,7 +983,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     struct tm *m;
     m = localtime(&t);
     QString ext;
-    ext = ".mp4";
+    
     //ext = (type == 0) ? ".mov" : ".avi";
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
@@ -1007,13 +1007,16 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     QString out_type;
     switch(type) {
         case 0:
+            ext = ".mp4";
             out_type = "MPEG-4";
             break;
         case 1:
+            ext = ".mp4";
             out_type = "AVC";
             break;
         case 2:
-            out_type = "HEVC";
+            ext = ".avi";
+            out_type = "XviD";
             break;
     }
     
@@ -1043,7 +1046,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
                 c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
                 break;
             case '2':
-                c_type = cv::VideoWriter::fourcc('h', 'v', 'c', '1');
+                c_type = cv::VideoWriter::fourcc('X', 'v', 'i', 'D');
                 break;
         }
       
@@ -1131,13 +1134,16 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     QString out_type;
     switch(type) {
         case 0:
+            ext = ".mp4";
             out_type = "MPEG-4";
             break;
         case 1:
+            ext = ".mp4";
             out_type = "AVC";
             break;
         case 2:
-            out_type = "HEVC";
+            ext = ".avi";
+            out_type = "XviD";
             break;
     }
     
@@ -1157,7 +1163,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
                 c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
                 break;
             case '2':
-                c_type = cv::VideoWriter::fourcc('h', 'v', 'c', '1');
+                c_type = cv::VideoWriter::fourcc('X', 'v', 'i', 'D');
                 break;
         }
 
@@ -1165,7 +1171,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         
         if(!writer.isOpened()) {
             Log("Error could not open video writer.\n");
-            QMessageBox::information(this, tr("Error invalid path"), tr("Incorrect Pathname/Or you do not have permission to write to the directory."));
+            QMessageBox::information(this, tr("Error invalid path"), tr("Incorrect Pathname or Codec not supported/Or you do not have permission to write to the directory."));
             return false;
         }
         QString out_s;
