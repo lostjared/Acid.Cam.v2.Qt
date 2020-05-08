@@ -240,7 +240,7 @@ void AC_MainWindow::createControls() {
     btn_remove->setGeometry(390, 215, 80, 25);
     btn_moveup->setGeometry(460, 215, 80, 25);
     btn_movedown->setGeometry(530, 215, 80, 25);
-    btn_load->setGeometry(655+20, 215, 60, 25);
+    btn_load->setGeometry(655+30, 215, 60, 25);
     btn_save->setGeometry(655+60+20, 215, 60, 25);
     btn_sub->setGeometry(10, 165, 100, 25);
     btn_clr->setGeometry(115, 165, 100, 25);
@@ -356,7 +356,7 @@ void AC_MainWindow::createControls() {
     chk_negate->setCheckState(Qt::Unchecked);
     use_settings = new QCheckBox(tr("Settings"), this);
     use_settings->setCheckState(Qt::Checked);
-    use_settings->setGeometry(615, 215,80, 20);
+    use_settings->setGeometry(613, 220,80, 20);
     connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
     
     combo_rgb = new QComboBox(this);
@@ -1509,7 +1509,7 @@ void AC_MainWindow::help_About() {
     QString about_str;
     QTextStream stream(&about_str);
     stream << tr("<b>Acid Cam Qt version: ") << ac_version << " filters: " << ac::version.c_str() << "</b><br><br> ";
-    stream << tr("Engineering by <b>Jared Bruni</b><br><br><b>This software is dedicated to all the people that experience mental illness. </b><br><br><b>My Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostsidedead\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">LostSideDead Facebook</a><br><a href=\"http://facebook.com/lostsidedead\">My Facebook</a><br><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n");
+    stream << tr("Engineering by <b>Jared Bruni</b><br><br><b>This software is dedicated to all the people that experience mental illness. </b><br><br>If you wish to donate to this project you can here: <a href=\"http://lostsidedead.com\">Donate</a><br><br><b>My Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostsidedead\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">LostSideDead Facebook</a><br><a href=\"http://facebook.com/lostsidedead\">My Facebook</a><br><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n");
     
     QMessageBox::information(this, tr("About Acid Cam"), about_str);
 }
