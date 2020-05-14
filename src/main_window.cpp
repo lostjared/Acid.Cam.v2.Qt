@@ -1186,14 +1186,16 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     QString path = filename.mid(filename.lastIndexOf("/"));
     stream1 << outdir << "/" << path << "_png." << output_index;
     
-    QDir dir(dpath);
-    if(!dir.exists()) {
-        dir.mkpath(dpath);
-        std::cout << "mkpath: " << dpath.toStdString().c_str() << "\n";
-    } else {
-        std::cout << "directory exisits...\n";
+    if(png_record) {
+        QDir dir(dpath);
+        if(!dir.exists()) {
+            dir.mkpath(dpath);
+            std::cout << "mkpath: " << dpath.toStdString().c_str() << "\n";
+        } else {
+            std::cout << "directory exisits...\n";
+        }
+        ++output_index;
     }
-    ++output_index;
     playback->setPngPath(dpath.toStdString());
     playback->setVideo(capture_video,writer,recording, png_record);
     playback->Play();
