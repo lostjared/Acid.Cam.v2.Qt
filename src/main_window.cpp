@@ -1084,7 +1084,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     return true;
 }
 
-bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record, int type) {
+bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record, bool png_record, int type) {
     programMode = MODE_VIDEO;
     controls_stop->setEnabled(true);
     controls_pause->setEnabled(true);
@@ -1179,7 +1179,23 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
     }
-    playback->setVideo(capture_video,writer,recording);
+    
+    static int output_index = 1;
+    QString dpath;
+    QTextStream stream1(&dpath);
+    QString path = filename.mid(filename.lastIndexOf("/"));
+    stream1 << outdir << "/" << path << "_png." << output_index;
+    
+    QDir dir(dpath);
+    if(!dir.exists()) {
+        dir.mkpath(dpath);
+        std::cout << "mkpath: " << dpath.toStdString().c_str() << "\n";
+    } else {
+        std::cout << "directory exisits...\n";
+    }
+    ++output_index;
+    playback->setPngPath(dpath.toStdString());
+    playback->setVideo(capture_video,writer,recording, png_record);
     playback->Play();
     disp->show();
 #ifndef DISABLE_JOYSTICK

@@ -46,8 +46,14 @@ void Playback::Play() {
     start(HighPriority);
 }
 
-void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record) {
+void Playback::setPngPath(std::string path) {
+    png_path = path;
+    png_index = 0;
+}
+
+void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record, bool rec_png) {
     mode = MODE_VIDEO;
+    record_png = rec_png;
     mutex.lock();
     capture = cap;
     writer = wr;
@@ -374,6 +380,14 @@ void Playback::run() {
             msleep(duration);
         }
         mutex.lock();
+        
+        if(record_png) {
+            std::ostringstream stream;
+            stream << png_path << "/" << std::setfill('0') << std::setw(15) << png_index << ".png";
+            ++png_index;
+            cv::imwrite(stream.str(), frame);
+        }
+        
         if(recording && writer.isOpened()) {
             writer.write(frame);
         }

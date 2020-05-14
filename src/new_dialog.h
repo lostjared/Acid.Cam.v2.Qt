@@ -41,7 +41,7 @@ public:
     
     QLineEdit *edit_src, *edit_outdir;
     QPushButton *btn_setedit, *btn_setout, *btn_start;
-    QCheckBox *chk_record;
+    QCheckBox *chk_record, *chk_png;
     QComboBox *video_type;
     
 public slots:

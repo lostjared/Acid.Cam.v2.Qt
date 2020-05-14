@@ -96,7 +96,7 @@ void CaptureCamera::btn_Start() {
 
 CaptureVideo::CaptureVideo(QWidget *parent) : QDialog(parent) {
     setGeometry(100, 100, 330, 100);
-    setFixedSize(330, 100);
+    setFixedSize(330, 120);
     setWindowTitle(tr("Capture from Video"));
     setWindowIcon(QPixmap(":/images/icon.png"));
     createControls();
@@ -114,9 +114,11 @@ void CaptureVideo::createControls() {
     edit_outdir->setGeometry(120, 30, 200, 20);
     edit_outdir->setReadOnly(true);
     btn_start = new QPushButton(tr("Start"), this);
-    btn_start->setGeometry(10, 60, 100, 20);
+    btn_start->setGeometry(10, 60, 100, 25);
     chk_record = new QCheckBox(tr("Record"), this);
     chk_record->setGeometry(110, 60, 80, 20);
+    chk_png = new QCheckBox(tr("PNG"), this);
+    chk_png->setGeometry(110, 80, 80, 20);
     
     video_type = new QComboBox(this);
     video_type->setGeometry(180, 55, 120, 25);
@@ -156,10 +158,12 @@ void CaptureVideo::btn_Start() {
         return;
     }
     
+    
+    
+    
     int num;
     num = video_type->currentIndex();
-    
-    if(win_parent->startVideo(edit_src->text(), edit_outdir->text(), chk_record->isChecked(), num)) {
+    if(win_parent->startVideo(edit_src->text(), edit_outdir->text(), chk_record->isChecked(),chk_png->isChecked(), num)) {
         hide();
     } else {
         QMessageBox::information(this, tr("Could not open file"), tr("Could not open video file, an error has occured"));

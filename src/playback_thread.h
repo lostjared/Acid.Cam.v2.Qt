@@ -30,8 +30,12 @@ private:
     QImage img;
     std::vector<FilterValue> current;
     bool isPaused, isStep;
+    bool record_png;
+    int png_index;
+    std::string png_path;
     VideoMode mode;
     int device_num;
+    std::string file_name_png;
     unsigned long *frame_index;
     unsigned int red, green, blue;
     unsigned int bright_, gamma_, saturation_;
@@ -57,11 +61,12 @@ public:
     void setRGB(int r, int g, int b);
     void setColorOptions(int b, int g, int s);
     void setColorMap(int c);
+    void setPngPath(std::string path);
     void Play();
     void Stop();
     void Release();
     void SetFlip(bool f1, bool f2);
-    void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record);
+    void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record, bool record_png);
     bool setVideoCamera(std::string name, int type, int device, int res, cv::VideoWriter writer, bool record);
     bool isStopped() const;
     void run();
