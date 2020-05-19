@@ -42,8 +42,8 @@ void Playback::Play() {
             stop = false;
         }
     }
-    //start(LowPriority);
-    start(HighPriority);
+    start(LowPriority);
+    //start(HighPriority);
 }
 
 void Playback::setPngPath(std::string path) {
