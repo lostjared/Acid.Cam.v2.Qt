@@ -1400,8 +1400,10 @@ void AC_MainWindow::setFrameIndex(int index) {
     frame_index = index;
 }
 
+std::mutex mut_lock;
 
 void AC_MainWindow::updateFrame(QImage img) {
+    mut_lock.lock();
     if(playback->isStopped() == false) {
         disp->displayImage(img);
         //disp2->displayImage(img);
@@ -1445,6 +1447,7 @@ void AC_MainWindow::updateFrame(QImage img) {
             take_snapshot = false;
         }
     }
+    mut_lock.unlock();
 }
 
 void AC_MainWindow::stopRecording() {

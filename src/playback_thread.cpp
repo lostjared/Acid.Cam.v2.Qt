@@ -345,7 +345,7 @@ void Playback::run() {
             ac::in_custom = false;
             drawFilter(frame, current_filter);
             drawEffects(frame);
-            msleep(duration/2);
+            msleep(duration);
             mutex.unlock();
         } else if(cur.size()>0) {
             mutex.lock();
@@ -355,7 +355,7 @@ void Playback::run() {
                     if(i == cur.size()-1)
                         ac::in_custom = false;
                     drawFilter(frame, cur[i]);
-                    msleep(duration/2);
+                    msleep(duration);
                 }
             } else {
                 if(_custom_cycle_index > static_cast<int>(cur.size()-1))
@@ -363,7 +363,7 @@ void Playback::run() {
 
                 if(_custom_cycle_index >= 0 && _custom_cycle_index < static_cast<int>(cur.size())) {
                     drawFilter(frame, cur[_custom_cycle_index]);
-                    msleep(duration/2);
+                    msleep(duration);
                 }
             }
             drawEffects(frame);
