@@ -1501,6 +1501,8 @@ void AC_MainWindow::setFade() {
     playback->setFadeFilter(fc);
 }
 
+std::mutex mutex_lock_;
+
 void AC_MainWindow::frameInc() {
     frame_index++;
     QString frame_string;

@@ -70,7 +70,11 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     device_num = device;
     mutex.lock();
 //#if defined(__linux__) || defined(__APPLE__)
+#ifdef _WIN32
+    capture.open(cv::CAP_DSHOW+device);
+#else
     capture.open(device);
+#endif
     if(!capture.isOpened()) {
         mutex.unlock();
         return false;
