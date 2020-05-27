@@ -989,16 +989,14 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     std::ostringstream time_stream;
     switch(res) {
     case 0:
-        break;
-        case 1:
             res_w = 640;
             res_h = 480;
-            break;
-        case 2:
+        break;
+        case 1:
             res_w = 1280;
             res_h = 720;
-            break;
-        case 3:
+        break;
+        case 2:
             res_w = 1920;
             res_h = 1080;
             break;

@@ -71,7 +71,8 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     mutex.lock();
 //#if defined(__linux__) || defined(__APPLE__)
 #ifdef _WIN32
-    capture.open(cv::CAP_DSHOW+device);
+    //capture.open(cv::CAP_DSHOW+device);
+    capture.open(0, cv::CAP_MSMF);
 #else
     capture.open(device);
 #endif
@@ -84,29 +85,25 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     int res_w = 640, res_h = 480;
     switch(res) {
         case 0:
-        break;
-        case 1:
             res_w = 640;
             res_h = 480;
             break;
-        case 2:
+        case 1:
             res_w = 1280;
             res_h = 720;
             break;
-        case 3:
+        case 2:
             res_w = 1920;
             res_h = 1080;
             break;
     }
 
-    if(res != 0) {
-        capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
-        capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
-    }
+   capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
+   capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
    double fps = capture.get(cv::CAP_PROP_FPS);
    res_w = capture.get(cv::CAP_PROP_FRAME_WIDTH);
    res_h = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
-    if(name.size()>0) {
+    if(record == true && name.size()>0) {
         writer = cv::VideoWriter(name, type, fps, cv::Size(res_w, res_h), true);
         if(!writer.isOpened()) {
             return false;
@@ -396,6 +393,8 @@ void Playback::run() {
             writer.write(frame);
         }
         mutex.unlock();
+
+
         if(video_shown == true) {
             if(frame.channels()==3) {
                 cv::cvtColor(frame, rgb_frame, cv::COLOR_BGR2RGB);
