@@ -203,7 +203,9 @@ void Playback::setSubFilter(int index) {
 }
 
 void Playback::setSingleMode(bool val) {
+    mutex.lock();
     single_mode = val;
+    mutex.unlock();
 }
 
 void Playback::setRGB(int r, int g, int b) {

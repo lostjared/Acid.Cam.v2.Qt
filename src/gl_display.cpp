@@ -5,7 +5,6 @@
 #endif
 #include <QtCore/QCoreApplication>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLPaintDevice>
 #include <QtGui/QPainter>
 #include <iostream>
 #include<cmath>
@@ -64,9 +63,7 @@ void glDisplayWindow::render() {
     
     glViewport(0, 0, width(), height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (!m_device)
-        m_device = new QOpenGLPaintDevice;
-
+  
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glViewport(0, 0, width(), height());

@@ -1364,7 +1364,7 @@ void AC_MainWindow::buildVector(std::vector<FilterValue> &v) {
         QListWidgetItem *val = custom_filters->item(i);
         QString name = val->text();
         std::string n = name.toStdString();
-        if(n.find(":") == std::string::npos)
+        if(n.find(":") == std::string::npos && n.find("SubFilter") == std::string::npos)
             v.push_back(filter_map[name.toStdString()]);
         else {
             std::string namev = name.toStdString();
@@ -1864,7 +1864,7 @@ void AC_MainWindow::prev_filter() {
 }
 
 void AC_MainWindow::showGLDisplay() {
-    disp->showGL();
+    
 }
 
 void AC_MainWindow::chk_Joystick() {

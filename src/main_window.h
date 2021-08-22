@@ -19,7 +19,6 @@
 #include "dl-man.h"
 #include "image_window.h"
 #include "options_window.h"
-#include "gl_display.h"
 #include "controller.h"
 #include "color_range.h"
 #include "slitscan_win.h"
