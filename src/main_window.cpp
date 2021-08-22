@@ -86,7 +86,7 @@ void custom_filter(cv::Mat &) {
 
 AC_MainWindow::~AC_MainWindow() {
     controls_Stop();
-    delete playback;
+    //delete playback;
 }
 
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
