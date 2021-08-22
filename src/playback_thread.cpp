@@ -71,8 +71,8 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     mutex.lock();
 //#if defined(__linux__) || defined(__APPLE__)
 #ifdef _WIN32
-    //capture.open(cv::CAP_DSHOW+device);
-    capture.open(0, cv::CAP_MSMF);
+    capture.open(device, cv::CAP_DSHOW);
+    //capture.open(0, cv::CAP_MSMF);
 #else
     capture.open(device);
 #endif
