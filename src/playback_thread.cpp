@@ -205,6 +205,7 @@ void Playback::setSubFilter(int index) {
 void Playback::setSingleMode(bool val) {
     mutex.lock();
     single_mode = val;
+    ac::setSubFilter(-1);
     mutex.unlock();
 }
 
@@ -250,6 +251,11 @@ void Playback::drawEffects(cv::Mat &frame) {
 
 void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
     if(f.index == 0) {
+        
+        if(single_mode == true &&
+           ac::draw_strings[f.filter].find("SubFilter") != std::string::npos)
+            return;
+        
         ac::setSubFilter(f.subfilter);
         //ac::draw_func[f.filter](frame);
         ac::CallFilter(f.filter, frame);
@@ -345,6 +351,7 @@ void Playback::run() {
             alpha -= 0.08;
         } else if(single_mode == true) {
             mutex.lock();
+            ac::setSubFilter(-1);
             ac::in_custom = false;
             drawFilter(frame, current_filter);
             drawEffects(frame);
