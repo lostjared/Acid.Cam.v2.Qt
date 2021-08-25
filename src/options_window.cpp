@@ -17,7 +17,7 @@ void OptionsWindow::createControls() {
     op_intensity->setGeometry(110, 40, 50, 25);
     QLabel *label_z = new QLabel(tr("Max Frames: "), this);
     label_z->setGeometry(10, 70, 100, 25);
-    op_max_frames = new QLineEdit("1500", this);
+    op_max_frames = new QLineEdit("300", this);
     op_max_frames->setGeometry(110,70, 50, 25);
 
     QLabel *label_q = new QLabel(tr("Delay: "), this);

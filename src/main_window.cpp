@@ -103,7 +103,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     createMenu();
     speed_index = 0;
     loading = false;
-    
+    ac::setMaxAllocated(300);
     cap_camera = new CaptureCamera(this);
     cap_camera->setParent(this);
     
@@ -372,7 +372,7 @@ void AC_MainWindow::createControls() {
     progress_bar->setMaximum(100);
     progress_bar->hide();
     menu_cat->setCurrentIndex(1);
-
+    Log(tr("Max frames set to 300; set accordingly based on desired ram.\nIntertwine Rows and other filters that require more than 300 frames will not work until max is set.\n"));
 }
 
 void AC_MainWindow::createMenu() {
