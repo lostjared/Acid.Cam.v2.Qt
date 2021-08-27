@@ -1367,7 +1367,13 @@ void AC_MainWindow::buildVector(std::vector<FilterValue> &v) {
         if(n.find(":") == std::string::npos && n.find("SubFilter") == std::string::npos)
             v.push_back(filter_map[name.toStdString()]);
         else {
+            
+            
             std::string namev = name.toStdString();
+            
+            if(namev.find("SubFilter") != std::string::npos && namev.find(":") == std::string::npos)
+                continue;
+            
             std::string left_str = namev.substr(0, namev.find(":"));
             std::string right_str = namev.substr(namev.find(":")+1,namev.length()-left_str.length()-1);
             int index_val = filter_map[right_str].filter;
