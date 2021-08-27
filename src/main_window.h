@@ -78,6 +78,7 @@ public:
     void setSpeedIndex(int index);
     void setOptionString(std::string op, std::string value);
     void setProcMode(int index);
+    bool checkAdd(QString str);
 public slots:
     void showRange();
     void chk_Joystick();

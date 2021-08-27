@@ -176,6 +176,14 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     
 }
 
+bool AC_MainWindow::checkAdd(QString str) {
+    const char *ex[] = { "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
+    
+    for(int i = 0; ex[i] != 0; ++i)
+        if(str == ex[i])
+            return true;
+    return false;
+}
 
 void AC_MainWindow::createControls() {
     custom_filters = new QListWidget(this);
@@ -1559,6 +1567,7 @@ void AC_MainWindow::menuFilterChanged(int index) {
         for(int i = 0; i < static_cast<int>(v.size()); ++i) {
             if(map_values.find(v[i]) == map_values.end()) {
                 map_values[v[i]] = v[i];
+                if(checkAdd(v[i].c_str()) == false)
                 filters->addItem(v[i].c_str());
             }
         }

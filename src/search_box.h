@@ -21,6 +21,8 @@ private:
     QLineEdit *search_text;
     QPushButton *search, *add, *subf;
     QComboBox *filters;
+    
+    bool checkAdd(QString str);
 };
 
 #endif

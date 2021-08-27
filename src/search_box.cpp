@@ -15,6 +15,14 @@ SearchWindow::SearchWindow(QWidget *parent) : QDialog(parent) {
     createControls();
 }
 
+bool SearchWindow::checkAdd(QString str) {
+    const char *ex[] = { "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
+    
+    for(int i = 0; ex[i] != 0; ++i)
+        if(str == ex[i])
+            return true;
+    return false;
+}
 
 void SearchWindow::createControls() {
     search_list = new QListWidget(this);
@@ -47,7 +55,7 @@ void SearchWindow::search_filter() {
     for(int i = 0; i < ac::draw_max-6; ++i) {
         std::string search_value = lowerString(ac::draw_strings[i]);
         for(unsigned int q = 0; q < tokens.size(); ++q) {
-            if(search_value.find(tokens[q]) != std::string::npos) {
+            if(search_value.find(tokens[q]) != std::string::npos && checkAdd(ac::draw_strings[i].c_str()) == false) {
                 search_list->addItem(ac::draw_strings[i].c_str());
                 break;
             }
