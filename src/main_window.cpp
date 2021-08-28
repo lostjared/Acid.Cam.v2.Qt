@@ -177,10 +177,13 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 bool AC_MainWindow::checkAdd(QString str) {
-    const char *ex[] = { "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
+    const char *ex[] = { "Desktop", "MultiVideo", "Solo", "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
+    
+    
+    std::string val = str.toStdString();
     
     for(int i = 0; ex[i] != 0; ++i)
-        if(str == ex[i])
+        if(val.find(ex[i]) != std::string::npos)
             return true;
     return false;
 }

@@ -119,7 +119,7 @@ void ImageWindow::setPlayback(Playback *play) {
 }
 
 void ImageWindow::video_Set() {
-    QString file_name = QFileDialog::getOpenFileName(this,"Select A video file to open","/home","Video (*.mov *.mp4 *.mkv *.m4v)");
+    QString file_name = QFileDialog::getOpenFileName(this,"Select A video file to open","/home","Video (*.avi *.mov *.mp4 *.mkv *.m4v)");
     
     std::string vname = file_name.toStdString();
     ac::v_cap.open(vname);

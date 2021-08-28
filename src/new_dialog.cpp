@@ -136,7 +136,7 @@ void CaptureVideo::setParent(AC_MainWindow *p) {
 
 void CaptureVideo::btn_SetSourceFile() {
     QString def_path = "";
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Video"), def_path, tr("Video Files (*.avi *.mov *.mp4 *.mkv)"));
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Video"), def_path, tr("Video Files (*.avi *.mov *.mp4 *.mkv *.m4v)"));
     if(fileName != "")
         edit_src->setText(fileName);
 }
