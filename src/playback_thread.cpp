@@ -119,6 +119,13 @@ void Playback::setVector(std::vector<FilterValue> v) {
     mutex_add.unlock();
 }
 
+unsigned long Playback::calcMem() {
+    mutex.lock();
+    unsigned long calc = ac::calculateMemory();
+    mutex.unlock();
+    return calc;
+}
+
 void Playback::setOptions(bool n, int c) {
     mutex.lock();
     ac::isNegative = n;

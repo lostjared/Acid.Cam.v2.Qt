@@ -89,6 +89,7 @@ public:
     void setCycle(int type, int frame_skip, std::vector<std::string> &val);
     void setCycle(int type);
     void setPref(int thread_count, int intense);
+    unsigned long calcMem();
     void setCustomCycle(bool b);
     void setCustomCycleDelay(int delay);
 signals:
