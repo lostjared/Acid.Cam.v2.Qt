@@ -65,7 +65,7 @@ void OptionsWindow::setValues() {
     if(delay_value > 0)
         playback->setCustomCycleDelay(delay_value);
     
-    ac::setMaxAllocated(max_frames);
+    playback->setMaxAlloc(max_frames);
     QString text;
     
     int level_ = atoi(level->text().toStdString().c_str());
@@ -75,8 +75,8 @@ void OptionsWindow::setValues() {
         QMessageBox::information(this, tr("Error requires valid level/wait"), tr("Requires Level/Intensity greater than zero value"));
         return;
     }
-    ac::setVariableWait(wait_);
-    ac::setColorLevel(level_);
+  
+    playback->setWaitColorLevel(wait_, level_);
     QTextStream stream(&text);
     stream << tr("Thread Count set to: ") << thread_count << tr(" and Intensity set to: ") << intensity << tr("\nMaximum Stored Frames: ") << max_frames << tr("\n") << tr("Delay: ") << delay_value << "\n" << tr("Wait: ") << wait_ << "\n" << tr("Level: ") << level_ << "\n";
     QMessageBox::information(this, tr("Pref Value Set"), text);

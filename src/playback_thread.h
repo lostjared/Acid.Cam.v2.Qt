@@ -66,6 +66,7 @@ public:
     void setMaxAlloc(int a);
     unsigned int getObjectSize();
     unsigned long allocatedFrames();
+    void setWaitColorLevel(int c, int l);
     void setColorMap(int c);
     void setPngPath(std::string path);
     void Play();

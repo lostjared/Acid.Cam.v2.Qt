@@ -13,6 +13,8 @@
 #include <opencv2/core/ocl.hpp>
 
 std::unordered_map<std::string, FilterValue> filter_map;
+std::unordered_map<std::string, int> filter_map_main;
+std::vector<std::string> solo_filter;
 void custom_filter(cv::Mat &);
 
 const char *filter_names[] = { "AC Self AlphaBlend", "Reverse Self AlphaBlend",
@@ -72,6 +74,9 @@ void generate_map() {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
         filter_map[name] = FilterValue(2, j, -1);
     }
+    
+    filter_map_main = ac::filter_map;
+    solo_filter = ac::solo_filter;
 }
 
 
@@ -1866,9 +1871,9 @@ void AC_MainWindow::save_CustomFile() {
 void AC_MainWindow::setRandomFilterValue() {
     menu_cat->setCurrentIndex(0);
     resetMenu();
-    int index = rand()%ac::solo_filter.size();
-    std::string filter_name = ac::solo_filter[index];
-    int filter_index = ac::filter_map[filter_name];
+    int index = rand()%solo_filter.size();
+    std::string filter_name = solo_filter[index];
+    int filter_index = filter_map_main[filter_name];
     filters->setCurrentIndex(filter_index);
 }
 

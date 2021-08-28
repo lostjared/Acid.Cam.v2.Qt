@@ -159,6 +159,13 @@ unsigned long Playback::allocatedFrames() {
     
 }
 
+void Playback::setWaitColorLevel(int w, int l) {
+    mutex.lock();
+    ac::setVariableWait(w);
+    ac::setColorLevel(l);
+    mutex.unlock();
+}
+
 void Playback::setSubFilter_(int s) {
     mutex.lock();
     ac::setSubFilter(s);
