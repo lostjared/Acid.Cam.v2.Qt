@@ -126,6 +126,45 @@ unsigned long Playback::calcMem() {
     return calc;
 }
 
+void Playback::setAlpha(int a) {
+    mutex.lock();
+    ac::alpha_increase = a;
+    mutex.unlock();
+}
+
+void Playback::setProcMode(int p) {
+    mutex.lock();
+    ac::setProcMode(ac::PROC_MODE_TYPE(p));
+    mutex.unlock();
+}
+
+void Playback::setMaxAlloc(int a) {
+    mutex.lock();
+    ac::setMaxAllocated(a);
+    mutex.unlock();
+}
+
+unsigned int Playback::getObjectSize() {
+    mutex.lock();
+    unsigned int s = ac::all_objects.size();
+    mutex.unlock();
+    return s;
+}
+
+unsigned long Playback::allocatedFrames() {
+    mutex.lock();
+    unsigned long l = ac::getCurrentAllocatedFrames();
+    mutex.unlock();
+    return l;
+    
+}
+
+void Playback::setSubFilter_(int s) {
+    mutex.lock();
+    ac::setSubFilter(s);
+    mutex.unlock();
+}
+
 void Playback::setOptions(bool n, int c) {
     mutex.lock();
     ac::isNegative = n;

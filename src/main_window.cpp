@@ -106,7 +106,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     createMenu();
     speed_index = 0;
     loading = false;
-    ac::setMaxAllocated(300);
+    playback->setMaxAlloc(300);
     cap_camera = new CaptureCamera(this);
     cap_camera->setParent(this);
     
@@ -639,7 +639,7 @@ void AC_MainWindow::clear_subfilter() {
         playback->setVector(v);
         Log(tr("Cleared SubFilter"));
     }
-    ac::setSubFilter(-1);
+    playback->setSubFilter_(-1);
 }
 
 void AC_MainWindow::clear_img() {
@@ -700,10 +700,11 @@ void AC_MainWindow::repeat_vid() {
 
 void AC_MainWindow::speed1() {
     speed_index = 0;
-    ac::alpha_increase = speed_actions[0];
+    playback->setAlpha(speed_actions[0]);
     QString text;
     QTextStream stream(&text);
-    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    stream << "Movements Speed Set to: " <<
+    speed_actions[0] << "\n";
     Log(text);
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i]->setChecked(false);
@@ -715,8 +716,8 @@ void AC_MainWindow::speed2() {
     speed_index = 1;
     QString text;
     QTextStream stream(&text);
-    ac::alpha_increase = speed_actions[1];
-    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    playback->setAlpha(speed_actions[1]);
+    stream << "Movements Speed Set to: " << speed_actions[1] << "\n";
     Log(text);
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i]->setChecked(false);
@@ -725,10 +726,10 @@ void AC_MainWindow::speed2() {
 }
 void AC_MainWindow::speed3() {
     speed_index = 2;
-    ac::alpha_increase = speed_actions[2];
     QString text;
     QTextStream stream(&text);
-    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    playback->setAlpha(speed_actions[2]);
+    stream << "Movements Speed Set to: " << speed_actions[2] << "\n";
     Log(text);
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i]->setChecked(false);
@@ -738,10 +739,11 @@ void AC_MainWindow::speed3() {
 }
 void AC_MainWindow::speed4() {
     speed_index = 3;
-    ac::alpha_increase = speed_actions[3];
     QString text;
     QTextStream stream(&text);
-    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    playback->setAlpha(speed_actions[3]);
+    stream << "Movements Speed Set to: " << speed_actions[3] << "\n";
+    
     Log(text);
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i]->setChecked(false);
@@ -750,10 +752,11 @@ void AC_MainWindow::speed4() {
 }
 void AC_MainWindow::speed5() {
     speed_index = 4;
-    ac::alpha_increase = speed_actions[4];
     QString text;
     QTextStream stream(&text);
-    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    playback->setAlpha(speed_actions[4]);
+    stream << "Movements Speed Set to: " << speed_actions[4] << "\n";
+    
     Log(text);
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i]->setChecked(false);
@@ -762,10 +765,10 @@ void AC_MainWindow::speed5() {
 }
 void AC_MainWindow::speed6() {
     speed_index = 5;
-    ac::alpha_increase = speed_actions[5];
     QString text;
     QTextStream stream(&text);
-    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
+    playback->setAlpha(speed_actions[5]);
+    stream << "Movements Speed Set to: " << speed_actions[5] << "\n";
     Log(text);
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i]->setChecked(false);
@@ -777,9 +780,9 @@ void AC_MainWindow::speed7() {
     speed_index = 6;
     QString text;
     QTextStream stream(&text);
-    ac::alpha_increase = speed_actions[6];
-    stream << "Movements Speed Set to: " << ac::alpha_increase << "\n";
-    Log(text);
+    playback->setAlpha(speed_actions[6]);
+    stream << "Movements Speed Set to: " << speed_actions[6] << "\n";
+        Log(text);
     for(int i = 0; i < 7; ++i) {
         speed_action_items[i]->setChecked(false);
     }
@@ -787,7 +790,7 @@ void AC_MainWindow::speed7() {
 }
 
 void AC_MainWindow::movementOption1() {
-    ac::setProcMode(ac::PROC_MODE_TYPE(0));
+    playback->setProcMode(0);
     in_out_increase->setChecked(true);
     in_out->setChecked(false);
     out_reset->setChecked(false);
@@ -797,7 +800,7 @@ void AC_MainWindow::movementOption2() {
     in_out_increase->setChecked(false);
     in_out->setChecked(true);
     out_reset->setChecked(false);
-    ac::setProcMode(ac::PROC_MODE_TYPE(1));
+    playback->setProcMode(1);
     Log(tr("Proc Mode set to: 1\n"));
 }
 
@@ -805,7 +808,7 @@ void AC_MainWindow::movementOption3() {
     in_out_increase->setChecked(false);
     in_out->setChecked(false);
     out_reset->setChecked(true);
-    ac::setProcMode(ac::PROC_MODE_TYPE(2));
+    playback->setProcMode(2);
     Log(tr("Proc Mode set to: 2\n"));
 }
 
@@ -1433,14 +1436,14 @@ void AC_MainWindow::updateFrame(QImage img) {
             frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned long)(frame_index/video_fps) << ") - ";
             
             unsigned long mem = playback->calcMem();
-                frame_stream << "Memory Allocated: " << ((mem > 0) ? (mem/1024/1024) : 0) << " MB - " << " Initalized: " << ac::all_objects.size() << " - Allocated: " << ac::getCurrentAllocatedFrames() << "\n";
+                frame_stream << "Memory Allocated: " << ((mem > 0) ? (mem/1024/1024) : 0) << " MB - " << " Initalized: " << playback->getObjectSize() << " - Allocated: " << playback->allocatedFrames() << "\n";
                
         } else {
             struct stat buf;
             stat(video_file_name.toStdString().c_str(), &buf);
             frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1000)/1000) <<  " MB) - ";
             unsigned long mem = playback->calcMem();
-                frame_stream << "Memory Allocated: " << ((mem > 0) ? (mem/1024/1024) : 0) << " MB - " << "Initalized: " << ac::all_objects.size() << " - Allocated: " << ac::getCurrentAllocatedFrames() << "\n";
+                frame_stream << "Memory Allocated: " << ((mem > 0) ? (mem/1024/1024) : 0) << " MB - " << "Initalized: " << playback->getObjectSize() << " - Allocated: " << playback->allocatedFrames() << "\n";
         }
         if(programMode == MODE_VIDEO) {
             

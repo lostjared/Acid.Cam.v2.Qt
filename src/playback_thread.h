@@ -60,6 +60,12 @@ public:
     bool getFrame(QImage &img, const int &index);
     void setRGB(int r, int g, int b);
     void setColorOptions(int b, int g, int s);
+    void setAlpha(int a);
+    void setProcMode(int p);
+    void setSubFilter_(int s);
+    void setMaxAlloc(int a);
+    unsigned int getObjectSize();
+    unsigned long allocatedFrames();
     void setColorMap(int c);
     void setPngPath(std::string path);
     void Play();
