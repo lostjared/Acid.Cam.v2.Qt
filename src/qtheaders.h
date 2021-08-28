@@ -53,6 +53,7 @@
 struct FilterValue {
     int index, filter, subfilter;
     FilterValue() : index(0), filter(0), subfilter(-1) {}
+    FilterValue(const FilterValue &f) : index(f.index), filter(f.filter), subfilter(f.subfilter) {}
     FilterValue(int i, int f, int s) : index(i), filter(f), subfilter(s) {}
     FilterValue &operator=(const FilterValue &v) {
         index = v.index;

@@ -1387,8 +1387,9 @@ void AC_MainWindow::buildVector(std::vector<FilterValue> &v) {
         QListWidgetItem *val = custom_filters->item(i);
         QString name = val->text();
         std::string n = name.toStdString();
-        if(n.find(":") == std::string::npos && n.find("SubFilter") == std::string::npos)
-            v.push_back(filter_map[name.toStdString()]);
+        if(n.find(":") == std::string::npos && n.find("SubFilter") == std::string::npos) {
+            v.push_back(FilterValue(filter_map[name.toStdString()].index, filter_map[name.toStdString()].filter, -1));
+        }
         else {
             
             
