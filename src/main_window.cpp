@@ -1426,11 +1426,17 @@ void AC_MainWindow::updateFrame(QImage img) {
         QString frame_string;
         QTextStream frame_stream(&frame_string);
         if(!recording) {
-            frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned long)(frame_index/video_fps) << ") ";
+            frame_stream << "(Current/Total Frames/Seconds) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned long)(frame_index/video_fps) << ") - ";
+            
+            unsigned long mem = ac::calculateMemory();
+                frame_stream << "Memory Allocated: " << ((mem > 0) ? (mem/1024/1024) : 0) << " MB - " << " Initalized: " << ac::all_objects.size() << " - Allocated: " << ac::getCurrentAllocatedFrames() << "\n";
+               
         } else {
             struct stat buf;
             stat(video_file_name.toStdString().c_str(), &buf);
-            frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1000)/1000) <<  " MB) ";
+            frame_stream << "(Current/Total Frames/Seconds/Size) - (" << frame_index << "/" << video_frames << "/" <<  (unsigned int)(frame_index/video_fps) << "/" << ((buf.st_size/1000)/1000) <<  " MB) - ";
+            unsigned long mem = ac::calculateMemory();
+                frame_stream << "Memory Allocated: " << ((mem > 0) ? (mem/1024/1024) : 0) << " MB - " << "Initalized: " << ac::all_objects.size() << " - Allocated: " << ac::getCurrentAllocatedFrames() << "\n";
         }
         if(programMode == MODE_VIDEO) {
             
