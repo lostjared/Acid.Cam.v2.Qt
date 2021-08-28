@@ -839,7 +839,8 @@ void AC_MainWindow::comboFilterChanged(int) {
     std::string text = filters->currentText().toStdString();
     if(blend_set == false && text.find("Image") != std::string::npos)
         Log(tr("Set an Image to use this filter\n"));
-    else if(ac::subfilter == -1 && text.find("SubFilter") != std::string::npos)
+    
+    if(ac::subfilter == -1 && text.find("SubFilter") != std::string::npos)
         Log(tr("Set a SubFilter to use this filter\n"));
     
 }
