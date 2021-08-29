@@ -848,7 +848,7 @@ void AC_MainWindow::comboFilterChanged(int) {
     if(blend_set == false && text.find("Image") != std::string::npos)
         Log(tr("Set an Image to use this filter\n"));
     
-    if(filter_single->isChecked() && text.find("SubFilter") != std::string::npos)
+    if(playback->getProgramMode() && text.find("SubFilter") != std::string::npos)
         Log(tr("Set a SubFilter to use this filter\n"));
     
     if(playback->getMaxAlloc() < 1080 && text.find("Intertwine") != std::string::npos)

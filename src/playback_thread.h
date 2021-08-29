@@ -58,6 +58,7 @@ public:
     void setFadeFilter(bool f);
     void setFrameIndex(const long &index);
     bool getFrame(QImage &img, const int &index);
+    bool getProgramMode();
     void setRGB(int r, int g, int b);
     void setColorOptions(int b, int g, int s);
     void setAlpha(int a);

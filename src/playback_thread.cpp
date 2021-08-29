@@ -132,6 +132,13 @@ void Playback::setAlpha(int a) {
     mutex.unlock();
 }
 
+bool Playback::getProgramMode() {
+    mutex.lock();
+    bool m = single_mode;
+    mutex.unlock();
+    return m;
+}
+
 void Playback::setProcMode(int p) {
     mutex.lock();
     ac::setProcMode(ac::PROC_MODE_TYPE(p));
