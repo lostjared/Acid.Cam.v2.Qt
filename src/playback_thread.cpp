@@ -159,6 +159,13 @@ unsigned long Playback::allocatedFrames() {
     
 }
 
+unsigned long Playback::getMaxAlloc() {
+    mutex.lock();
+    unsigned long l = ac::getMaxAllocated();
+    mutex.unlock();
+    return l;
+}
+
 void Playback::setWaitColorLevel(int w, int l) {
     mutex.lock();
     ac::setVariableWait(w);
