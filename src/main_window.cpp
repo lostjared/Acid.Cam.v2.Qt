@@ -104,6 +104,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     generate_map();
     ac::SortFilters();
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
+    playback = new Playback();
     setGeometry(100, 100, 800, 700);
     setFixedSize(800, 700);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
@@ -131,8 +132,6 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     disp2->setGeometry(100, 100, 640, 480);
     disp2->hide();
     disp2->setWindowTitle("View Window");
-    playback = new Playback();
-    
     goto_window->setParent(this);
     goto_window->setDisplayWindow(disp);
     goto_window->setPlayback(playback);
@@ -1568,7 +1567,7 @@ void AC_MainWindow::help_About() {
     QString about_str;
     QTextStream stream(&about_str);
     stream << tr("<b>Acid Cam Qt version: ") << ac_version << " filters: " << ac::version.c_str() << "</b><br><br> ";
-    stream << tr("Engineering by <b>Jared Bruni</b><br><br><b>This software is dedicated to all the people that experience mental illness. </b><br><br>If you wish to donate to this project you can here: <a href=\"http://lostsidedead.com\">Donate</a><br><br><b>My Social Media Accounts</b><br><br>\n\n <a href=\"http://github.com/lostjared\">GitHub</a><br>\n<a href=\"http://youtube.com/lostjared\">YouTube</a><br><a href=\"http://instagram.com/lostsidedead\">Instagram</a><br><a href=\"http://facebook.com/LostSideDead0x\">LostSideDead Facebook</a><br><a href=\"http://facebook.com/lostsidedead\">My Facebook</a><br><a href=\"http://twitter.com/jaredbruni\">Twitter</a><br><br><br>\n");
+    stream << tr("Engineering by <b>Jared Bruni</b><br><br><b>This software is dedicated to all the people that experience mental illness. </b><br><br>Thanks to <b>Boris</b> for testing.<br><a href=\"https://lostsidedead.biz/wish\">My Wish List</a><br>\n");
     
     QMessageBox::information(this, tr("About Acid Cam"), about_str);
 }
