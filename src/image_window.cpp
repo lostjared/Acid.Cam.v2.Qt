@@ -4,6 +4,7 @@ ImageWindow::ImageWindow(QWidget *parent) : QDialog(parent) {
     setFixedSize(800, 400);
     setWindowTitle(tr("Acid Cam v2 - Image Manager"));
     createControls();
+    settings = new QSettings();
 }
 
 void ImageWindow::createControls() {
@@ -52,10 +53,15 @@ void ImageWindow::createControls() {
 }
 
 void ImageWindow::image_AddFiles() {
-    QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open","/home","Images (*.png *.jpg)");
+    QString dir_path = settings->value("dir_path_image", "").toString();
+    
+    QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open",dir_path,"Images (*.png *.jpg)");
+    QString value;
     for(int i = 0; i < files.size(); ++i) {
         image_files->addItem(files.at(i));
+        value = files.at(i);
     }
+    settings->setValue("dir_path_image", value);
 }
 
 void ImageWindow::image_RmvFile() {
@@ -119,7 +125,16 @@ void ImageWindow::setPlayback(Playback *play) {
 }
 
 void ImageWindow::video_Set() {
-    QString file_name = QFileDialog::getOpenFileName(this,"Select A video file to open","/home","Video (*.avi *.mov *.mp4 *.mkv *.m4v)");
+    
+    QString dir_path = settings->value("dir_vid_path", "").toString();
+    
+    
+    QString file_name = QFileDialog::getOpenFileName(this,"Select A video file to open",dir_path,"Video (*.avi *.mov *.mp4 *.mkv *.m4v)");
+    
+    if(file_name != "")
+        settings->setValue("dir_vid_path",file_name);
+    else return;
+    
     
     std::string vname = file_name.toStdString();
     ac::v_cap.open(vname);

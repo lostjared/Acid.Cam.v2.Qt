@@ -30,12 +30,14 @@ public slots:
     
 private:
     AC_MainWindow *win_parent;
+    
 };
 
 class CaptureVideo : public QDialog {
     Q_OBJECT
 public:
     CaptureVideo(QWidget *parent = 0);
+    ~CaptureVideo();
     void createControls();
     void setParent(AC_MainWindow *p);
     
@@ -50,7 +52,7 @@ public slots:
     void btn_Start();
 private:
     AC_MainWindow *win_parent;
-    
+    QSettings *settings;
 };
 
 #endif

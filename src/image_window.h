@@ -29,6 +29,7 @@ private:
     Playback *playback;
     QPushButton *btn_setvideo, *btn_clear;
     QLabel *lbl_video;
+    QSettings *settings;
 };
 
 #endif

@@ -99,7 +99,12 @@ CaptureVideo::CaptureVideo(QWidget *parent) : QDialog(parent) {
     setFixedSize(330, 120);
     setWindowTitle(tr("Capture from Video"));
     setWindowIcon(QPixmap(":/images/icon.png"));
+    settings = new QSettings();
     createControls();
+}
+
+CaptureVideo::~CaptureVideo() {
+    
 }
 
 void CaptureVideo::createControls() {
@@ -135,10 +140,12 @@ void CaptureVideo::setParent(AC_MainWindow *p) {
 }
 
 void CaptureVideo::btn_SetSourceFile() {
-    QString def_path = "";
+    QString def_path = settings->value("dir_path", "").toString();
     QString fileName = QFileDialog::getOpenFileName(this,tr("Open Video"), def_path, tr("Video Files (*.avi *.mov *.mp4 *.mkv *.m4v)"));
-    if(fileName != "")
+    if(fileName != "") {
         edit_src->setText(fileName);
+        settings->setValue("dir_path",fileName);
+    }
 }
 
 void CaptureVideo::btn_SetOutputDir() {

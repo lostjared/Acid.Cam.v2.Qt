@@ -105,6 +105,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     ac::SortFilters();
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     playback = new Playback();
+    settings = new QSettings();
     setGeometry(100, 100, 800, 700);
     setFixedSize(800, 700);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
@@ -1346,7 +1347,8 @@ void AC_MainWindow::controls_Pause() {
 }
 
 void AC_MainWindow::controls_SetImage() {
-    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), "", tr("Image Files (*.png *.jpg)"));
+    QString dir_path = settings->value("dir_image", "").toString();
+    QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"), dir_path, tr("Image Files (*.png *.jpg)"));
     if(fileName != "") {
         cv::Mat tblend_image = cv::imread(fileName.toStdString());
         if(!tblend_image.empty()) {
@@ -1356,6 +1358,7 @@ void AC_MainWindow::controls_SetImage() {
             stream << "Successfully Loaded Image: [" << fileName << "] Size: " << tblend_image.cols << "x" << tblend_image.rows << "\n";
             Log(text);
             ac::pix.setInit(false);
+            settings->setValue("dir_image", fileName);
         } else {
             QMessageBox::information(this, tr("Image Load failed"), tr("Could not load image"));
         }

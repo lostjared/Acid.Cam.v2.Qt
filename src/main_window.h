@@ -178,6 +178,8 @@ private:
 #ifndef DISABLE_JOYSTICK
     Controller controller;
 #endif
+    QSettings *settings;
+    
     
 };
 
