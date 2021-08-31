@@ -328,6 +328,8 @@ void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
         
         if(ac::getMaxAllocated() < 1080 && ac::draw_strings[f.filter].find("Intertwine") != std::string::npos)
             return;
+        if(ac::getMaxAllocated() < 1080 && ac::draw_strings[f.filter].find("inOrder") != std::string::npos)
+            return;
         
         ac::setSubFilter(f.subfilter);
         //ac::draw_func[f.filter](frame);
