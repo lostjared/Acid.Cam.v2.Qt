@@ -99,7 +99,7 @@ CaptureVideo::CaptureVideo(QWidget *parent) : QDialog(parent) {
     setFixedSize(330, 120);
     setWindowTitle(tr("Capture from Video"));
     setWindowIcon(QPixmap(":/images/icon.png"));
-    settings = new QSettings();
+    settings = new QSettings("LostSideDead", "Acid Cam Qt");
     createControls();
 }
 

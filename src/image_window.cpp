@@ -4,7 +4,7 @@ ImageWindow::ImageWindow(QWidget *parent) : QDialog(parent) {
     setFixedSize(800, 400);
     setWindowTitle(tr("Acid Cam v2 - Image Manager"));
     createControls();
-    settings = new QSettings();
+    settings = new QSettings("LostSideDead", "Acid Cam Qt");
 }
 
 void ImageWindow::createControls() {
