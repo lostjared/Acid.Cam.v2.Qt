@@ -28,12 +28,16 @@ Playback::Playback(QObject *parent) : QThread(parent) {
 }
 
 void Playback::setCustomCycle(bool b) {
+    mutex.lock();
     _custom_cycle = b;
     _custom_cycle_index = 0;
+    mutex.unlock();
 }
 
 void Playback::setCustomCycleDelay(int delay) {
+    mutex.lock();
     fps_delay = delay;
+    mutex.unlock();
 }
 
 void Playback::Play() {
@@ -47,14 +51,16 @@ void Playback::Play() {
 }
 
 void Playback::setPngPath(std::string path) {
+    mutex.lock();
     png_path = path;
     png_index = 0;
+    mutex.unlock();
 }
 
 void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record, bool rec_png) {
+    mutex.lock();
     mode = MODE_VIDEO;
     record_png = rec_png;
-    mutex.lock();
     capture = cap;
     writer = wr;
     recording = record;
@@ -66,9 +72,10 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record, b
 }
 
 bool Playback::setVideoCamera(std::string name, int type, int device, int res, cv::VideoWriter wr, bool record) {
+    mutex.lock();
     mode = MODE_CAMERA;
     device_num = device;
-    mutex.lock();
+
 //#if defined(__linux__) || defined(__APPLE__)
 #ifdef _WIN32
     capture.open(device, cv::CAP_DSHOW);
@@ -115,6 +122,8 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
 
 void Playback::setVector(std::vector<FilterValue> v) {
     mutex_add.lock();
+    // here:
+    //ac::release_all_objects();
     current = v;
     mutex_add.unlock();
 }
@@ -258,9 +267,13 @@ void Playback::setPref(int thread_count, int intense) {
 }
 
 void Playback::setIndexChanged(std::string value) {
+    mutex.lock();
     prev_filter = current_filter;
     current_filter = filter_map[value];
     alpha = 1.0;
+    // here:
+    //ac::release_all_objects();
+    mutex.unlock();
 }
 
 void Playback::setSubFilter(int index) {
@@ -291,7 +304,10 @@ void Playback::setColorMap(int c) {
 }
 
 void Playback::setDisplayed(bool shown) {
+    mutex.lock();
     video_shown = shown;
+    mutex.unlock();
+
 }
 
 void Playback::drawEffects(cv::Mat &frame) {
@@ -552,9 +568,11 @@ void Playback::Clear() {
 }
 
 void Playback::Stop() {
+    mutex.lock();
     stop = true;
     alpha = 0;
     prev_filter = FilterValue(0, 0, -1);
+    mutex.unlock();
 }
 
 void Playback::Release() {
