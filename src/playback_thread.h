@@ -35,7 +35,6 @@ private:
     std::string png_path;
     VideoMode mode;
     std::atomic<int> device_num;
-    std::string file_name_png;
     unsigned long *frame_index;
     std::atomic<unsigned int> red, green, blue;
     std::atomic<unsigned int> bright_, gamma_, saturation_;

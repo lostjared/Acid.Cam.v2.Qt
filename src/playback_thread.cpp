@@ -398,6 +398,7 @@ void Playback::run() {
             static int frame_count = 0;
             ++frame_count;
             if(frame_count > frame_num) {
+                mutex.lock();
                 frame_count = 0;
                 switch(cycle_on) {
                     case 0:
@@ -425,6 +426,7 @@ void Playback::run() {
                 }
                 if(blend_set == true && cycle_image != 0)
                     blend_image = cycle_image->clone();
+                mutex.unlock();
             }
         }
         
