@@ -435,11 +435,9 @@ void Playback::run() {
         mutex.unlock();
 
         if(single_mode == true && alpha > 0) {
-            mutex.lock();
             if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
             drawEffects(frame);
-            alpha -= 0.08;
-            mutex.unlock();
+            alpha = alpha-0.08;
         } else if(single_mode == true) {
             mutex.lock();
             ac::setSubFilter(-1);

@@ -22,7 +22,7 @@ private:
     QMutex mutex, mutex_shown, mutex_add;
     QWaitCondition condition;
     cv::Mat frame;
-    double frame_rate;
+    std::atomic<double> frame_rate;
     std::atomic<bool> recording;
     cv::VideoCapture capture;
     cv::VideoWriter  writer;
@@ -41,7 +41,7 @@ private:
     std::atomic<unsigned int> bright_, gamma_, saturation_;
     std::atomic<bool> single_mode;
     FilterValue current_filter, prev_filter;
-    double alpha;
+    std::atomic<double> alpha;
     std::atomic<bool> flip_frame1, flip_frame2;
     std::atomic<bool> repeat_video;
     std::atomic<bool> fadefilter;
