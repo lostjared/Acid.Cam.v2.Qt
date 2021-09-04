@@ -28,16 +28,12 @@ Playback::Playback(QObject *parent) : QThread(parent) {
 }
 
 void Playback::setCustomCycle(bool b) {
-    mutex.lock();
     _custom_cycle = b;
     _custom_cycle_index = 0;
-    mutex.unlock();
 }
 
 void Playback::setCustomCycleDelay(int delay) {
-    mutex.lock();
     fps_delay = delay;
-    mutex.unlock();
 }
 
 void Playback::Play() {
@@ -227,11 +223,9 @@ void Playback::setCycle(int type, int frame_skip, std::vector<std::string> &v) {
 }
 
 void Playback::setCycle(int type) {
-    mutex.lock();
     cycle_on = type;
     cycle_index = 0;
     blend_set = false;
-    mutex.unlock();
 }
 
 void Playback::reset_filters() {
@@ -245,18 +239,14 @@ void Playback::reset_filters() {
 }
 
 void Playback::SetFlip(bool f1, bool f2) {
-    mutex.lock();
     flip_frame1 = f1;
     flip_frame2 = f2;
-    mutex.unlock();
 }
 
 void Playback::setColorOptions(int b, int g, int s) {
-    mutex.lock();
     bright_ = b;
     gamma_ = g;
     saturation_ = s;
-    mutex.unlock();
 }
 
 void Playback::setPref(int thread_count, int intense) {
@@ -270,10 +260,10 @@ void Playback::setIndexChanged(std::string value) {
     mutex.lock();
     prev_filter = current_filter;
     current_filter = filter_map[value];
-    alpha = 1.0;
     // here:
     //ac::release_all_objects();
     mutex.unlock();
+    alpha = 1.0;
 }
 
 void Playback::setSubFilter(int index) {
@@ -386,6 +376,13 @@ void Playback::run() {
             emit stopRecording();
             return;
         }
+        static std::vector<FilterValue> cur;
+        cur = current;
+        ac::orig_frame = frame.clone();
+        FilterValue current_filterx = current_filter, prev_filterx = prev_filter;
+        std::string png_pathx = png_path;
+        mutex.unlock();
+        
         cv::Mat temp_frame;
         if(flip_frame1 == true) {
             cv::flip(frame, temp_frame, 1);
@@ -396,11 +393,6 @@ void Playback::run() {
             frame = temp_frame;
         }
 
-        static std::vector<FilterValue> cur;
-        cur = current;
-        ac::orig_frame = frame.clone();
-        mutex.unlock();
-        mutex.lock();
         if(cycle_on > 0) {
             cv::Mat *cycle_image = 0;
             static int frame_count = 0;
@@ -435,22 +427,18 @@ void Playback::run() {
                     blend_image = cycle_image->clone();
             }
         }
-        mutex.unlock();
-
+        
         if(single_mode == true && alpha > 0) {
-            if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
+            if(fadefilter == true) filterFade(frame, current_filterx, prev_filterx, alpha);
             drawEffects(frame);
             alpha = alpha-0.08;
         } else if(single_mode == true) {
-            mutex.lock();
             ac::setSubFilter(-1);
             ac::in_custom = false;
-            drawFilter(frame, current_filter);
+            drawFilter(frame, current_filterx);
             drawEffects(frame);
             msleep(duration);
-            mutex.unlock();
         } else if(cur.size()>0) {
-            mutex.lock();
             ac::in_custom = true;
             if(_custom_cycle == false) {
                 for(unsigned int i = 0; i < cur.size(); ++i) {
@@ -477,15 +465,13 @@ void Playback::run() {
                 if(_custom_cycle_index > static_cast<int>(cur.size()-1))
                     _custom_cycle_index = 0;
             }
-            mutex.unlock();
         } else {
             msleep(duration);
         }
-        mutex.lock();
         
         if(record_png) {
             std::ostringstream stream;
-            stream << png_path << "/" << std::setfill('0') << std::setw(15) << png_index << ".png";
+            stream << png_pathx << "/" << std::setfill('0') << std::setw(15) << png_index << ".png";
             ++png_index;
             cv::imwrite(stream.str(), frame);
         }
@@ -493,9 +479,6 @@ void Playback::run() {
         if(recording && writer.isOpened()) {
             writer.write(frame);
         }
-        mutex.unlock();
-
-
         if(video_shown == true) {
             if(frame.channels()==3) {
                 cv::cvtColor(frame, rgb_frame, cv::COLOR_BGR2RGB);
