@@ -121,11 +121,11 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
 }
 
 void Playback::setVector(std::vector<FilterValue> v) {
-    mutex_add.lock();
+    mutex.lock();
     // here:
     //ac::release_all_objects();
     current = v;
-    mutex_add.unlock();
+    mutex.unlock();
 }
 
 unsigned long Playback::calcMem() {
@@ -271,9 +271,9 @@ void Playback::setIndexChanged(std::string value) {
     prev_filter = current_filter;
     current_filter = filter_map[value];
     alpha = 1.0;
-    mutex.unlock();
     // here:
     //ac::release_all_objects();
+    mutex.unlock();
 }
 
 void Playback::setSubFilter(int index) {
