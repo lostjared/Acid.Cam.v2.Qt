@@ -25,6 +25,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     _custom_cycle = false;
     _custom_cycle_index = 0;
     fps_delay = 60;
+    draw_strings = ac::draw_strings;
 }
 
 void Playback::setCustomCycle(bool b) {
@@ -326,15 +327,15 @@ void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
     if(f.index == 0) {
         
         if(single_mode == true &&
-           ac::draw_strings[f.filter].find("SubFilter") != std::string::npos)
+           draw_strings[f.filter].find("SubFilter") != std::string::npos)
             return;
         
-        if(single_mode == false && ac::draw_strings[f.filter].find("SubFilter") != std::string::npos && f.subfilter == -1)
+        if(single_mode == false && draw_strings[f.filter].find("SubFilter") != std::string::npos && f.subfilter == -1)
             return;
         
-        if(ac::getMaxAllocated() < 1080 && ac::draw_strings[f.filter].find("Intertwine") != std::string::npos)
+        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("Intertwine") != std::string::npos)
             return;
-        if(ac::getMaxAllocated() < 1080 && ac::draw_strings[f.filter].find("inOrder") != std::string::npos)
+        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("inOrder") != std::string::npos)
             return;
         
         ac::setSubFilter(f.subfilter);

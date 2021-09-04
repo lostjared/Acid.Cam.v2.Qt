@@ -52,6 +52,7 @@ private:
     std::atomic<bool> _custom_cycle;
     std::atomic<int> _custom_cycle_index;
     std::atomic<int> fps_delay;
+    std::vector<std::string> draw_strings;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
