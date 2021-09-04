@@ -186,10 +186,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 bool AC_MainWindow::checkAdd(QString str) {
     const char *ex[] = { "ImageXorSmooth", "SketchFilter", "SlideSub", "Histogram", "Desktop","MultiVideo","Solo", "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
-
-    
     std::string val = str.toStdString();
-    
     for(int i = 0; ex[i] != 0; ++i)
         if(val.find(ex[i]) != std::string::npos)
             return true;
@@ -1440,7 +1437,8 @@ void AC_MainWindow::updateFrame(QImage img) {
     mut_lock.lock();
     if(playback->isStopped() == false) {
         disp->displayImage(img);
-        //disp2->displayImage(img);
+        if(disp2->isVisible())
+            disp2->displayImage(img);
         frame_index++;
         QString frame_string;
         QTextStream frame_stream(&frame_string);
