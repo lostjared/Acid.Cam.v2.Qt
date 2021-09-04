@@ -139,10 +139,7 @@ void Playback::setAlpha(int a) {
 }
 
 bool Playback::getProgramMode() {
-    mutex.lock();
-    bool m = single_mode;
-    mutex.unlock();
-    return m;
+    return single_mode;
 }
 
 void Playback::setProcMode(int p) {
@@ -183,12 +180,6 @@ void Playback::setWaitColorLevel(int w, int l) {
     mutex.lock();
     ac::setVariableWait(w);
     ac::setColorLevel(l);
-    mutex.unlock();
-}
-
-void Playback::setSubFilter_(int s) {
-    mutex.lock();
-    ac::setSubFilter(s);
     mutex.unlock();
 }
 
@@ -267,16 +258,9 @@ void Playback::setIndexChanged(std::string value) {
     alpha = 1.0;
 }
 
-void Playback::setSubFilter(int index) {
-    mutex.lock();
-    ac::setSubFilter(index);
-    mutex.unlock();
-}
-
 void Playback::setSingleMode(bool val) {
     mutex.lock();
     single_mode = val;
-    ac::setSubFilter(-1);
     mutex.unlock();
 }
 

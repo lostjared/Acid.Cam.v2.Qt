@@ -641,7 +641,6 @@ void AC_MainWindow::clear_subfilter() {
         playback->setVector(v);
         Log(tr("Cleared SubFilter"));
     }
-    playback->setSubFilter_(-1);
 }
 
 void AC_MainWindow::clear_img() {

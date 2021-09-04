@@ -63,7 +63,6 @@ public:
     void setColorOptions(int b, int g, int s);
     void setAlpha(int a);
     void setProcMode(int p);
-    void setSubFilter_(int s);
     void setMaxAlloc(int a);
     unsigned int getObjectSize();
     unsigned long allocatedFrames();
@@ -93,7 +92,6 @@ public:
     void drawEffects(cv::Mat &frame);
     void filterFade(cv::Mat &frame, FilterValue &filter1, FilterValue &filter2, double alpha);
     void reset_filters();
-    void setSubFilter(int index);
     void enableRepeat(bool re);
     void setCycle(int type, int frame_skip, std::vector<std::string> &val);
     void setCycle(int type);
