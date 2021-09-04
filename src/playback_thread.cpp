@@ -393,12 +393,10 @@ void Playback::run() {
             frame = temp_frame;
         }
 
-        mutex.unlock();
         static std::vector<FilterValue> cur;
-        mutex_shown.lock();
         cur = current;
-        mutex_shown.unlock();
         ac::orig_frame = frame.clone();
+        mutex.unlock();
         mutex.lock();
         if(cycle_on > 0) {
             cv::Mat *cycle_image = 0;
@@ -437,9 +435,11 @@ void Playback::run() {
         mutex.unlock();
 
         if(single_mode == true && alpha > 0) {
+            mutex.lock();
             if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
             drawEffects(frame);
             alpha -= 0.08;
+            mutex.unlock();
         } else if(single_mode == true) {
             mutex.lock();
             ac::setSubFilter(-1);
