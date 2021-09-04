@@ -361,8 +361,11 @@ void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
 
 void Playback::run() {
 
-    //int duration = 1000/ac::fps;
-
+#ifdef _WIN32
+    int duration = (1000/ac::fps)/4;
+#else
+    int duration = 10;
+#endif
     while(!stop) {
         mutex.lock();
         if(ac::release_frames) {
@@ -444,7 +447,7 @@ void Playback::run() {
             ac::in_custom = false;
             drawFilter(frame, current_filter);
             drawEffects(frame);
-            //msleep(duration);
+            msleep(duration);
             mutex.unlock();
         } else if(cur.size()>0) {
             mutex.lock();
@@ -454,7 +457,7 @@ void Playback::run() {
                     if(i == cur.size()-1)
                         ac::in_custom = false;
                     drawFilter(frame, cur[i]);
-                    //msleep(duration);
+                    msleep(duration);
                 }
             } else {
                 if(_custom_cycle_index > static_cast<int>(cur.size()-1))
@@ -462,7 +465,7 @@ void Playback::run() {
 
                 if(_custom_cycle_index >= 0 && _custom_cycle_index < static_cast<int>(cur.size())) {
                     drawFilter(frame, cur[_custom_cycle_index]);
-                    //msleep(duration);
+                    msleep(duration);
                 }
             }
             drawEffects(frame);
@@ -476,7 +479,7 @@ void Playback::run() {
             }
             mutex.unlock();
         } else {
-            //msleep(duration);
+            msleep(duration);
         }
         mutex.lock();
         
