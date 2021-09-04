@@ -99,12 +99,14 @@ AC_MainWindow::~AC_MainWindow() {
 
 AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     programMode = MODE_CAMERA;
+
     init_plugins();
     ac::init_filter_menu_map();
     generate_map();
+    draw_strings = ac::draw_strings;
     ac::SortFilters();
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
-    playback = new Playback();
+   playback = new Playback();
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
     setGeometry(100, 100, 800, 700);
     setFixedSize(800, 700);
@@ -1759,9 +1761,9 @@ void AC_MainWindow::load_CustomFile() {
         //int value1 = atoi(s_left.c_str());
         //int value2 = atoi(s_right.c_str());
         std::ostringstream stream;
-        stream << ac::draw_strings[value1];
+        stream << draw_strings[value1];
         if(value2 != -1)
-            stream << ":" << ac::draw_strings[value2];
+            stream << ":" << draw_strings[value2];
         custom_filters->addItem(stream.str().c_str());
     }
     slideChanged(0);
@@ -1857,12 +1859,12 @@ void AC_MainWindow::save_CustomFile() {
         	int value1 = v[i].filter;
         	int value2 = v[i].subfilter;
             std::string v1, v2;
-            v1 = ac::draw_strings[value1];
+            v1 = draw_strings[value1];
             if(value2 == -1) {
                 v2 = "None";
             }
             else {
-                v2 = ac::draw_strings[value2];
+                v2 = draw_strings[value2];
             }
         	file_n << v1 << ":" << v2 << "\n";
         }

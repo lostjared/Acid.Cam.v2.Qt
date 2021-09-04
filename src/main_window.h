@@ -179,7 +179,7 @@ private:
     Controller controller;
 #endif
     QSettings *settings;
-    
+    std::vector<std::string> draw_strings;
     
 };
 

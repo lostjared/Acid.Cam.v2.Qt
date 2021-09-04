@@ -9,6 +9,7 @@ std::string lowerString(std::string text) {
 }
 
 SearchWindow::SearchWindow(QWidget *parent) : QDialog(parent) {
+    draw_strings = ac::draw_strings;
     setFixedSize(640, 480);
     setWindowTitle(tr("Search Filters"));
     setWindowIcon(QPixmap(":/images/icon.png"));
@@ -56,10 +57,10 @@ void SearchWindow::search_filter() {
     std::vector<std::string> tokens;
     token::tokenize(search, std::string(" "), tokens);
     for(int i = 0; i < ac::draw_max-6; ++i) {
-        std::string search_value = lowerString(ac::draw_strings[i]);
+        std::string search_value = lowerString(draw_strings[i]);
         for(unsigned int q = 0; q < tokens.size(); ++q) {
-            if(search_value.find(tokens[q]) != std::string::npos && checkAdd(ac::draw_strings[i].c_str()) == false) {
-                search_list->addItem(ac::draw_strings[i].c_str());
+            if(search_value.find(tokens[q]) != std::string::npos && checkAdd(draw_strings[i].c_str()) == false) {
+                search_list->addItem(draw_strings[i].c_str());
                 break;
             }
         }

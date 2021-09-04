@@ -23,6 +23,7 @@ private:
     QComboBox *filters;
     
     bool checkAdd(QString str);
+    std::vector<std::string> draw_strings;
 };
 
 #endif
