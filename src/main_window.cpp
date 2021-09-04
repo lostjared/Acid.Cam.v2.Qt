@@ -1436,7 +1436,8 @@ std::mutex mut_lock;
 void AC_MainWindow::updateFrame(QImage img) {
     mut_lock.lock();
     if(playback->isStopped() == false) {
-        disp->displayImage(img);
+        if(disp->isVisible())
+            disp->displayImage(img);
         if(disp2->isVisible())
             disp2->displayImage(img);
         frame_index++;
