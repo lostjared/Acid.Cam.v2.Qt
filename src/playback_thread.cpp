@@ -325,7 +325,6 @@ void Playback::drawEffects(cv::Mat &frame) {
 
 void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
     if(f.index == 0) {
-        
         if(single_mode == true &&
            draw_strings[f.filter].find("SubFilter") != std::string::npos)
             return;
@@ -539,25 +538,23 @@ bool Playback::getFrame(QImage &img, const int &index) {
 }
 
 void Playback::enableRepeat(bool re) {
-    mutex.lock();
     repeat_video = re;
-    mutex.unlock();
 }
 
 
 void Playback::Clear() {
-    mutex.lock();
     blend_set = false;
     colorkey_set = false;
+    mutex.lock();
     blend_image.release();
     color_image.release();
     mutex.unlock();
 }
 
 void Playback::Stop() {
-    mutex.lock();
     stop = true;
     alpha = 0;
+    mutex.lock();
     prev_filter = FilterValue(0, 0, -1);
     mutex.unlock();
 }
@@ -579,27 +576,23 @@ bool Playback::isStopped() const {
 }
 
 void Playback::setStep() {
-    mutex.lock();
     isStep = true;
-    mutex.unlock();
 }
 
 void Playback::setImage(const cv::Mat &frame) {
-    mutex.lock();
     blend_set = true;
+    mutex.lock();
     blend_image = frame;
     mutex.unlock();
 }
 
 void Playback::setFadeFilter(bool f) {
-    mutex.lock();
     fadefilter = f;
-    mutex.unlock();
 }
 
 void Playback::setColorKey(const cv::Mat &image) {
-    mutex.lock();
     colorkey_set = true;
+    mutex.lock();
     color_image = image;
     mutex.unlock();
 }
