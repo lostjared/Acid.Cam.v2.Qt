@@ -476,9 +476,11 @@ void Playback::run() {
             cv::imwrite(stream.str(), frame);
         }
         
+        mutex.lock();
         if(recording && writer.isOpened()) {
             writer.write(frame);
         }
+        mutex.unlock();
         if(video_shown == true) {
             if(frame.channels()==3) {
                 cv::cvtColor(frame, rgb_frame, cv::COLOR_BGR2RGB);
