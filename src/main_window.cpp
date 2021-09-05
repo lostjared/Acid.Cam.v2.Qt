@@ -476,7 +476,7 @@ void AC_MainWindow::createMenu() {
     cycle_custom->setCheckable(true);
     cycle_custom->setChecked(false);
     
-    fade_on = new QAction(tr("Fade"), this);
+    fade_on = new QAction(tr("Cross Fade"), this);
     fade_on->setCheckable(true);
     fade_on->setChecked(true);
     options->addAction(fade_on);
@@ -535,7 +535,7 @@ void AC_MainWindow::createMenu() {
     //connect(show_glDisplay, SIGNAL(triggered()), this, SLOT(showGLDisplay()));
     //controls_menu->addAction(show_glDisplay);
     show_fullscreen = new QAction(tr("Enter Full Screen"), this);
-    show_image_window = new QAction(tr("Show Image Window"), this);
+    show_image_window = new QAction(tr("Show Image/Video Manager"), this);
     controls_menu->addAction(show_fullscreen);
     connect(show_fullscreen, SIGNAL(triggered()), this, SLOT(showFull()));
     controls_menu->addAction(show_image_window);
