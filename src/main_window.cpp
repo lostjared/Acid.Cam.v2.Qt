@@ -106,7 +106,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     draw_strings = ac::draw_strings;
     ac::SortFilters();
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
-   playback = new Playback();
+    playback = new Playback();
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
     setGeometry(100, 100, 800, 700);
     setFixedSize(800, 700);
@@ -211,7 +211,7 @@ void AC_MainWindow::createControls() {
     
     std::vector<std::string> fnames;
     for(int i = 0; i < ac::draw_max-5; ++i) {
-        fnames.push_back(ac::draw_strings[i].c_str());
+        fnames.push_back(draw_strings[i].c_str());
     }
     
     std::sort(fnames.begin(), fnames.end());
@@ -850,9 +850,9 @@ void AC_MainWindow::comboFilterChanged(int) {
         Log(tr("Set a SubFilter to use this filter\n"));
     
     if(playback->getMaxAlloc() < 1080 && text.find("Intertwine") != std::string::npos)
-        Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use Intertwine filters"));
+        Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use Intertwine filters\n"));
     if(playback->getMaxAlloc() < 1080 && text.find("inOrder") != std::string::npos)
-        Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use inOrder filters"));
+        Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use inOrder filters\n"));
 }
 
 void AC_MainWindow::setFilterSingle() {
