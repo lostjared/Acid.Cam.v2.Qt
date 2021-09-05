@@ -52,6 +52,7 @@ private:
     std::atomic<int> _custom_cycle_index;
     std::atomic<int> fps_delay;
     std::vector<std::string> draw_strings;
+    std::unordered_map<std::string, FilterValue> filter_map_ex;
 public:
     Playback(QObject *parent = 0);
     ~Playback();

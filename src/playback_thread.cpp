@@ -26,6 +26,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     _custom_cycle_index = 0;
     fps_delay = 60;
     draw_strings = ac::draw_strings;
+    filter_map_ex = filter_map;
 }
 
 void Playback::setCustomCycle(bool b) {
@@ -262,7 +263,7 @@ void Playback::setPref(int thread_count, int intense) {
 void Playback::setIndexChanged(std::string value) {
     mutex.lock();
     prev_filter = current_filter;
-    current_filter = filter_map[value];
+    current_filter = filter_map_ex[value];
     // here:
     //ac::release_all_objects();
     mutex.unlock();
