@@ -137,12 +137,11 @@ void ImageWindow::video_Set() {
     
     
     std::string vname = file_name.toStdString();
-    ac::v_cap.open(vname);
-    if(ac::v_cap.isOpened() == false) {
+    if(playback->openVideo(vname) == true) {
+        lbl_video->setText("File Opened and Active");
+    } else {
         QMessageBox::information(this, "Error could not open file", "File not supported");
-        return;
     }
-    lbl_video->setText("File Opened and Active");
 }
 
 void ImageWindow::video_Clr() {

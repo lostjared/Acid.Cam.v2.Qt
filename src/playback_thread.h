@@ -76,6 +76,7 @@ public:
     void SetFlip(bool f1, bool f2);
     void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record, bool record_png);
     bool setVideoCamera(std::string name, int type, int device, int res, cv::VideoWriter writer, bool record);
+    bool openVideo(std::string video);
     bool isStopped() const;
     void run();
     void Clear();

@@ -117,6 +117,17 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     return true;
 }
 
+bool Playback::openVideo(std::string vname) {
+    mutex.lock();
+    ac::v_cap.open(vname);
+    if(ac::v_cap.isOpened() == false) {
+        mutex.unlock();
+        return false;
+    }
+    mutex.unlock();
+    return true;
+}
+
 void Playback::setVector(std::vector<FilterValue> v) {
     mutex.lock();
     // here:
