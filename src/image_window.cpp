@@ -61,7 +61,20 @@ void ImageWindow::image_AddFiles() {
         image_files->addItem(files.at(i));
         value = files.at(i);
     }
-    settings->setValue("dir_path_image", value);
+    
+//#ifdef _WIN32
+    
+    std::string val = value.toStdString();
+    auto pos = val.rfind("/");
+    if(pos == std::string::npos)
+        pos = val.rfind("\\");
+    if(pos != std::string::npos) {
+        val = val.substr(0, pos);
+    }
+//#else
+    settings->setValue("dir_path_image", val.c_str());
+//#endif
+    
 }
 
 void ImageWindow::image_RmvFile() {
@@ -131,8 +144,16 @@ void ImageWindow::video_Set() {
     
     QString file_name = QFileDialog::getOpenFileName(this,"Select A video file to open",dir_path,"Video (*.avi *.mov *.mp4 *.mkv *.m4v)");
     
+    std::string val = file_name.toStdString();
+    auto pos = val.rfind("/");
+    if(pos == std::string::npos)
+        pos = val.rfind("\\");
+    if(pos != std::string::npos) {
+        val = val.substr(0, pos);
+    }
+    
     if(file_name != "")
-        settings->setValue("dir_vid_path",file_name);
+        settings->setValue("dir_vid_path",val.c_str());
     else return;
     
     

@@ -187,7 +187,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 bool AC_MainWindow::checkAdd(QString str) {
-    const char *ex[] = { "ImageXorSmooth", "SketchFilter", "SlideSub", "Histogram", "Desktop","MultiVideo","Solo", "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
+    const char *ex[] = { "Zoom", "ImageXorSmooth", "SketchFilter", "SlideSub", "Histogram", "Desktop","MultiVideo","Solo", "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
     std::string val = str.toStdString();
     for(int i = 0; ex[i] != 0; ++i)
         if(val.find(ex[i]) != std::string::npos)
@@ -853,6 +853,8 @@ void AC_MainWindow::comboFilterChanged(int) {
         Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use Intertwine filters\n"));
     if(playback->getMaxAlloc() < 1080 && text.find("inOrder") != std::string::npos)
         Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use inOrder filters\n"));
+    if(playback->getMaxAlloc() < 1080 && text.find("Slit") != std::string::npos)
+        Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use inOrder filters\n"));
 }
 
 void AC_MainWindow::setFilterSingle() {
@@ -1356,7 +1358,16 @@ void AC_MainWindow::controls_SetImage() {
             stream << "Successfully Loaded Image: [" << fileName << "] Size: " << tblend_image.cols << "x" << tblend_image.rows << "\n";
             Log(text);
             ac::pix.setInit(false);
-            settings->setValue("dir_image", fileName);
+            
+            std::string val = fileName.toStdString();
+            auto pos = val.rfind("/");
+            if(pos == std::string::npos)
+                pos = val.rfind("\\");
+            if(pos != std::string::npos) {
+                val = val.substr(0, pos);
+            }
+            
+            settings->setValue("dir_image", val.c_str());
         } else {
             QMessageBox::information(this, tr("Image Load failed"), tr("Could not load image"));
         }

@@ -332,6 +332,8 @@ void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
             return;
         if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("inOrder") != std::string::npos)
             return;
+        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("Slit") != std::string::npos)
+            return;
         
         ac::setSubFilter(f.subfilter);
         //ac::draw_func[f.filter](frame);

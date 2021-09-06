@@ -144,7 +144,16 @@ void CaptureVideo::btn_SetSourceFile() {
     QString fileName = QFileDialog::getOpenFileName(this,tr("Open Video"), def_path, tr("Video Files (*.avi *.mov *.mp4 *.mkv *.m4v)"));
     if(fileName != "") {
         edit_src->setText(fileName);
-        settings->setValue("dir_path",fileName);
+        
+        std::string val = fileName.toStdString();
+        auto pos = val.rfind("/");
+        if(pos == std::string::npos)
+            pos = val.rfind("\\");
+        if(pos != std::string::npos) {
+            val = val.substr(0, pos);
+        }
+        
+        settings->setValue("dir_path",val.c_str());
     }
 }
 
