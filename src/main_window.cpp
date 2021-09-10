@@ -854,10 +854,11 @@ void AC_MainWindow::comboFilterChanged(int) {
     if(playback->getMaxAlloc() < 1080 && text.find("inOrder") != std::string::npos)
         Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use inOrder filters\n"));
     if(playback->getMaxAlloc() < 1080 && text.find("Slit") != std::string::npos)
-        Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use inOrder filters\n"));
+        Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use SlitScan filters\n"));
 }
 
 void AC_MainWindow::setFilterSingle() {
+    comboFilterChanged(0);
     playback->setSingleMode(true);
     Log("Set to Single Filter Mode\n");
 }
