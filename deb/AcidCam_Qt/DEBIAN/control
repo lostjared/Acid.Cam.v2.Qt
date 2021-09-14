@@ -1,8 +1,8 @@
 Package: acidcam-qt
 Architecture: amd64
 Maintainer: Jared Bruni
-Depends: libopencv-dev, libqt4-dev, libacidcam
+Depends: libopencv-dev, qt5-default,libsdl2-2.0-0,libacidcam
 Priority: optional
-Version: 1.56.0
+Version: 1.76.11
 Description: Acid.Cam
 	Turns Webcam or Video files into interactive work of art
