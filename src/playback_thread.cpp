@@ -27,6 +27,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     fps_delay = 60;
     draw_strings = ac::draw_strings;
     filter_map_ex = filter_map;
+    blend_image_copy_set = false;
 }
 
 bool Playback::VideoRelease() {
@@ -397,6 +398,10 @@ void Playback::run() {
         ac::orig_frame = frame.clone();
         FilterValue current_filterx = current_filter, prev_filterx = prev_filter;
         std::string png_pathx = png_path;
+        if(blend_image_copy_set) {
+            blend_image = blend_image_copy.clone();
+            blend_image_copy_set = false;
+        }
         mutex.unlock();
         
         cv::Mat temp_frame;
@@ -600,12 +605,15 @@ void Playback::setStep() {
 void Playback::setImage(const cv::Mat &frame) {
     blend_set = true;
     mutex.lock();
-    blend_image = frame;
+    blend_image_copy = frame.clone();
+    blend_image_copy_set = true;
     mutex.unlock();
 }
 
 void Playback::setFadeFilter(bool f) {
+    mutex.lock();
     fadefilter = f;
+    mutex.unlock();
 }
 
 void Playback::setColorKey(const cv::Mat &image) {

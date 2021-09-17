@@ -27,6 +27,8 @@ private:
     cv::VideoCapture capture;
     cv::VideoWriter  writer;
     cv::Mat rgb_frame;
+    cv::Mat blend_image_copy;
+    std::atomic<bool> blend_image_copy_set;
     QImage img;
     std::vector<FilterValue> current;
     std::atomic<bool> isPaused, isStep;
