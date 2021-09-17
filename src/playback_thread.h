@@ -74,6 +74,7 @@ public:
     void Play();
     void Stop();
     void Release();
+    bool VideoRelease();
     void SetFlip(bool f1, bool f2);
     void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record, bool record_png);
     bool setVideoCamera(std::string name, int type, int device, int res, cv::VideoWriter writer, bool record);

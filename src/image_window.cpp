@@ -166,8 +166,6 @@ void ImageWindow::video_Set() {
 }
 
 void ImageWindow::video_Clr() {
-    if(ac::v_cap.isOpened()) {
-        ac::v_cap.release();
+    if(playback->VideoRelease())
         lbl_video->setText("Video closed..");
-    }
 }

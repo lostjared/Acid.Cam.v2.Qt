@@ -29,6 +29,17 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     filter_map_ex = filter_map;
 }
 
+bool Playback::VideoRelease() {
+    bool ret = false;
+    mutex.lock();
+    if(ac::v_cap.isOpened()) {
+        ac::v_cap.release();
+        ret = true;
+    }
+    mutex.unlock();
+    return ret;
+}
+
 void Playback::setCustomCycle(bool b) {
     _custom_cycle = b;
     _custom_cycle_index = 0;
