@@ -71,6 +71,7 @@ public:
     void setWaitColorLevel(int c, int l);
     void setColorMap(int c);
     void setPngPath(std::string path);
+    void clearImage();
     void Play();
     void Stop();
     void Release();

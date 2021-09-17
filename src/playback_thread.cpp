@@ -253,6 +253,13 @@ void Playback::reset_filters() {
     mutex.unlock();
 }
 
+void Playback::clearImage() {
+    mutex.lock();
+    blend_set = false;
+    blend_image.release();
+    mutex.unlock();
+}
+
 void Playback::SetFlip(bool f1, bool f2) {
     flip_frame1 = f1;
     flip_frame2 = f2;
