@@ -229,7 +229,8 @@ void Playback::setCycle(int type, int frame_skip, std::vector<std::string> &v) {
         }
         cycle_index = 0;
         frame_num = frame_skip;
-        blend_image = cv::imread(v[0]);
+        blend_image_copy = cv::imread(v[0]);
+        blend_image_copy_set = true;
         blend_set = true;
         static std::random_device r;
         static auto rng = std::default_random_engine(r());
