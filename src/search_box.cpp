@@ -16,8 +16,9 @@ SearchWindow::SearchWindow(QWidget *parent) : QDialog(parent) {
     createControls();
 }
 
+extern char *ex[];
+
 bool SearchWindow::checkAdd(QString str) {
-    const char *ex[] = { "Zoom","AcidShuffleMedian","MatrixColorBlur", "AlphaBlendArrayExpand", "Zoom", "ImageXorSmooth", "SketchFilter", "SlideSub", "Histogram", "Desktop","MultiVideo","Solo", "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};  
     std::string val = str.toStdString();
     for(int i = 0; ex[i] != 0; ++i)
         if(val.find(ex[i]) != std::string::npos)
