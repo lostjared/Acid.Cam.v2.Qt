@@ -6,6 +6,7 @@
 
 
 #include"playback_thread.h"
+#include<chrono>
 
 Playback::Playback(QObject *parent) : QThread(parent) {
     stop = true;
@@ -375,6 +376,10 @@ void Playback::run() {
     int duration = 10;
 #endif
     while(!stop) {
+        
+        std::chrono::time_point<std::chrono::system_clock> now =
+        std::chrono::system_clock::now();
+        
         mutex.lock();
         if(ac::release_frames) {
             std::cout << "Cleared Frames...\n";
@@ -469,7 +474,7 @@ void Playback::run() {
                     if(i == cur.size()-1)
                         ac::in_custom = false;
                     drawFilter(frame, cur[i]);
-                    msleep(duration);
+                    //msleep(duration);
                 }
             } else {
                 if(_custom_cycle_index > static_cast<int>(cur.size()-1))
@@ -477,7 +482,7 @@ void Playback::run() {
 
                 if(_custom_cycle_index >= 0 && _custom_cycle_index < static_cast<int>(cur.size())) {
                     drawFilter(frame, cur[_custom_cycle_index]);
-                    msleep(duration);
+                    //msleep(duration);
                 }
             }
             drawEffects(frame);
@@ -520,6 +525,16 @@ void Playback::run() {
         } else {
             emit frameIncrement();
         }
+        
+        std::chrono::time_point<std::chrono::system_clock> nowx =
+        std::chrono::system_clock::now();
+        auto m = std::chrono::duration_cast<std::chrono::milliseconds>(nowx - now).count();
+        if (ac::fps > 0) {
+            int fps_mil = 1000 / ac::fps;
+            if (m < fps_mil)
+                std::this_thread::sleep_for(std::chrono::milliseconds(fps_mil - m - 1));
+        }
+        
     }
     mutex.lock();
     ac::release_all_objects();
