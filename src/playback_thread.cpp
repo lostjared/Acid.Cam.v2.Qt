@@ -141,7 +141,6 @@ bool Playback::openVideo(std::string vname) {
     mutex.unlock();
     return true;
 }
-
 void Playback::setVector(std::vector<FilterValue> v) {
     mutex.lock();
     // here:
@@ -351,7 +350,7 @@ void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
         
         if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("Intertwine") != std::string::npos)
             return;
-        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("inOrder") != std::string::npos)
+        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("InOrder") != std::string::npos)
             return;
         if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("Slit") != std::string::npos)
             return;

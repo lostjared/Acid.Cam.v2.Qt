@@ -851,7 +851,7 @@ void AC_MainWindow::comboFilterChanged(int) {
     
     if(playback->getMaxAlloc() < 1080 && text.find("Intertwine") != std::string::npos)
         Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use Intertwine filters\n"));
-    if(playback->getMaxAlloc() < 1080 && text.find("inOrder") != std::string::npos)
+    if(playback->getMaxAlloc() < 1080 && text.find("InOrder") != std::string::npos)
         Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use inOrder filters\n"));
     if(playback->getMaxAlloc() < 1080 && text.find("Slit") != std::string::npos)
         Log(tr("Set Max Frames to greater than 1080 (requires enough RAM) to use SlitScan filters\n"));
