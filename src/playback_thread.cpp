@@ -407,6 +407,10 @@ void Playback::run() {
             blend_image = blend_image_copy.clone();
             blend_image_copy_set = false;
         }
+        if(chroma_image_set) {
+            color_replace_image = chroma_image.clone();
+            chroma_image_set = false;
+        }
         mutex.unlock();
         
         cv::Mat temp_frame;
@@ -622,6 +626,13 @@ void Playback::setImage(const cv::Mat &frame) {
     mutex.lock();
     blend_image_copy = frame.clone();
     blend_image_copy_set = true;
+    mutex.unlock();
+}
+
+void Playback::setChromaImage(cv::Mat &frame) {
+    mutex.lock();
+    chroma_image = frame.clone();
+    chroma_image_set = true;
     mutex.unlock();
 }
 

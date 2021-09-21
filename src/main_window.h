@@ -24,6 +24,7 @@
 #include "slitscan_win.h"
 
 class SearchWindow;
+class ChromaWindow;
 
 class AC_MainWindow : public QMainWindow {
     Q_OBJECT
@@ -79,6 +80,9 @@ public:
     void setOptionString(std::string op, std::string value);
     void setProcMode(int index);
     bool checkAdd(QString str);
+    
+    Playback *playback;
+    
 public slots:
     void showRange();
     void chk_Joystick();
@@ -145,6 +149,7 @@ public slots:
     void next_filter();
     void prev_filter();
     void showSlit();
+     
 private:
     void createControls();
     void createMenu();
@@ -169,7 +174,6 @@ private:
     QString output_directory;
     bool take_snapshot;
     unsigned long file_pos, frame_index;
-    Playback *playback;
     VideoMode programMode;
     void buildVector(std::vector<FilterValue> &v);
     bool loading;

@@ -22,6 +22,8 @@ private:
     QMutex mutex, mutex_shown, mutex_add;
     QWaitCondition condition;
     cv::Mat frame;
+    cv::Mat chroma_image;
+    std::atomic<bool> chroma_image_set;
     std::atomic<double> frame_rate;
     std::atomic<bool> recording;
     cv::VideoCapture capture;
@@ -105,6 +107,7 @@ public:
     unsigned long calcMem();
     void setCustomCycle(bool b);
     void setCustomCycleDelay(int delay);
+    void setChromaImage(cv::Mat &frame);
 signals:
     void procImage(const QImage image);
     void stopRecording();

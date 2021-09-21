@@ -129,11 +129,12 @@ void ChromaWindow::createControls() {
 void ChromaWindow::setImage() {
     QString fileName = QFileDialog::getOpenFileName(this,tr("Open Image"),".", tr("Image Files (*.png *.jpg *.bmp *.tiff)"));
     if(fileName != "") {
-        color_replace_image = cv::imread(fileName.toStdString());
+        cv::Mat color_replace_image = cv::imread(fileName.toStdString());
         if(color_replace_image.empty()) {
             QMessageBox::information(this, "Error", "Could not open image file...");
         } else {
             select_image_path->setText(fileName);
+            main_window->playback->setChromaImage(color_replace_image);
         }
     }
 }

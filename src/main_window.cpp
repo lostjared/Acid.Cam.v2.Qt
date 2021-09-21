@@ -165,6 +165,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     filters->setCurrentIndex(cindex);
     chroma_window = new ChromaWindow(this);
     chroma_window->hide();
+    chroma_window->main_window = this;
     define_window = new DefineWindow(this);
     define_window->hide();
     define_window->main_window = this;
@@ -187,7 +188,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 bool AC_MainWindow::checkAdd(QString str) {
-    const char *ex[] = { "Zoom", "AcidShuffleMedian", "MatrixColorBlur", "AlphaBlendArrayExpand", "Zoom", "ImageXorSmooth", "SketchFilter", "SlideSub", "Histogram", "Desktop","MultiVideo","Solo", "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
+    const char *ex[] = { "ExpandSquareVertical", "DistortPixelate128", "Zoom", "AcidShuffleMedian", "MatrixColorBlur", "AlphaBlendArrayExpand", "Zoom", "ImageXorSmooth", "SketchFilter", "SlideSub", "Histogram", "Desktop","MultiVideo","Solo", "Bars", "BilateralFilter", "BilateralFilterFade", "BoxFilter", "CurrentDesktopRect", "HorizontalTrailsInter", "IntertwineAlpha", "IntertwineAlphaBlend", "IntertwineVideo640", "RandomAlphaBlendFilter", "RandomOrigFrame", "RectangleGlitch", "SquareSwap64x32", "VideoColorMap", 0};
 
     std::string val = str.toStdString();
     for(int i = 0; ex[i] != 0; ++i)

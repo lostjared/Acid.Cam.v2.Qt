@@ -2,7 +2,7 @@
 #define __CHROMAKEY__H_
 
 #include "qtheaders.h"
-
+#include "main_window.h"
 
 class ChromaWindow : public QDialog {
     Q_OBJECT
@@ -13,6 +13,8 @@ public:
     void setEditFromColor(int val, QColor color);
     void enableKey(bool op);
     void showGL();
+    AC_MainWindow *main_window;
+  
 public slots:
     void openColorSelectRange();
     void openColorSelectTolerance();
