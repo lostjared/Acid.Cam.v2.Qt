@@ -1585,7 +1585,7 @@ void AC_MainWindow::help_About() {
     QString about_str;
     QTextStream stream(&about_str);
     stream << tr("<b>Acid Cam Qt version: ") << ac_version << " filters: " << ac::version.c_str() << "</b><br><br> ";
-    stream << tr("Engineering by <b>Jared Bruni</b><br><br><b>This software is dedicated to all the people that experience mental illness. </b><br><br>Thanks to <b>Boris D. S</b> for testing.<br><br><br><a href=\"https://lostsidedead.biz/wish\">My Wish List</a><br>\n");
+    stream << tr("Engineering by <b>Jared Bruni</b><br>Testing by <b>Boris D. S</b><br><br><b>This software is dedicated to all the people that experience mental illness. </b><br><br><a href=\"https://lostsidedead.biz/wish\">My Wish List</a><br>\n");
     
     QMessageBox::information(this, tr("About Acid Cam"), about_str);
 }
