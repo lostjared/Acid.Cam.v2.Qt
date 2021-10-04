@@ -57,6 +57,8 @@ void Playback::Play() {
             stop = false;
         }
     }
+    prev_filter = FilterValue(0, 0, -1);
+    alpha = 0;
     start(LowPriority);
     //start(HighPriority);
 }
