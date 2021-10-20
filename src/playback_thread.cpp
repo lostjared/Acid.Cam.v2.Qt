@@ -152,8 +152,10 @@ void Playback::setVector(std::vector<FilterValue> v) {
 }
 
 void Playback::setFilterMapEx(std::unordered_map<std::string, FilterValue> f) {
+    mutex.lock();
     filter_map_ex_set = f;
     setFilterMap = true;
+    mutex.unlock();
 }
 
 unsigned long Playback::calcMem() {
