@@ -27,8 +27,11 @@ void DefineWindow::createControls() {
     def_load = new QPushButton("Load", this);
     def_load->setGeometry(340, 290, 100, 20);
     
+    
     for(auto &i : ac::svAllSorted) {
-        def_filters->addItem(i.c_str());
+        static int q = 0;
+        if((++q)%2 == 0 && main_window->checkAdd(i.c_str()) == false && i.find("Intertwine") == std::string::npos && i.find("InOrder") == std::string::npos)
+            def_filters->addItem(i.c_str());
     }
     connect(def_set, SIGNAL(clicked()), this, SLOT(setFilterName()));
     connect(def_clear, SIGNAL(clicked()), this, SLOT(clearFilterNames()));
