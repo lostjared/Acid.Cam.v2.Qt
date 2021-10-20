@@ -57,6 +57,8 @@ private:
     std::atomic<int> fps_delay;
     std::vector<std::string> draw_strings;
     std::unordered_map<std::string, FilterValue> filter_map_ex;
+    bool setFilterMap = false;
+    std::unordered_map<std::string, FilterValue> filter_map_ex_set;
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -76,6 +78,7 @@ public:
     void setColorMap(int c);
     void setPngPath(std::string path);
     void clearImage();
+    void setFilterMapEx(std::unordered_map<std::string, FilterValue> f);
     void Play();
     void Stop();
     void Release();

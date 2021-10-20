@@ -54,6 +54,7 @@ void DefineWindow::setFilterName() {
         filter_map[fn].index = 0;
         filter_map[fn].filter = filter_map[ft].filter;
         filter_map[fn].subfilter = -1;
+        main_window->playback->setFilterMapEx(filter_map);
         main_window->resetMenu();
         def_list->addItem(real_final_name.c_str());
         def_newname->setText("");

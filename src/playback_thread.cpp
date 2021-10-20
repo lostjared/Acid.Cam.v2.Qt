@@ -151,6 +151,11 @@ void Playback::setVector(std::vector<FilterValue> v) {
     mutex.unlock();
 }
 
+void Playback::setFilterMapEx(std::unordered_map<std::string, FilterValue> f) {
+    filter_map_ex_set = f;
+    setFilterMap = true;
+}
+
 unsigned long Playback::calcMem() {
     mutex.lock();
     unsigned long calc = ac::calculateMemory();
@@ -413,6 +418,11 @@ void Playback::run() {
             color_replace_image = chroma_image.clone();
             chroma_image_set = false;
         }
+        if(setFilterMap) {
+            filter_map_ex = filter_map_ex_set;
+            setFilterMap = false;
+        }
+        
         mutex.unlock();
         
         cv::Mat temp_frame;
