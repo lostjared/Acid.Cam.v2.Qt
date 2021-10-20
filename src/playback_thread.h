@@ -57,7 +57,7 @@ private:
     std::atomic<int> fps_delay;
     std::vector<std::string> draw_strings;
     std::unordered_map<std::string, FilterValue> filter_map_ex;
-    std::atmoic<bool> setFilterMap;
+    std::atomic<bool> setFilterMap;
     std::unordered_map<std::string, FilterValue> filter_map_ex_set;
 public:
     Playback(QObject *parent = 0);
