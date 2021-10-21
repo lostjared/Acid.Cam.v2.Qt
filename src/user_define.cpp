@@ -30,7 +30,7 @@ void DefineWindow::createControls() {
     
     for(auto &i : ac::svAllSorted) {
         static int q = 0;
-        if((++q)%2 == 0 && main_window->checkAdd(i.c_str()) == false && i.find("Intertwine") == std::string::npos && i.find("InOrder") == std::string::npos)
+        if((++q)%2 == 0 && main_window->checkAdd(i.c_str()) == false && i.find("Intertwine") == std::string::npos && i.find("InOrder") == std::string::npos && i.find("Slit") == std::string::npos)
             def_filters->addItem(i.c_str());
     }
     connect(def_set, SIGNAL(clicked()), this, SLOT(setFilterName()));
@@ -61,7 +61,7 @@ void DefineWindow::setFilterName() {
         main_window->resetMenu();
         def_list->addItem(real_final_name.c_str());
         def_newname->setText("");
-    }
+    } else QMessageBox::information(this, tr("Requires a name"), tr("New filter define requires a name"));
 }
 void DefineWindow::clearFilterNames() {
     std::vector<std::string> *v = ac::filter_menu_map["User"].menu_list;
