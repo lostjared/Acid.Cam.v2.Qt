@@ -525,9 +525,9 @@ void AC_MainWindow::createMenu() {
     controls_setimage = new QAction(tr("Set Image"), this);
     //controls_setimage->setShortcut(tr("Ctrl+Q"));
     controls_menu->addAction(controls_setimage);
-    controls_setkey = new QAction(tr("Set Color Key Image"), this);
+    //controls_setkey = new QAction(tr("Set Color Key Image"), this);
     //controls_setkey->setShortcut(tr("Ctrl+K"));
-    controls_menu->addAction(controls_setkey);
+    //controls_menu->addAction(controls_setkey);
     controls_showvideo = new QAction(tr("Hide Display Video"), this);
     controls_showvideo->setShortcut(tr("Ctrl+V"));
     controls_menu->addAction(controls_showvideo);
@@ -576,7 +576,7 @@ void AC_MainWindow::createMenu() {
     connect(controls_step, SIGNAL(triggered()), this, SLOT(controls_Step()));
     connect(controls_stop, SIGNAL(triggered()), this, SLOT(controls_Stop()));
     connect(controls_setimage, SIGNAL(triggered()), this, SLOT(controls_SetImage()));
-    connect(controls_setkey, SIGNAL(triggered()), this, SLOT(controls_SetKey()));
+  //  connect(controls_setkey, SIGNAL(triggered()), this, SLOT(controls_SetKey()));
     connect(controls_showvideo, SIGNAL(triggered()), this, SLOT(controls_ShowVideo()));
     connect(reset_filters, SIGNAL(triggered()), this, SLOT(controls_Reset()));
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
