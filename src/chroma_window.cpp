@@ -305,7 +305,7 @@ void ChromaWindow::enableKey(bool op) {
                     QMessageBox::information(this, "Enabled Keys", keys_text);
                     break;
                 case 1:
-                    if(color_replace_image.empty()) {
+                    if(select_image_path->text().length() == 0) {
                         QMessageBox::information(this, "Need to Set Image", "Please Select a image to replace key with");
                         return;
                     }
