@@ -480,7 +480,7 @@ void AC_MainWindow::createMenu() {
     
     fade_on = new QAction(tr("Cross Fade"), this);
     fade_on->setCheckable(true);
-    fade_on->setChecked(true);
+    fade_on->setChecked(false);
     options->addAction(fade_on);
     options->addAction(repeat_v);
     options->addAction(cycle_custom);

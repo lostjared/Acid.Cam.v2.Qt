@@ -19,7 +19,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     flip_frame1 = false;
     flip_frame2 = false;
     repeat_video = false;
-    fadefilter = true;
+    fadefilter = false;
     cycle_on = 0;
     cycle_index = 0;
     frame_num = 0;
@@ -295,8 +295,9 @@ void Playback::setIndexChanged(std::string value) {
     current_filter = filter_map_ex[value];
     // here:
     //ac::release_all_objects();
-    mutex.unlock();
     alpha = 1.0;
+    mutex.unlock();
+    
 }
 
 void Playback::setSingleMode(bool val) {
@@ -410,7 +411,7 @@ void Playback::run() {
         static std::vector<FilterValue> cur;
         cur = current;
         ac::orig_frame = frame.clone();
-        FilterValue current_filterx = current_filter, prev_filterx = prev_filter;
+        FilterValue current_filterxv = current_filter, prev_filterx = prev_filter;
         std::string png_pathx = png_path;
         if(blend_image_copy_set) {
             blend_image = blend_image_copy.clone();
@@ -475,13 +476,13 @@ void Playback::run() {
         }
         
         if(single_mode == true && alpha > 0) {
-            if(fadefilter == true) filterFade(frame, current_filterx, prev_filterx, alpha);
+            if(fadefilter == true) filterFade(frame, current_filterxv, prev_filterx, alpha);
             drawEffects(frame);
             alpha = alpha-0.08;
         } else if(single_mode == true) {
             ac::setSubFilter(-1);
             ac::in_custom = false;
-            drawFilter(frame, current_filterx);
+            drawFilter(frame, current_filterxv);
             drawEffects(frame);
             msleep(duration);
         } else if(cur.size()>0) {
