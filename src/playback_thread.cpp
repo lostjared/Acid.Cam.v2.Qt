@@ -476,13 +476,13 @@ void Playback::run() {
         }
         
         if(single_mode == true && alpha > 0) {
-            if(fadefilter == true) filterFade(frame, current_filterxv, prev_filterx, alpha);
+            if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
             drawEffects(frame);
             alpha = alpha-0.08;
         } else if(single_mode == true) {
             ac::setSubFilter(-1);
             ac::in_custom = false;
-            drawFilter(frame, current_filterxv);
+            drawFilter(frame, current_filter);
             drawEffects(frame);
             msleep(duration);
         } else if(cur.size()>0) {
