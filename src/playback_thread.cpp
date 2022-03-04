@@ -292,7 +292,7 @@ void Playback::setPref(int thread_count, int intense) {
 void Playback::setIndexChanged(std::string value) {
     mutex.lock();
     prev_filter = current_filter;
-    current_filter = filter_map_ex[value];
+    current_filter = filter_map[value];
     // here:
     //ac::release_all_objects();
     alpha = 1.0;
