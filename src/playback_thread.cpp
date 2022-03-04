@@ -476,7 +476,7 @@ void Playback::run() {
         }
         
         if(single_mode == true && alpha > 0) {
-            if(fadefilter == true) filterFade(frame, current_filter, prev_filter, alpha);
+            if(fadefilter == true) filterFade(frame, current_filterxv, prev_filter, alpha);
             drawEffects(frame);
             alpha = alpha-0.08;
         } else if(single_mode == true) {
