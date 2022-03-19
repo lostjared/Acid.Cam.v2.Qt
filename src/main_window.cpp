@@ -844,6 +844,11 @@ void AC_MainWindow::comboFilterChanged(int) {
     stream << "Filter changed to: " << filters->currentText() << "\n";
     Log(str);
     std::string text = filters->currentText().toStdString();
+    
+    if(ac::v_cap.isOpened() == false && text.find("Video") != std::string::npos) {
+        Log(tr("Set a video file to use this filter"));
+    }
+    
     if(blend_set == false && text.find("Image") != std::string::npos)
         Log(tr("Set an Image to use this filter\n"));
     
