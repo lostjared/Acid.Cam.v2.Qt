@@ -19,6 +19,7 @@ class Playback : public QThread {
 private:
     std::atomic<bool> stop;
     std::atomic<bool> video_shown;
+    std::atomic<bool> video_is_set;
     QMutex mutex, mutex_shown, mutex_add;
     QWaitCondition condition;
     cv::Mat frame;
@@ -62,6 +63,7 @@ private:
 public:
     Playback(QObject *parent = 0);
     ~Playback();
+    bool videoIsOpen();
     void setFadeFilter(bool f);
     void setFrameIndex(const long &index);
     bool getFrame(QImage &img, const int &index);

@@ -37,6 +37,7 @@ bool Playback::VideoRelease() {
     if(ac::v_cap.isOpened()) {
         ac::v_cap.release();
         ret = true;
+        video_is_set = false;
     }
     mutex.unlock();
     return ret;
@@ -133,14 +134,20 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     return true;
 }
 
+bool Playback::videoIsOpen() {
+    return video_is_set;
+}
+
 bool Playback::openVideo(std::string vname) {
     mutex.lock();
     ac::v_cap.open(vname);
     if(ac::v_cap.isOpened() == false) {
         mutex.unlock();
+        video_is_set = false;
         return false;
     }
     mutex.unlock();
+    video_is_set = true;
     return true;
 }
 void Playback::setVector(std::vector<FilterValue> v) {

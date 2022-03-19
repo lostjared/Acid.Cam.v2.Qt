@@ -845,7 +845,7 @@ void AC_MainWindow::comboFilterChanged(int) {
     Log(str);
     std::string text = filters->currentText().toStdString();
     
-    if(ac::v_cap.isOpened() == false && text.find("Video") != std::string::npos) {
+    if(playback->videoIsOpen() == false && text.find("Video") != std::string::npos) {
         Log(tr("Set a video file to use this filter"));
     }
     
