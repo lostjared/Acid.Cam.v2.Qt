@@ -4,12 +4,11 @@
 
 ![scr1](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acid.cam.img1.jpg "screenshot")
 
-To watch all the videos I have created with this project checkout my YouTube playlist:
-https://www.youtube.com/playlist?list=PLUgo--lX2kmr6ikfz0hPlez1-jbGAYuTZ
+Join us on Discord: https://discord.gg/kSxTe6M8
 
 To be able to use all the filters in this program your system should have at lest 8 GB of ram.
 
-Program requires the Visual C++ 2015 Runtime.
+Program requires the Visual C++ 2019 Runtime.
 
 You can download it here: https://www.microsoft.com/en-us/download/details.aspx?id=48145
 
