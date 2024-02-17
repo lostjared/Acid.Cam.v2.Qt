@@ -4,113 +4,56 @@
 
 ![scr1](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acid.cam.img1.jpg "screenshot")
 
-Join us on Discord: https://discord.gg/kSxTe6M8
+Welcome to the Acid Cam project, a creative tool for transforming videos into art, tailor-made for both enthusiasts and professional Glitch artists. Acid Cam offers an expansive suite of filters, enabling the production of unique visual effects known as Acid Glitches. Designed for versatility, Acid Cam can be used as a standalone application or alongside other software to enhance your artistic workflow.
 
-To be able to use all the filters in this program your system should have at lest 8 GB of ram.
+Join Our Community
 
-Program requires the Visual C++ 2019 Runtime.
+System Requirements
 
-You can download it here: https://www.microsoft.com/en-us/download/details.aspx?id=48145
+To fully enjoy Acid Cam's capabilities, your system needs at least 8 GB of RAM.
+Installation of Visual C++ 2019 Runtime is required. Download it here.
+Installation Notes
 
-Note: On Windows 10 make sure you create a directory you have full access to for the output directories for Webcam/Video mode. For me on my Windows 10 I have created a folder at C:\ProgramOutput for the output. 
-There is currently a bug that if you try to use a resolution higher than the maximum your webcam supports it will cause the file written to be corrupt. So make sure you use a resolution your webcam supports. I will try to fix this problem in future release.
+Windows 10 users: Ensure you create a directory (e.g., C:\ProgramOutput) with full access to avoid output issues in Webcam/Video modes.
+Be mindful of your webcam's maximum resolution to prevent output corruption. We're working on a fix for future updates.
+Acid Cam depends on OpenCV, Qt5, libsdl2, and libacidcam. Ensure these are compiled and configured correctly.
+Modify the .pro file with OpenCV paths on Windows for successful compilation with qmake.
+Getting Started
 
-Projects requires OpenCV, Qt5, libsdl2, and libacidcam are compiled and pkg-config files are configured to compile
+Begin by installing GCC/Automake/Autoconf along with the g++ compiler. For Debian systems, install the required build tools and libraries via:
+arduino
 
-You will need to modify the desired pro file with paths to OpenCV on Windows (no libSDL2)  for qmake for it to compile correctly.
+	sudo apt-get install qt5-default libopencv-dev g++ git cmake autoconf automake libtool pkg-config libsdl2-dev
+ 
+Don't forget to install pkg-config and libacidcam. You can find libacidcam https://github.com/lostjared/libacidcam
+Compilation
 
-Acid Cam distorts video to create art. It is designed to bo used with other software or on its own. There are multiple versions of the program for macOS, Linux, and Windows as well as a command line version of the program.
+After downloading Acid Cam, navigate to the src directory.
+Select the appropriate qmake command based on your operating system and OpenCV version, followed by make -j4 for compilation.
+Managing Output File Sizes
 
-This project was created in hopes of providing some entertainment, or for the Glitch artist to give you a starting image/video to use with other tools.
+High-resolution settings result in large MPEG-4 bitrates. Consider using Final Cut, Handbrake, or ffmpeg for compression. For example:
 
-I call the art that I create with Acid Cam an Acid Glitch, but you can call it whatever you want. It is just meant to be a tool to use with other programs to help aid in the creation of artistic images/videos.
+Explore and Share
 
-Acid Cam's effects are created by using Acid Cam 'filters', or pieces of code that distort an image and can be combined to produce some interesting results. The project currently has over 2,000 filters to mix and match.
+	ffmpeg -i "input.file.mp4" -c:v libx265 -tag:v hvc1 -crf 18 output.file.mp4
+For the latest updates and sample videos, visit our Facebook page.
+Acid Cam is ideal for generating foundational artwork for further manipulation, creating visuals for music videos, or simply for experimentation and fun.
+Notes and Tips
 
-![AnimatedImage](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/jaredpeace.gif "screenshot")
+Filters marked with 720 or 1080 may require significant RAM; insufficient memory will cause the program to exit.
+Acid Cam is a cross-platform solution, crafted in C++11, ensuring wide accessibility and performance.
+Developing Custom Filters
 
-Now uses Qt5
+Interested in crafting your own filters? Check out the example in the plugins directory. Acid Cam dynamically loads filters, offering endless possibilities for customization.
+Output Considerations
 
+Due to OpenCV's high bitrate recording, output files can be quite large. Consider compressing the files before sharing online.
+Platform Specifics
 
-First download GCC/Automake/Autoconf with g++ compiler and make then compile on Debian install build tools, QT5 and OpenCV development libraries via Terminal with
-
-	$ sudo apt-get install qt5-default libopencv-dev g++ git cmake autoconf automake libtool pkg-config libsdl2-dev
-
-Also install pkg-config
-
-You will also need libacidcam
-
-Download libacidcam from: https://github.com/lostjared/libacidcam
-
-Compile and install the library libacidcam
-instructions here: https://github.com/lostjared/libacidcam/blob/master/README.md
-
-Next download this project via git clone or zip enter the src directory
-
-For compiling with macOS and OpenCV 4 use:
-
-	$ qmake Acid.Cam.v2.OpenCV4.pro
-    
-For compiling with macOS and OpenCV 3 use:
-    
-   	 $ qmake Acid.Cam.v2.OpenCV3.pro
-
-For compiling on Linux with OpenCV 4 use:
-
-	$ qmake Acid.Cam.v2.OpenCV4.Linux.pro
-    
-Then to build project
-
-	$ make -j4
-
-
-If you are using a high resolution the program outputs very high bitrate for MPEG-4. To be able to play it back you can load it into Final Cut and export as H.264, use Handbrake to lower the bitrate, or use ffmpeg. The command I use to compress 4K Acid Cam videos is:
-
-    $ ffmpeg -i "input.file.mp4" -c:v libx265 -tag:v hvc1 -crf 18 output.file.mp4
-
-or
-    
-    $ ffmpeg -i "input.file.mp4" -c:v libx264 -crf 18 output_file.mp4
-
-Then Run the program
-
-For sample videos and updates about this software view the Facebook page: http://facebook.com/AcidCam
-
-This is an application that will allow you to generate video files/images with live video or video files. This is accomplished by mixing different 'filters' 
-in different orders to produce different results. This program could be useful to you for generating basic artwork to be manipulated further. Also I have seen 
-it used to create video for music videos or just for fun. 
-
-NOTE: Some of the filters that contain either a 720 or 1080 at the end require a lot of ram if you do not have enough the program will exit.
-
-Cross platform version of Acid Cam written in C++11 
-
-To compile on Linux watch this video: https://youtu.be/ntsoGTglWzY
-
-To develop C++ filters that the program will load dynamically see the example
-filter in the plugins directory. The program will look for two functions:
-
-void pixel(int x, int y, unsigned char *buffer);
-
-void complete();
-
-pixel is called once for every pixel in the frame and complete is called
-when every pixel has been drawn. 
-
-The output from the program video file size can be very large. This is because OpenCV records at a very high bitrate. I usually load the file into Final Cut and share as H.264.
-You also could use Handbrake of FFmpeg to adjust the file size for uploading to the internet.
-
-
-For the Windows version of this program requires the Visual Studio 2015 Runtime
-
-Download it here: https://www.microsoft.com/en-us/download/details.aspx?id=48145
-
-Currently program works best when ran in Video mode, I have not been able to test
-on host os of windows or linux, just a guest virtual machine.  But in the VM webcam 
-resolution is maximum of 640x480.
-
-Screen shots of program on different Operating Systems:
-
-Screenshot from Windows:
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''\For Windows users, Visual Studio 2015 Runtime is necessary. Download here.
+Acid Cam performs optimally in Video mode, though testing on native OS environments is limited to virtual machines at this time.
+We're excited to see how Acid Cam inspires your creativity, whether for professional projects or personal exploration. Your feedback and contributions are highly valued as we continue to develop and refine Acid Cam.]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘1
 
 ![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acqt-ss.png?raw=true "screenshot 1")
 
@@ -118,7 +61,5 @@ Screenshot from Linux:
 
 ![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.2.lin.jpg?raw=true "screenshot 2")
 
-Screenshot from macOS:
 
-![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.3.osx.jpg?raw=true "screenshot 3")
-
+}|||||||||||||||
