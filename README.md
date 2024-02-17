@@ -53,9 +53,7 @@ Output Considerations
 Due to OpenCV's high bitrate recording, output files can be quite large. Consider compressing the files before sharing online.
 Platform Specifics
 
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''\For Windows users, Visual Studio 2015 Runtime is necessary. Download here.
-Acid Cam performs optimally in Video mode, though testing on native OS environments is limited to virtual machines at this time.
-We're excited to see how Acid Cam inspires your creativity, whether for professional projects or personal exploration. Your feedback and contributions are highly valued as we continue to develop and refine Acid Cam.]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘1
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''\‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘1
 
 ![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acqt-ss.png?raw=true "screenshot 1")
 
@@ -63,5 +61,3 @@ Screenshot from Linux:
 
 ![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.2.lin.jpg?raw=true "screenshot 2")
 
-
-}|||||||||||||||
