@@ -26,6 +26,8 @@ arduino
 	sudo apt-get install qt5-default libopencv-dev g++ git cmake autoconf automake libtool pkg-config libsdl2-dev
  
 Don't forget to install pkg-config and libacidcam. You can find libacidcam https://github.com/lostjared/libacidcam
+
+
 Compilation
 
 After downloading Acid Cam, navigate to the src directory.
