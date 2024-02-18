@@ -6,8 +6,6 @@
 
 Welcome to the Acid Cam project, a creative tool for transforming videos into art, tailor-made for both enthusiasts and professional Glitch artists. Acid Cam offers an expansive suite of filters, enabling the production of unique visual effects known as Acid Glitches. Designed for versatility, Acid Cam can be used as a standalone application or alongside other software to enhance your artistic workflow.
 
-Join Our Community
-
 System Requirements
 
 To fully enjoy Acid Cam's capabilities, your system needs at least 8 GB of RAM.
@@ -27,7 +25,6 @@ arduino
  
 Don't forget to install pkg-config and libacidcam. You can find libacidcam https://github.com/lostjared/libacidcam
 
-
 Compilation
 
 After downloading Acid Cam, navigate to the src directory.
@@ -39,6 +36,7 @@ High-resolution settings result in large MPEG-4 bitrates. Consider using Final C
 Explore and Share
 
 	ffmpeg -i "input.file.mp4" -c:v libx265 -tag:v hvc1 -crf 18 output.file.mp4
+
 For the latest updates and sample videos, visit our Facebook page.
 Acid Cam is ideal for generating foundational artwork for further manipulation, creating visuals for music videos, or simply for experimentation and fun.
 Notes and Tips
@@ -52,8 +50,6 @@ Output Considerations
 
 Due to OpenCV's high bitrate recording, output files can be quite large. Consider compressing the files before sharing online.
 Platform Specifics
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''\‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘‘1
 
 ![ScreenShot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acqt-ss.png?raw=true "screenshot 1")
 
