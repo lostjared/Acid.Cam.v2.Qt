@@ -2,8 +2,6 @@
 
 ![scr2](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/screenshot.jpg "screenshot")
 
-![scr1](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acid.cam.img1.jpg "screenshot")
-
 Check out the manual subdirectory for more information on how to use this program.
 
 Welcome to the Acid Cam project, a creative tool for transforming videos into art, tailor-made for both enthusiasts and professional Glitch artists. Acid Cam offers an expansive suite of filters, enabling the production of unique visual effects known as Acid Glitches. Designed for versatility, Acid Cam can be used as a standalone application or alongside other software to enhance your artistic workflow.
