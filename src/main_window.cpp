@@ -1014,6 +1014,7 @@ void AC_MainWindow::Log(const QString &s) {
     QTextCursor tmpCursor = log_text->textCursor();
     tmpCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
     log_text->setTextCursor(tmpCursor);
+    log_text->ensureCursorVisible();
 }
 
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record, int type,
