@@ -43,6 +43,13 @@
 #include<QDesktopServices>
 #include<QKeyEvent>
 #include<QSettings>
+#include<QVBoxLayout>
+#include<QHBoxLayout>
+#include<QGridLayout>
+#include<QGroupBox>
+#include<QSlider>
+#include<QSizePolicy>
+#include<QSpinBox>
 #include"ac.h"
 #include"fractal.h"
 #include<unordered_map>

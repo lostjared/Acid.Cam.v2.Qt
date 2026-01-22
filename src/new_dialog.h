@@ -9,6 +9,7 @@
 #define _NEW_DIALOG_H_
 
 #include "qtheaders.h"
+#include "ffmpeg_write.h"
 
 class AC_MainWindow;
 
@@ -24,13 +25,17 @@ public:
     QCheckBox *chk_record;
     QPushButton *btn_start, *btn_select;
     QComboBox *video_type;
+    QCheckBox *chk_use_ffmpeg;
+    QComboBox *ffmpeg_codec;
+    QSpinBox *spin_crf;
+    
 public slots:
     void btn_Select();
     void btn_Start();
+    void onUseFFmpegChanged(int state);
     
 private:
     AC_MainWindow *win_parent;
-    
 };
 
 class CaptureVideo : public QDialog {
@@ -45,11 +50,17 @@ public:
     QPushButton *btn_setedit, *btn_setout, *btn_start;
     QCheckBox *chk_record, *chk_png;
     QComboBox *video_type;
+    QCheckBox *chk_use_ffmpeg;
+    QComboBox *ffmpeg_codec;
+    QSpinBox *spin_crf;
+    QCheckBox *chk_mux_audio;
     
 public slots:
     void btn_SetSourceFile();
     void btn_SetOutputDir();
     void btn_Start();
+    void onUseFFmpegChanged(int state);
+    
 private:
     AC_MainWindow *win_parent;
     QSettings *settings;

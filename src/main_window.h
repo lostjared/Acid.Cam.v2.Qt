@@ -22,6 +22,7 @@
 #include "controller.h"
 #include "color_range.h"
 #include "slitscan_win.h"
+#include "ffmpeg_write.h"
 
 class SearchWindow;
 class ChromaWindow;
@@ -32,8 +33,10 @@ public:
     AC_MainWindow(QWidget *parent = 0);
     ~AC_MainWindow();
     void Log(const QString &s);
-    bool startCamera(int res, int dev, const QString &outdir, bool record, int type);
-    bool startVideo(const QString &filename, const QString &outdir, bool record,bool png_record, int type);
+    bool startCamera(int res, int dev, const QString &outdir, bool record, int type,
+                     bool useFFmpeg = false, FFmpegCodec codec = FFmpegCodec::LIBX264, int crf = 23);
+    bool startVideo(const QString &filename, const QString &outdir, bool record, bool png_record, int type,
+                    bool useFFmpeg = false, FFmpegCodec codec = FFmpegCodec::LIBX264, int crf = 23, bool muxAudio = true);
     QListWidget /**filters,*/ *custom_filters;
     QPushButton *btn_add, *btn_remove, *btn_moveup, *btn_movedown,*btn_load, *btn_save, *btn_sub, *btn_clr;
     QTextEdit *log_text;
@@ -149,6 +152,7 @@ public slots:
     void next_filter();
     void prev_filter();
     void showSlit();
+    void onFFmpegFinished(QString tempFile, QString sourceFile, QString outputFile);
      
 private:
     void createControls();

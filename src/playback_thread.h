@@ -9,6 +9,7 @@
 #define __PLAYBACK_WINDOW_H__
 
 #include "qtheaders.h"
+#include "ffmpeg_write.h"
 #include<atomic>
 
 
@@ -60,6 +61,12 @@ private:
     std::unordered_map<std::string, FilterValue> filter_map_ex;
     std::atomic<bool> setFilterMap;
     std::unordered_map<std::string, FilterValue> filter_map_ex_set;
+    FILE *ffmpeg_pipe;
+    std::atomic<bool> use_ffmpeg;
+    std::string ffmpeg_output_path;
+    std::string ffmpeg_source_path;
+    std::atomic<bool> ffmpeg_mux_audio;
+    
 public:
     Playback(QObject *parent = 0);
     ~Playback();
@@ -113,11 +120,19 @@ public:
     void setCustomCycle(bool b);
     void setCustomCycleDelay(int delay);
     void setChromaImage(cv::Mat &frame);
+    void setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPath,
+                        FFmpegCodec codec, int crf, double fps, int width, int height,
+                        bool muxAudio, const std::string &sourcePath);
+    bool setVideoCameraFFmpeg(const std::string &outputPath, int device, int res,
+                              FFmpegCodec codec, int crf);
+    void closeFFmpeg();
+    
 signals:
     void procImage(const QImage image);
     void stopRecording();
     void frameIncrement();
     void resetIndex();
+    void ffmpegFinished(QString tempFile, QString sourceFile, QString outputFile);
 };
 
 #endif

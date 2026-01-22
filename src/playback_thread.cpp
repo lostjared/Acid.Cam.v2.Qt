@@ -29,6 +29,9 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     draw_strings = ac::draw_strings;
     filter_map_ex = filter_map;
     blend_image_copy_set = false;
+    ffmpeg_pipe = nullptr;
+    use_ffmpeg = false;
+    ffmpeg_mux_audio = false;
 }
 
 bool Playback::VideoRelease() {
@@ -531,7 +534,10 @@ void Playback::run() {
         }
         
         mutex.lock();
-        if(recording && writer.isOpened()) {
+        if(recording && use_ffmpeg && ffmpeg_pipe != nullptr) {
+            ffmpeg_write_frame(ffmpeg_pipe, frame);
+        }
+        else if(recording && writer.isOpened()) {
             writer.write(frame);
         }
         mutex.unlock();
@@ -629,6 +635,9 @@ void Playback::Release() {
     if(capture.isOpened() && mode == MODE_VIDEO) capture.release();
     if(writer.isOpened()) writer.release();
     mutex.unlock();
+    if(use_ffmpeg && ffmpeg_pipe != nullptr) {
+        closeFFmpeg();
+    }
 }
 
 void Playback::msleep(int ms) {
@@ -692,3 +701,133 @@ void Playback::filterFade(cv::Mat &frame, FilterValue &filter1, FilterValue &fil
     }
 }
 
+void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPath,
+                              FFmpegCodec codec, int crf, double fps, int width, int height,
+                              bool muxAudio, const std::string &sourcePath) {
+    mutex.lock();
+    mode = MODE_VIDEO;
+    capture = cap;
+    recording = true;
+    use_ffmpeg = true;
+    ffmpeg_mux_audio = muxAudio;
+    ffmpeg_source_path = sourcePath;
+    ffmpeg_output_path = outputPath;
+    
+    if(capture.isOpened()) {
+        frame_rate = capture.get(cv::CAP_PROP_FPS);
+        if(frame_rate <= 0) frame_rate = 24;
+    }
+    
+    std::ostringstream resStream;
+    resStream << width << "x" << height;
+    std::string resolution = resStream.str();
+    
+    ffmpeg_pipe = ffmpeg_open(outputPath, codec, resolution, resolution, fps, crf);
+    if(!ffmpeg_pipe) {
+        std::cerr << "acidcam: Failed to open FFmpeg pipe for encoding\n";
+        use_ffmpeg = false;
+        recording = false;
+    }
+    
+    mutex.unlock();
+}
+
+bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device, int res,
+                                    FFmpegCodec codec, int crf) {
+    mutex.lock();
+    mode = MODE_CAMERA;
+    device_num = device;
+
+#ifdef _WIN32
+    capture.open(device, cv::CAP_DSHOW);
+#else
+    capture.open(device);
+#endif
+    
+    if(!capture.isOpened()) {
+        mutex.unlock();
+        return false;
+    }
+    
+    recording = true;
+    use_ffmpeg = true;
+    ffmpeg_output_path = outputPath;
+    
+    int res_w = 640, res_h = 480;
+    switch(res) {
+        case 0:
+            res_w = 640;
+            res_h = 480;
+            break;
+        case 1:
+            res_w = 1280;
+            res_h = 720;
+            break;
+        case 2:
+            res_w = 1920;
+            res_h = 1080;
+            break;
+    }
+
+    capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
+    capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
+    double fps = capture.get(cv::CAP_PROP_FPS);
+    if(fps <= 0) fps = 30;
+    res_w = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH));
+    res_h = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    
+    std::ostringstream resStream;
+    resStream << res_w << "x" << res_h;
+    std::string resolution = resStream.str();
+    
+    ffmpeg_pipe = ffmpeg_open(outputPath, codec, resolution, resolution, fps, crf);
+    if(!ffmpeg_pipe) {
+        std::cerr << "acidcam: Failed to open FFmpeg pipe for camera encoding\n";
+        use_ffmpeg = false;
+        recording = false;
+        mutex.unlock();
+        return false;
+    }
+    
+    mutex.unlock();
+    return true;
+}
+
+void Playback::closeFFmpeg() {
+    mutex.lock();
+    if(ffmpeg_pipe != nullptr) {
+        ffmpeg_close(ffmpeg_pipe);
+        ffmpeg_pipe = nullptr;
+        
+        // If we need to mux audio from source
+        if(ffmpeg_mux_audio && !ffmpeg_source_path.empty() && !ffmpeg_output_path.empty()) {
+            // Create final output path (replace temp_ prefix or add _final)
+            std::string finalPath = ffmpeg_output_path;
+            auto lastSlash = finalPath.rfind('/');
+            if(lastSlash == std::string::npos) lastSlash = finalPath.rfind('\\');
+            
+            std::string dir = (lastSlash != std::string::npos) ? finalPath.substr(0, lastSlash + 1) : "";
+            std::string filename = (lastSlash != std::string::npos) ? finalPath.substr(lastSlash + 1) : finalPath;
+            
+            // If filename starts with temp_, create non-temp version
+            if(filename.substr(0, 5) == "temp_") {
+                filename = filename.substr(5);
+            } else {
+                // Add _with_audio before extension
+                auto dotPos = filename.rfind('.');
+                if(dotPos != std::string::npos) {
+                    filename = filename.substr(0, dotPos) + "_with_audio" + filename.substr(dotPos);
+                }
+            }
+            finalPath = dir + filename;
+            
+            emit ffmpegFinished(QString::fromStdString(ffmpeg_output_path),
+                               QString::fromStdString(ffmpeg_source_path),
+                               QString::fromStdString(finalPath));
+        }
+    }
+    use_ffmpeg = false;
+    recording = false;
+    ffmpeg_mux_audio = false;
+    mutex.unlock();
+}

@@ -46,6 +46,7 @@ set(SOURCES
     controller.cpp
     color_range.cpp
     slitscan_win.cpp
+    ffmpeg_write.cpp
 )
 
 set(HEADERS
@@ -66,6 +67,7 @@ set(HEADERS
     controller.h
     color_range.h
     slitscan_win.h
+    ffmpeg_write.h
 )
 
 

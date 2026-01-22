@@ -108,8 +108,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     playback = new Playback();
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
-    setGeometry(100, 100, 800, 700);
-    setFixedSize(800, 700);
+    setGeometry(100, 100, 850, 700);
+    setMinimumSize(750, 600);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
@@ -153,6 +153,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     QObject::connect(playback, SIGNAL(stopRecording()), this, SLOT(stopRecording()));
     QObject::connect(playback, SIGNAL(frameIncrement()), this, SLOT(frameInc()));
     QObject::connect(playback, SIGNAL(resetIndex()), this, SLOT(resetIndex()));
+    QObject::connect(playback, SIGNAL(ffmpegFinished(QString, QString, QString)), 
+                     this, SLOT(onFFmpegFinished(QString, QString, QString)));
     
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
         QString text;
@@ -198,144 +200,170 @@ bool AC_MainWindow::checkAdd(QString str) {
 }
 
 void AC_MainWindow::createControls() {
-    custom_filters = new QListWidget(this);
-    custom_filters->setGeometry(400, 30, 390, 180);
-    custom_filters->show();
+    QWidget *centralWidget = new QWidget(this);
+    setCentralWidget(centralWidget);
+    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+    mainLayout->setSpacing(8);
+    mainLayout->setContentsMargins(10, 10, 10, 10);
+    QGroupBox *filterModeGroup = new QGroupBox(tr("Filter Mode"), this);
+    QHBoxLayout *filterModeLayout = new QHBoxLayout(filterModeGroup);
+    filter_single = new QRadioButton(tr("Single Filter"), this);
+    filter_custom = new QRadioButton(tr("Custom Filter"), this);
+    filter_single->setChecked(true);
+    filterModeLayout->addWidget(filter_single);
+    filterModeLayout->addWidget(filter_custom);
+    filterModeLayout->addStretch();
+    connect(filter_single, SIGNAL(pressed()), this, SLOT(setFilterSingle()));
+    connect(filter_custom, SIGNAL(pressed()), this, SLOT(setFilterCustom()));
+    QGroupBox *filterSelectGroup = new QGroupBox(tr("Filter Selection"), this);
+    QVBoxLayout *filterSelectLayout = new QVBoxLayout(filterSelectGroup);
+    QHBoxLayout *filterDropdownLayout = new QHBoxLayout();
+    QVBoxLayout *categoryLayout = new QVBoxLayout();
+    QLabel *categoryLabel = new QLabel(tr("Category:"), this);
     menu_cat = new QComboBox(this);
-    menu_cat->setGeometry(10, 90, 380, 30);
+    menu_cat->setMinimumWidth(200);
     for(int i = 0; menuNames[i] != 0; ++i) {
         menu_cat->addItem(menuNames[i]);
     }
     menu_cat->setCurrentIndex(0);
+    categoryLayout->addWidget(categoryLabel);
+    categoryLayout->addWidget(menu_cat);
     
+    QVBoxLayout *filterLayout = new QVBoxLayout();
+    QLabel *filterLabel = new QLabel(tr("Filter:"), this);
     filters = new QComboBox(this);
-    filters->setGeometry(10, 120, 380, 30);
+    filters->setMinimumWidth(200);
+    filterLayout->addWidget(filterLabel);
+    filterLayout->addWidget(filters);
     
-    std::vector<std::string> fnames;
-    for(int i = 0; i < ac::draw_max-5; ++i) {
-        fnames.push_back(draw_strings[i].c_str());
-    }
+    filterDropdownLayout->addLayout(categoryLayout);
+    filterDropdownLayout->addLayout(filterLayout);
+    filterDropdownLayout->addStretch();
     
-    std::sort(fnames.begin(), fnames.end());
+    QHBoxLayout *subfilterLayout = new QHBoxLayout();
+    btn_sub = new QPushButton(tr("Set Subfilter"), this);
+    btn_clr = new QPushButton(tr("Clear Subfilter"), this);
+    btn_sub->setMinimumWidth(100);
+    btn_clr->setMinimumWidth(100);
+    subfilterLayout->addWidget(btn_sub);
+    subfilterLayout->addWidget(btn_clr);
+    subfilterLayout->addStretch();
+    connect(btn_sub, SIGNAL(clicked()), this, SLOT(setSub()));
+    connect(btn_clr, SIGNAL(clicked()), this, SLOT(clear_subfilter()));
     
-    /*
-    for(unsigned long i = 0; i < fnames.size(); ++i) {
-        filters->addItem(fnames[i].c_str());
-    }
-    
-    for(int i = 0; filter_names[i] != 0; ++i) {
-        std::string filter_n = "AF_";
-        filter_n += filter_names[i];
-        filters->addItem(filter_n.c_str());
-    }
-    
-    for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
-        std::string name = "plugin " + plugins.plugin_list[i]->name();
-        filters->addItem(name.c_str());
-    }*/
+    filterSelectLayout->addLayout(filterDropdownLayout);
+    filterSelectLayout->addLayout(subfilterLayout);
     
     connect(filters, SIGNAL(currentIndexChanged(int)), this, SLOT(comboFilterChanged(int)));
     connect(menu_cat, SIGNAL(currentIndexChanged(int)), this, SLOT(menuFilterChanged(int)));
+
+    QGroupBox *customListGroup = new QGroupBox(tr("Custom Filter List"), this);
+    QVBoxLayout *customListLayout = new QVBoxLayout(customListGroup);
     
+    custom_filters = new QListWidget(this);
+    custom_filters->setMinimumHeight(120);
+    custom_filters->setMaximumHeight(160);
+    customListLayout->addWidget(custom_filters);
     
-    filter_single = new QRadioButton(tr("Single Filter"), this);
-    filter_single->setGeometry(30, 40, 200, 15);
-    filter_custom = new QRadioButton(tr("Custom Filter"), this);
-    filter_custom->setGeometry(30, 65, 200, 15);
-    
-    filter_single->setChecked(true);
-    
-    connect(filter_single, SIGNAL(pressed()), this, SLOT(setFilterSingle()));
-    connect(filter_custom, SIGNAL(pressed()), this, SLOT(setFilterCustom()));
-    
+    QHBoxLayout *customButtonLayout = new QHBoxLayout();
     btn_add = new QPushButton(tr("Add"), this);
     btn_remove = new QPushButton(tr("Remove"), this);
-    btn_moveup = new QPushButton(tr("Up"), this);
-    btn_movedown = new QPushButton(tr("Down"), this);
-    btn_sub = new QPushButton(tr("Subfilter"), this);
-    btn_clr = new QPushButton(tr("Clear Sub"), this);
+    btn_moveup = new QPushButton(tr("Move Up"), this);
+    btn_movedown = new QPushButton(tr("Move Down"), this);
     btn_load = new QPushButton(tr("Load"), this);
     btn_save = new QPushButton(tr("Save"), this);
-    btn_add->setGeometry(10, 215, 100, 25);
-    btn_remove->setGeometry(390, 215, 80, 25);
-    btn_moveup->setGeometry(460, 215, 80, 25);
-    btn_movedown->setGeometry(530, 215, 80, 25);
-    btn_load->setGeometry(655+30, 215, 60, 25);
-    btn_save->setGeometry(655+60+20, 215, 60, 25);
-    btn_sub->setGeometry(10, 165, 100, 25);
-    btn_clr->setGeometry(115, 165, 100, 25);
+    
+    customButtonLayout->addWidget(btn_add);
+    customButtonLayout->addWidget(btn_remove);
+    customButtonLayout->addWidget(btn_moveup);
+    customButtonLayout->addWidget(btn_movedown);
+    customButtonLayout->addStretch();
+    customButtonLayout->addWidget(btn_load);
+    customButtonLayout->addWidget(btn_save);
+    
+    QHBoxLayout *optionsRowLayout = new QHBoxLayout();
+    chk_negate = new QCheckBox(tr("Negate"), this);
+    chk_negate->setCheckState(Qt::Unchecked);
+    combo_rgb = new QComboBox(this);
+    combo_rgb->addItem(tr("RGB"));
+    combo_rgb->addItem(tr("BGR"));
+    combo_rgb->addItem(tr("BRG"));
+    combo_rgb->addItem(tr("GRB"));
+    combo_rgb->setMinimumWidth(100);
+    use_settings = new QCheckBox(tr("Use Settings"), this);
+    use_settings->setCheckState(Qt::Checked);
+    
+    optionsRowLayout->addWidget(chk_negate);
+    optionsRowLayout->addSpacing(20);
+    optionsRowLayout->addWidget(new QLabel(tr("Channel Order:"), this));
+    optionsRowLayout->addWidget(combo_rgb);
+    optionsRowLayout->addStretch(1);
+    optionsRowLayout->addWidget(use_settings);
+    
+    customListLayout->addLayout(customButtonLayout);
+    customListLayout->addLayout(optionsRowLayout);
+    
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
     connect(btn_moveup, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(btn_movedown, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(btn_sub, SIGNAL(clicked()), this, SLOT(setSub()));
-    connect(btn_clr, SIGNAL(clicked()), this, SLOT(clear_subfilter()));
     connect(btn_load, SIGNAL(clicked()), this, SLOT(load_CustomFile()));
     connect(btn_save, SIGNAL(clicked()), this, SLOT(save_CustomFile()));
-    QLabel *r_label = new QLabel(tr("Red: "), this);
-    r_label->setGeometry(10, 255, 50, 20);
-    slide_r = new QSlider(Qt::Horizontal,this);
-    slide_r->setGeometry(40, 250, 100, 30);
-    slide_r->setMaximum(255);
-    slide_r->setMinimum(0);
-    slide_r->setTickInterval(0);
+    connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
+    connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
+
+    QGroupBox *colorGroup = new QGroupBox(tr("Color Adjustments"), this);
+    QGridLayout *colorLayout = new QGridLayout(colorGroup);
+    colorLayout->setSpacing(10);
     
-    QLabel *g_label = new QLabel(tr("Green: "), this);
-    g_label->setGeometry(150, 255, 50, 20);
+    QLabel *r_label = new QLabel(tr("Red:"), this);
+    slide_r = new QSlider(Qt::Horizontal, this);
+    slide_r->setRange(0, 255);
+    slide_r->setMinimumWidth(100);
+    
+    QLabel *g_label = new QLabel(tr("Green:"), this);
     slide_g = new QSlider(Qt::Horizontal, this);
-    slide_g->setGeometry(190, 250, 100, 30);
-    slide_g->setMaximum(255);
-    slide_g->setMinimum(0);
-    slide_g->setTickInterval(0);
+    slide_g->setRange(0, 255);
+    slide_g->setMinimumWidth(100);
     
-    QLabel *b_label = new QLabel(tr("Blue: "), this);
-    b_label->setGeometry(300, 255, 50, 20);
+    QLabel *b_label = new QLabel(tr("Blue:"), this);
     slide_b = new QSlider(Qt::Horizontal, this);
-    slide_b->setGeometry(330, 250, 100, 30);
-    slide_b->setMaximum(255);
-    slide_b->setMinimum(0);
-    slide_b->setTickInterval(0);
+    slide_b->setRange(0, 255);
+    slide_b->setMinimumWidth(100);
     
-    connect(slide_r, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
-    connect(slide_g, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
-    connect(slide_b, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
+    colorLayout->addWidget(r_label, 0, 0);
+    colorLayout->addWidget(slide_r, 0, 1);
+    colorLayout->addWidget(g_label, 0, 2);
+    colorLayout->addWidget(slide_g, 0, 3);
+    colorLayout->addWidget(b_label, 0, 4);
+    colorLayout->addWidget(slide_b, 0, 5);
     
-    QLabel *label_slide_bright = new QLabel(tr("Brightness: "), this);
-    label_slide_bright->setGeometry(10, 280, 75, 20);
+    QLabel *bright_label = new QLabel(tr("Brightness:"), this);
     slide_bright = new QSlider(Qt::Horizontal, this);
-    slide_bright->setGeometry(80, 275, 100, 30);
-    slide_bright->setMaximum(255);
-    slide_bright->setMinimum(0);
-    slide_bright->setTickInterval(0);
+    slide_bright->setRange(0, 255);
+    slide_bright->setMinimumWidth(100);
     
-    
-    QLabel *label_slide_gamma = new QLabel(tr("Gamma: "), this);
-    label_slide_gamma->setGeometry(190, 280, 65, 20);
+    QLabel *gamma_label = new QLabel(tr("Gamma:"), this);
     slide_gamma = new QSlider(Qt::Horizontal, this);
-    slide_gamma->setGeometry(245, 275, 100, 30);
-    slide_gamma->setMaximum(255);
-    slide_gamma->setMinimum(0);
-    slide_gamma->setTickInterval(0);
+    slide_gamma->setRange(0, 255);
+    slide_gamma->setMinimumWidth(100);
     
-    QLabel *label_sat = new QLabel(tr("Saturation: "), this);
-    label_sat->setGeometry(350, 280, 100, 20);
+    QLabel *sat_label = new QLabel(tr("Saturation:"), this);
     slide_saturation = new QSlider(Qt::Horizontal, this);
-    slide_saturation->setGeometry(420, 275, 100, 30);
-    slide_saturation->setMaximum(255);
-    slide_saturation->setMinimum(0);
-    slide_saturation->setTickInterval(0);
+    slide_saturation->setRange(0, 255);
+    slide_saturation->setMinimumWidth(100);
     
-    connect(slide_bright, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
-    connect(slide_gamma, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
-    connect(slide_saturation, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
+    colorLayout->addWidget(bright_label, 1, 0);
+    colorLayout->addWidget(slide_bright, 1, 1);
+    colorLayout->addWidget(gamma_label, 1, 2);
+    colorLayout->addWidget(slide_gamma, 1, 3);
+    colorLayout->addWidget(sat_label, 1, 4);
+    colorLayout->addWidget(slide_saturation, 1, 5);
     
-    QLabel *color_maps_label = new QLabel("<b>Color Maps</b>", this);
-    color_maps_label->setGeometry(545, 260, 75, 20);
-    
+    QLabel *colormap_label = new QLabel(tr("Color Map:"), this);
     color_maps = new QComboBox(this);
-    color_maps->setGeometry(540, 275, 250, 30);
     color_maps->addItem(tr("None"));
-    color_maps->addItem(tr("Autum"));
+    color_maps->addItem(tr("Autumn"));
     color_maps->addItem(tr("Bone"));
     color_maps->addItem(tr("Jet"));
     color_maps->addItem(tr("Winter"));
@@ -347,12 +375,25 @@ void AC_MainWindow::createControls() {
     color_maps->addItem(tr("Pink"));
     color_maps->addItem(tr("Hot"));
     color_maps->addItem(tr("Parula"));
+    color_maps->setMinimumWidth(150);
     
+    colorLayout->addWidget(colormap_label, 2, 0);
+    colorLayout->addWidget(color_maps, 2, 1, 1, 2);
+    
+    connect(slide_r, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
+    connect(slide_g, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
+    connect(slide_b, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
+    connect(slide_bright, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
+    connect(slide_gamma, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
+    connect(slide_saturation, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
     connect(color_maps, SIGNAL(currentIndexChanged(int)), this, SLOT(colorMapChanged(int)));
+
+    QGroupBox *logGroup = new QGroupBox(tr("Log Output"), this);
+    QVBoxLayout *logLayout = new QVBoxLayout(logGroup);
     
     log_text = new QTextEdit(this);
-    log_text->setGeometry(10, 325, 780,310);
     log_text->setReadOnly(true);
+    log_text->setMinimumHeight(150);
     
     QString text;
     QTextStream stream(&text);
@@ -371,28 +412,27 @@ void AC_MainWindow::createControls() {
     }
     stream << s_stream.str().c_str();
     log_text->setText(text);
-    chk_negate = new QCheckBox(tr("Negate"), this);
-    chk_negate->setGeometry(120,215,100, 20);
-    chk_negate->setCheckState(Qt::Unchecked);
-    use_settings = new QCheckBox(tr("Settings"), this);
-    use_settings->setCheckState(Qt::Checked);
-    use_settings->setGeometry(613, 220,80, 20);
-    connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
     
-    combo_rgb = new QComboBox(this);
-    combo_rgb->setGeometry(200,215, 190, 25);
-    combo_rgb->addItem(tr("RGB"));
-    combo_rgb->addItem(tr("BGR"));
-    combo_rgb->addItem(tr("BRG"));
-    combo_rgb->addItem(tr("GRB"));
-    setWindowIcon(QPixmap(":/images/icon.png"));
+    logLayout->addWidget(log_text);
+
     progress_bar = new QProgressBar(this);
-    progress_bar->setGeometry(0, 640, 800, 20);
     progress_bar->setMinimum(0);
     progress_bar->setMaximum(100);
     progress_bar->hide();
+
+    QHBoxLayout *topRowLayout = new QHBoxLayout();
+    topRowLayout->addWidget(filterModeGroup);
+    topRowLayout->addWidget(filterSelectGroup, 1);
+    
+    mainLayout->addLayout(topRowLayout);
+    mainLayout->addWidget(customListGroup);
+    mainLayout->addWidget(colorGroup);
+    mainLayout->addWidget(logGroup, 1);
+    mainLayout->addWidget(progress_bar);
+
+    setWindowIcon(QPixmap(":/images/icon.png"));
     menu_cat->setCurrentIndex(1);
-    Log(tr("Max frames set to 300; set accordingly based on desired ram.\nIntertwine Rows and other filters that require more than 300 frames will not work until max is set.\n"));
+    Log(tr("Max frames set to 300; set accordingly based on desired RAM.\nIntertwine Rows and other filters that require more than 300 frames will not work until max is set.\n"));
 }
 
 void AC_MainWindow::createMenu() {
@@ -976,7 +1016,8 @@ void AC_MainWindow::Log(const QString &s) {
     log_text->setTextCursor(tmpCursor);
 }
 
-bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record, int type) {
+bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record, int type,
+                                bool useFFmpeg, FFmpegCodec ffmpegCodec, int crf) {
     programMode = MODE_CAMERA;
     progress_bar->hide();
     controls_showvideo->setEnabled(false);
@@ -989,25 +1030,15 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     step_frame = false;
     video_file_name = "";
     frame_index = 0;
-    /*
-     capture_camera.open(dev);
-     if(!capture_camera.isOpened()) {
-     return false;
-     }*/
+
     video_frames = 0;
-    video_fps = 24; /*
-                     int ores_w = capture_camera.get(CV_CAP_PROP_FRAME_WIDTH);
-                     int ores_h = capture_camera.get(CV_CAP_PROP_FRAME_HEIGHT);
-                     */
+    video_fps = 24;
+    
     int res_w = 0;
     int res_h = 0;
-    /*QString str;
-     QTextStream stream(&str);
-     stream << "Opened capture device " << res_w << "x" << res_h << "\n";
-     stream << "FPS: " << video_fps << "\n";*/
+    
     output_directory = outdir;
     frame_index = 0;
-    //Log(str);
     paused = false;
     recording = record;
     QString output_name;
@@ -1018,7 +1049,6 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     m = localtime(&t);
     QString ext;
     
-    //ext = (type == 0) ? ".mov" : ".avi";
     Log(tr("Capture Device Opened [Camera]\n"));
     std::ostringstream time_stream;
     switch(res) {
@@ -1037,69 +1067,78 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     }
     
     QString out_type;
-    switch(type) {
-        case 0:
-            ext = ".mp4";
-            out_type = "MPEG-4";
-            break;
-        case 1:
-            ext = ".mp4";
-            out_type = "AVC";
-            break;
-        case 2:
-            ext = ".avi";
-            out_type = "XviD";
-            break;
+    if(useFFmpeg) {
+        ext = ".mp4";
+        out_type = QString("FFmpeg.%1").arg(getCodecName(ffmpegCodec));
+    } else {
+        switch(type) {
+            case 0:
+                ext = ".mp4";
+                out_type = "MPEG-4";
+                break;
+            case 1:
+                ext = ".mp4";
+                out_type = "AVC";
+                break;
+            case 2:
+                ext = ".avi";
+                out_type = "XviD";
+                break;
+        }
     }
     
     std::ostringstream index_val;
     index_val << std::setw(4) << std::setfill('0') << (++index);
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
     stream_ << outdir << "/" << "Acid.Cam.Video" << "." << out_type << time_stream.str().c_str() << "." << "AC2.Output." << index_val.str().c_str() << ext;
-    /*
-     bool cw = capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
-     bool ch = capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
-     
-     if(cw == false || ch == false) {
-     QMessageBox::information(this, tr("Info"), tr("Could not set resolution reverting to default .."));
-     res_w = ores_w;
-     res_h = ores_h;
-     capture_camera.set(CV_CAP_PROP_FRAME_WIDTH, res_w);
-     capture_camera.set(CV_CAP_PROP_FRAME_HEIGHT, res_h);
-     } */
-    int c_type = 0;
-    if(recording) {
+
+    bool rt_val = false;
+    
+    if(recording && useFFmpeg) {
         video_file_name = output_name;
-        switch(type) {
-            case 0:
-                c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
-                break;
-            case '1':
-                c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
-                break;
-            case '2':
-                c_type = cv::VideoWriter::fourcc('X', 'v', 'i', 'D');
-                break;
-        }
-      
         QString out_s;
         QTextStream out_stream(&out_s);
-        out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
+        out_stream << "Now recording with FFmpeg (" << getCodecDescription(ffmpegCodec) << ") to: " << output_name 
+                   << "\nResolution: " << res_w << "x" << res_h << " CRF: " << crf << "\n";
         Log(out_s);
+        
+        rt_val = playback->setVideoCameraFFmpeg(output_name.toStdString(), dev, res, ffmpegCodec, crf);
     } else {
-        output_name = "";
+        int c_type = 0;
+        if(recording) {
+            video_file_name = output_name;
+            switch(type) {
+                case 0:
+                    c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
+                    break;
+                case 1:
+                    c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
+                    break;
+                case 2:
+                    c_type = cv::VideoWriter::fourcc('X', 'v', 'i', 'D');
+                    break;
+            }
+          
+            QString out_s;
+            QTextStream out_stream(&out_s);
+            out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
+            Log(out_s);
+        } else {
+            output_name = "";
+        }
+        rt_val = playback->setVideoCamera(output_name.toStdString(), c_type, dev, res, writer, recording);
     }
+    
     // if successful
     file_new_capture->setEnabled(false);
     file_new_video->setEnabled(false);
     controls_stop->setEnabled(true);
-    bool rt_val = playback->setVideoCamera(output_name.toStdString(), c_type, dev, res, writer, recording);
     
     if(rt_val == false) {
         QMessageBox::information(this, tr("Error Could not create output file"), tr("Output file"));
+        return false;
     }
     
-    if(rt_val == false) return false;
     playback->Play();
     disp->show();
     QString out_text;
@@ -1116,7 +1155,8 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     return true;
 }
 
-bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record, bool png_record, int type) {
+bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record, bool png_record, int type,
+                               bool useFFmpeg, FFmpegCodec ffmpegCodec, int crf, bool muxAudio) {
     programMode = MODE_VIDEO;
     controls_stop->setEnabled(true);
     controls_pause->setEnabled(true);
@@ -1159,42 +1199,63 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     time_t t = time(0);
     struct tm *m;
     m = localtime(&t);
-    QString ext;
-    ext = ".mp4";
-    //ext = (type == 0) ? ".mov" : ".avi";
+    QString ext = ".mp4";
     std::ostringstream time_stream;
     QString out_type;
-    switch(type) {
-        case 0:
-            ext = ".mp4";
-            out_type = "MPEG-4";
-            break;
-        case 1:
-            ext = ".mp4";
-            out_type = "AVC";
-            break;
-        case 2:
-            ext = ".avi";
-            out_type = "XviD";
-            break;
+    
+    if(useFFmpeg) {
+        ext = ".mp4";
+        out_type = QString("FFmpeg.%1").arg(getCodecName(ffmpegCodec));
+    } else {
+        switch(type) {
+            case 0:
+                ext = ".mp4";
+                out_type = "MPEG-4";
+                break;
+            case 1:
+                ext = ".mp4";
+                out_type = "AVC";
+                break;
+            case 2:
+                ext = ".avi";
+                out_type = "XviD";
+                break;
+        }
     }
     
     std::ostringstream index_val;
     index_val << std::setw(4) << std::setfill('0') << (++index);
     time_stream << "-" << (m->tm_year + 1900) << "." << (m->tm_mon + 1) << "." << m->tm_mday << "_" << m->tm_hour << "." << m->tm_min << "." << m->tm_sec <<  "_";
-    stream_ << outdir << "/" << "Acid.Cam.Video" << "." << out_type << time_stream.str().c_str() << "." << res_w << "x" << res_h << "." "AC2.Output." << index_val.str().c_str() << ext;
+    
+    // For FFmpeg with audio muxing, use temp_ prefix
+    QString prefix = (useFFmpeg && muxAudio) ? "temp_" : "";
+    stream_ << outdir << "/" << prefix << "Acid.Cam.Video" << "." << out_type << time_stream.str().c_str() << "." << res_w << "x" << res_h << "." "AC2.Output." << index_val.str().c_str() << ext;
 
-    if(recording) {
+    if(recording && useFFmpeg) {
+        video_file_name = output_name;
+        QString out_s;
+        QTextStream out_stream(&out_s);
+        out_stream << "Now recording with FFmpeg (" << getCodecDescription(ffmpegCodec) << ") to: " << output_name 
+                   << "\nResolution: " << res_w << "x" << res_h << " CRF: " << crf << "\n";
+        if(muxAudio) {
+            out_stream << "Audio will be copied from source video.\n";
+        }
+        Log(out_s);
+        
+        playback->setVideoFFmpeg(capture_video, output_name.toStdString(),
+                                 ffmpegCodec, crf, video_fps, res_w, res_h,
+                                 muxAudio, filename.toStdString());
+    } else if(recording) {
         video_file_name = output_name;
         int c_type = 0;
         switch(type) {
             case 0:
                 c_type = cv::VideoWriter::fourcc('m', 'p', '4', 'v');
                 break;
-            case '1':
+            case 1:
                 c_type = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
                 break;
-            case '2':
+            case 2:
                 c_type = cv::VideoWriter::fourcc('X', 'v', 'i', 'D');
                 break;
         }
@@ -1210,6 +1271,10 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         QTextStream out_stream(&out_s);
         out_stream << "Now recording to: " << output_name << "\nResolution: " << res_w << "x" << res_h << " FPS: " << video_fps << "\n";
         Log(out_s);
+        
+        playback->setVideo(capture_video, writer, recording, png_record);
+    } else {
+        playback->setVideo(capture_video, writer, recording, png_record);
     }
     
     static int output_index = 1;
@@ -1229,7 +1294,6 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         ++output_index;
     }
     playback->setPngPath(dpath.toStdString());
-    playback->setVideo(capture_video,writer,recording, png_record);
     playback->Play();
     disp->show();
 #ifndef DISABLE_JOYSTICK
@@ -1516,6 +1580,27 @@ void AC_MainWindow::stopRecording() {
     controls_step->setEnabled(false);
     controls_snapshot->setEnabled(false);
     progress_bar->hide();
+}
+
+void AC_MainWindow::onFFmpegFinished(QString tempFile, QString sourceFile, QString outputFile) {
+    Log(tr("FFmpeg encoding finished. Muxing audio...\n"));
+    bool success = ffmpeg_mux_audio(tempFile.toStdString(), sourceFile.toStdString(), outputFile.toStdString());
+    if(success) {
+        QFile::remove(tempFile);
+        QString msg;
+        QTextStream stream(&msg);
+        stream << "Video with audio saved to: " << outputFile << "\n";
+        Log(msg);
+        QMessageBox::information(this, tr("Encoding Complete"), 
+            tr("Video encoding complete with audio from source."));
+    } else {
+        QString msg;
+        QTextStream stream(&msg);
+        stream << "Audio muxing failed. Video saved to: " << tempFile << "\n";
+        Log(msg);
+        QMessageBox::warning(this, tr("Audio Muxing Failed"), 
+            tr("Could not copy audio from source. Video file saved without audio."));
+    }
 }
 
 
