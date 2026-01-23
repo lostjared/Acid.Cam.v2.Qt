@@ -10,6 +10,7 @@
 
 #include "qtheaders.h"
 #include "ffmpeg_write.h"
+#include "ffmpeg_encoder_thread.h"
 #include<atomic>
 
 
@@ -66,6 +67,7 @@ private:
     std::string ffmpeg_output_path;
     std::string ffmpeg_source_path;
     std::atomic<bool> ffmpeg_mux_audio;
+    FFmpegEncoderThread *encoder_thread;
     
 public:
     Playback(QObject *parent = 0);

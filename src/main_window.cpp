@@ -108,8 +108,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     playback = new Playback();
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
-    setGeometry(100, 100, 850, 700);
-    setMinimumSize(750, 600);
+    setGeometry(100, 100, 1280, 900);
+    setMinimumSize(1280, 900);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
@@ -203,25 +203,44 @@ void AC_MainWindow::createControls() {
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
-    mainLayout->setSpacing(8);
-    mainLayout->setContentsMargins(10, 10, 10, 10);
+    mainLayout->setSpacing(16);
+    mainLayout->setContentsMargins(16, 16, 16, 16);
+    
+    // ===== Filter Mode Selection =====
     QGroupBox *filterModeGroup = new QGroupBox(tr("Filter Mode"), this);
+    filterModeGroup->setMaximumHeight(60);
     QHBoxLayout *filterModeLayout = new QHBoxLayout(filterModeGroup);
+    filterModeLayout->setSpacing(12);
+    filterModeLayout->setContentsMargins(12, 8, 12, 8);
     filter_single = new QRadioButton(tr("Single Filter"), this);
     filter_custom = new QRadioButton(tr("Custom Filter"), this);
     filter_single->setChecked(true);
+    filter_single->setToolTip(tr("Apply a single filter to the video stream"));
+    filter_custom->setToolTip(tr("Apply a sequence of filters in custom order"));
     filterModeLayout->addWidget(filter_single);
     filterModeLayout->addWidget(filter_custom);
     filterModeLayout->addStretch();
     connect(filter_single, SIGNAL(pressed()), this, SLOT(setFilterSingle()));
     connect(filter_custom, SIGNAL(pressed()), this, SLOT(setFilterCustom()));
+    
+    // ===== Filter Selection Section =====
     QGroupBox *filterSelectGroup = new QGroupBox(tr("Filter Selection"), this);
     QVBoxLayout *filterSelectLayout = new QVBoxLayout(filterSelectGroup);
+    filterSelectLayout->setSpacing(12);
+    filterSelectLayout->setContentsMargins(12, 12, 12, 12);
+    
     QHBoxLayout *filterDropdownLayout = new QHBoxLayout();
+    filterDropdownLayout->setSpacing(16);
+    
+    // Category selector
     QVBoxLayout *categoryLayout = new QVBoxLayout();
+    categoryLayout->setSpacing(6);
     QLabel *categoryLabel = new QLabel(tr("Category:"), this);
+    categoryLabel->setStyleSheet("font-weight: bold;");
     menu_cat = new QComboBox(this);
     menu_cat->setMinimumWidth(200);
+    menu_cat->setMaximumHeight(24);
+    menu_cat->setToolTip(tr("Select filter category"));
     for(int i = 0; menuNames[i] != 0; ++i) {
         menu_cat->addItem(menuNames[i]);
     }
@@ -229,10 +248,15 @@ void AC_MainWindow::createControls() {
     categoryLayout->addWidget(categoryLabel);
     categoryLayout->addWidget(menu_cat);
     
+    // Filter selector
     QVBoxLayout *filterLayout = new QVBoxLayout();
+    filterLayout->setSpacing(6);
     QLabel *filterLabel = new QLabel(tr("Filter:"), this);
+    filterLabel->setStyleSheet("font-weight: bold;");
     filters = new QComboBox(this);
     filters->setMinimumWidth(200);
+    filters->setMaximumHeight(24);
+    filters->setToolTip(tr("Select a filter to apply"));
     filterLayout->addWidget(filterLabel);
     filterLayout->addWidget(filters);
     
@@ -240,11 +264,19 @@ void AC_MainWindow::createControls() {
     filterDropdownLayout->addLayout(filterLayout);
     filterDropdownLayout->addStretch();
     
+    // Subfilter controls
     QHBoxLayout *subfilterLayout = new QHBoxLayout();
+    subfilterLayout->setSpacing(10);
     btn_sub = new QPushButton(tr("Set Subfilter"), this);
     btn_clr = new QPushButton(tr("Clear Subfilter"), this);
-    btn_sub->setMinimumWidth(100);
-    btn_clr->setMinimumWidth(100);
+    btn_sub->setObjectName("btnPrimary");
+    btn_clr->setObjectName("btnSecondary");
+    btn_sub->setMinimumWidth(72);
+    btn_clr->setMinimumWidth(72);
+    btn_sub->setMaximumHeight(28);
+    btn_clr->setMaximumHeight(28);
+    btn_sub->setToolTip(tr("Configure advanced filter options"));
+    btn_clr->setToolTip(tr("Clear any subfilter settings"));
     subfilterLayout->addWidget(btn_sub);
     subfilterLayout->addWidget(btn_clr);
     subfilterLayout->addStretch();
@@ -257,21 +289,58 @@ void AC_MainWindow::createControls() {
     connect(filters, SIGNAL(currentIndexChanged(int)), this, SLOT(comboFilterChanged(int)));
     connect(menu_cat, SIGNAL(currentIndexChanged(int)), this, SLOT(menuFilterChanged(int)));
 
+    // ===== Custom Filter List Section =====
     QGroupBox *customListGroup = new QGroupBox(tr("Custom Filter List"), this);
     QVBoxLayout *customListLayout = new QVBoxLayout(customListGroup);
+    customListLayout->setSpacing(12);
+    customListLayout->setContentsMargins(14, 18, 14, 14);
     
+    // Filter list widget
     custom_filters = new QListWidget(this);
-    custom_filters->setMinimumHeight(120);
-    custom_filters->setMaximumHeight(160);
+    custom_filters->setMinimumHeight(100);
+    custom_filters->setMaximumHeight(140);
+    custom_filters->setToolTip(tr("List of filters in custom filter chain\nScroll to see all filters"));
     customListLayout->addWidget(custom_filters);
     
+    // Add spacing between list and buttons
+    customListLayout->addSpacing(8);
+    
+    // Buttons row (below list, above checkboxes)
     QHBoxLayout *customButtonLayout = new QHBoxLayout();
+    customButtonLayout->setSpacing(10);
     btn_add = new QPushButton(tr("Add"), this);
     btn_remove = new QPushButton(tr("Remove"), this);
     btn_moveup = new QPushButton(tr("Move Up"), this);
     btn_movedown = new QPushButton(tr("Move Down"), this);
     btn_load = new QPushButton(tr("Load"), this);
     btn_save = new QPushButton(tr("Save"), this);
+    btn_add->setObjectName("btnPrimary");
+    btn_remove->setObjectName("btnDanger");
+    btn_moveup->setObjectName("btnSecondary");
+    btn_movedown->setObjectName("btnSecondary");
+    btn_load->setObjectName("btnSecondary");
+    btn_save->setObjectName("btnPrimary");
+    
+    btn_add->setMinimumWidth(60);
+    btn_remove->setMinimumWidth(60);
+    btn_moveup->setMinimumWidth(60);
+    btn_movedown->setMinimumWidth(60);
+    btn_load->setMinimumWidth(60);
+    btn_save->setMinimumWidth(60);
+
+    btn_add->setMaximumHeight(26);
+    btn_remove->setMaximumHeight(26);
+    btn_moveup->setMaximumHeight(26);
+    btn_movedown->setMaximumHeight(26);
+    btn_load->setMaximumHeight(26);
+    btn_save->setMaximumHeight(26);
+    
+    btn_add->setToolTip(tr("Add selected filter to custom list"));
+    btn_remove->setToolTip(tr("Remove selected filter from custom list"));
+    btn_moveup->setToolTip(tr("Move selected filter up in the list"));
+    btn_movedown->setToolTip(tr("Move selected filter down in the list"));
+    btn_load->setToolTip(tr("Load filter list from file"));
+    btn_save->setToolTip(tr("Save current filter list to file"));
     
     customButtonLayout->addWidget(btn_add);
     customButtonLayout->addWidget(btn_remove);
@@ -280,28 +349,39 @@ void AC_MainWindow::createControls() {
     customButtonLayout->addStretch();
     customButtonLayout->addWidget(btn_load);
     customButtonLayout->addWidget(btn_save);
+    customListLayout->addLayout(customButtonLayout);
     
-    QHBoxLayout *optionsRowLayout = new QHBoxLayout();
-    chk_negate = new QCheckBox(tr("Negate"), this);
+    // Add spacing between buttons and options
+    customListLayout->addSpacing(6);
+    
+    // Options row (checkboxes and channel order)
+    QHBoxLayout *optionsRow = new QHBoxLayout();
+    optionsRow->setSpacing(14);
+    chk_negate = new QCheckBox(tr("Negate Colors"), this);
     chk_negate->setCheckState(Qt::Unchecked);
+    chk_negate->setToolTip(tr("Invert all colors in the output"));
+    
+    QLabel *channelLabel = new QLabel(tr("Channel Order:"), this);
     combo_rgb = new QComboBox(this);
     combo_rgb->addItem(tr("RGB"));
     combo_rgb->addItem(tr("BGR"));
     combo_rgb->addItem(tr("BRG"));
     combo_rgb->addItem(tr("GRB"));
-    combo_rgb->setMinimumWidth(100);
+    combo_rgb->setMinimumWidth(70);
+    combo_rgb->setMaximumHeight(24);
+    combo_rgb->setToolTip(tr("Select color channel order"));
+    
     use_settings = new QCheckBox(tr("Use Settings"), this);
     use_settings->setCheckState(Qt::Checked);
+    use_settings->setToolTip(tr("Apply color adjustment settings below"));
     
-    optionsRowLayout->addWidget(chk_negate);
-    optionsRowLayout->addSpacing(20);
-    optionsRowLayout->addWidget(new QLabel(tr("Channel Order:"), this));
-    optionsRowLayout->addWidget(combo_rgb);
-    optionsRowLayout->addStretch(1);
-    optionsRowLayout->addWidget(use_settings);
-    
-    customListLayout->addLayout(customButtonLayout);
-    customListLayout->addLayout(optionsRowLayout);
+    optionsRow->addWidget(chk_negate);
+    optionsRow->addSpacing(10);
+    optionsRow->addWidget(channelLabel);
+    optionsRow->addWidget(combo_rgb);
+    optionsRow->addStretch(1);
+    optionsRow->addWidget(use_settings);
+    customListLayout->addLayout(optionsRow);
     
     connect(btn_add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(btn_remove, SIGNAL(clicked()), this, SLOT(rmvClicked()));
@@ -312,55 +392,80 @@ void AC_MainWindow::createControls() {
     connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
 
+    // ===== Color Adjustments Section =====
     QGroupBox *colorGroup = new QGroupBox(tr("Color Adjustments"), this);
     QGridLayout *colorLayout = new QGridLayout(colorGroup);
-    colorLayout->setSpacing(10);
+    colorLayout->setSpacing(12);
+    colorLayout->setContentsMargins(14, 18, 14, 14);
+    colorLayout->setVerticalSpacing(14);
     
+    // RGB sliders row 1
     QLabel *r_label = new QLabel(tr("Red:"), this);
+    r_label->setStyleSheet("font-weight: bold;");
     slide_r = new QSlider(Qt::Horizontal, this);
     slide_r->setRange(0, 255);
-    slide_r->setMinimumWidth(100);
+    slide_r->setMinimumWidth(120);
+    slide_r->setMaximumHeight(22);
+    slide_r->setToolTip(tr("Adjust red channel intensity (0-255)"));
     
     QLabel *g_label = new QLabel(tr("Green:"), this);
+    g_label->setStyleSheet("font-weight: bold;");
     slide_g = new QSlider(Qt::Horizontal, this);
     slide_g->setRange(0, 255);
-    slide_g->setMinimumWidth(100);
+    slide_g->setMinimumWidth(120);
+    slide_g->setMaximumHeight(22);
+    slide_g->setToolTip(tr("Adjust green channel intensity (0-255)"));
     
     QLabel *b_label = new QLabel(tr("Blue:"), this);
+    b_label->setStyleSheet("font-weight: bold;");
     slide_b = new QSlider(Qt::Horizontal, this);
     slide_b->setRange(0, 255);
-    slide_b->setMinimumWidth(100);
+    slide_b->setMinimumWidth(120);
+    slide_b->setMaximumHeight(22);
+    slide_b->setToolTip(tr("Adjust blue channel intensity (0-255)"));
     
-    colorLayout->addWidget(r_label, 0, 0);
+    colorLayout->addWidget(r_label, 0, 0, Qt::AlignRight);
     colorLayout->addWidget(slide_r, 0, 1);
-    colorLayout->addWidget(g_label, 0, 2);
+    colorLayout->addWidget(g_label, 0, 2, Qt::AlignRight);
     colorLayout->addWidget(slide_g, 0, 3);
-    colorLayout->addWidget(b_label, 0, 4);
+    colorLayout->addWidget(b_label, 0, 4, Qt::AlignRight);
     colorLayout->addWidget(slide_b, 0, 5);
     
+    // Brightness, Gamma, Saturation row 2
     QLabel *bright_label = new QLabel(tr("Brightness:"), this);
+    bright_label->setStyleSheet("font-weight: bold;");
     slide_bright = new QSlider(Qt::Horizontal, this);
     slide_bright->setRange(0, 255);
-    slide_bright->setMinimumWidth(100);
+    slide_bright->setMinimumWidth(120);
+    slide_bright->setMaximumHeight(22);
+    slide_bright->setToolTip(tr("Adjust overall brightness (0-255)"));
     
     QLabel *gamma_label = new QLabel(tr("Gamma:"), this);
+    gamma_label->setStyleSheet("font-weight: bold;");
     slide_gamma = new QSlider(Qt::Horizontal, this);
     slide_gamma->setRange(0, 255);
-    slide_gamma->setMinimumWidth(100);
+    slide_gamma->setMinimumWidth(120);
+    slide_gamma->setMaximumHeight(22);
+    slide_gamma->setToolTip(tr("Adjust gamma correction (0-255)"));
     
     QLabel *sat_label = new QLabel(tr("Saturation:"), this);
+    sat_label->setStyleSheet("font-weight: bold;");
     slide_saturation = new QSlider(Qt::Horizontal, this);
     slide_saturation->setRange(0, 255);
-    slide_saturation->setMinimumWidth(100);
+    slide_saturation->setMinimumWidth(120);
+    slide_saturation->setMaximumHeight(22);
+    slide_saturation->setToolTip(tr("Adjust color saturation (0-255)"));
     
-    colorLayout->addWidget(bright_label, 1, 0);
+    colorLayout->addWidget(bright_label, 1, 0, Qt::AlignRight);
     colorLayout->addWidget(slide_bright, 1, 1);
-    colorLayout->addWidget(gamma_label, 1, 2);
+    colorLayout->addWidget(gamma_label, 1, 2, Qt::AlignRight);
     colorLayout->addWidget(slide_gamma, 1, 3);
-    colorLayout->addWidget(sat_label, 1, 4);
+    colorLayout->addWidget(sat_label, 1, 4, Qt::AlignRight);
     colorLayout->addWidget(slide_saturation, 1, 5);
     
+    // Color map row 3
     QLabel *colormap_label = new QLabel(tr("Color Map:"), this);
+    colormap_label->setStyleSheet("font-weight: bold;");
     color_maps = new QComboBox(this);
     color_maps->addItem(tr("None"));
     color_maps->addItem(tr("Autumn"));
@@ -375,10 +480,13 @@ void AC_MainWindow::createControls() {
     color_maps->addItem(tr("Pink"));
     color_maps->addItem(tr("Hot"));
     color_maps->addItem(tr("Parula"));
-    color_maps->setMinimumWidth(150);
+    color_maps->setMinimumWidth(140);
+    color_maps->setMaximumHeight(22);
+    color_maps->setToolTip(tr("Apply a color mapping to the output"));
     
-    colorLayout->addWidget(colormap_label, 2, 0);
+    colorLayout->addWidget(colormap_label, 2, 0, Qt::AlignRight);
     colorLayout->addWidget(color_maps, 2, 1, 1, 2);
+    colorLayout->setColumnStretch(5, 1);
     
     connect(slide_r, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
     connect(slide_g, SIGNAL(valueChanged(int)), this, SLOT(slideChanged(int)));
@@ -388,12 +496,15 @@ void AC_MainWindow::createControls() {
     connect(slide_saturation, SIGNAL(valueChanged(int)), this, SLOT(colorChanged(int)));
     connect(color_maps, SIGNAL(currentIndexChanged(int)), this, SLOT(colorMapChanged(int)));
 
+    // ===== Log Output Section =====
     QGroupBox *logGroup = new QGroupBox(tr("Log Output"), this);
     QVBoxLayout *logLayout = new QVBoxLayout(logGroup);
+    logLayout->setSpacing(8);
     
     log_text = new QTextEdit(this);
     log_text->setReadOnly(true);
-    log_text->setMinimumHeight(150);
+    log_text->setMinimumHeight(100);
+    log_text->setToolTip(tr("Application log and status messages"));
     
     QString text;
     QTextStream stream(&text);
@@ -418,17 +529,22 @@ void AC_MainWindow::createControls() {
     progress_bar = new QProgressBar(this);
     progress_bar->setMinimum(0);
     progress_bar->setMaximum(100);
+    progress_bar->setMinimumHeight(20);
+    progress_bar->setMaximumHeight(24);
     progress_bar->hide();
+    progress_bar->setToolTip(tr("Recording progress"));
 
+    // ===== Final Layout Assembly =====
     QHBoxLayout *topRowLayout = new QHBoxLayout();
+    topRowLayout->setSpacing(12);
     topRowLayout->addWidget(filterModeGroup);
     topRowLayout->addWidget(filterSelectGroup, 1);
     
     mainLayout->addLayout(topRowLayout);
     mainLayout->addWidget(customListGroup);
     mainLayout->addWidget(colorGroup);
-    mainLayout->addWidget(logGroup, 1);
     mainLayout->addWidget(progress_bar);
+    mainLayout->addWidget(logGroup, 1);
 
     setWindowIcon(QPixmap(":/images/icon.png"));
     menu_cat->setCurrentIndex(1);

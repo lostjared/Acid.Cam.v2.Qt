@@ -50,6 +50,7 @@ FILE* ffmpeg_open(const std::string &output, FFmpegCodec codec,
         << " -f rawvideo"
         << " -r " << fps
         << " -i pipe:"
+        << " -vsync cfr"  // Force constant frame rate - prevents stuttering with hardware encoders
         << " -vcodec " << codec_name
         << " -pix_fmt yuv420p";
     

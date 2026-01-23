@@ -47,6 +47,7 @@ set(SOURCES
     color_range.cpp
     slitscan_win.cpp
     ffmpeg_write.cpp
+    ffmpeg_encoder_thread.cpp
 )
 
 set(HEADERS
@@ -68,6 +69,7 @@ set(HEADERS
     color_range.h
     slitscan_win.h
     ffmpeg_write.h
+    ffmpeg_encoder_thread.h
 )
 
 

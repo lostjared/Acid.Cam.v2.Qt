@@ -32,6 +32,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     ffmpeg_pipe = nullptr;
     use_ffmpeg = false;
     ffmpeg_mux_audio = false;
+    encoder_thread = new FFmpegEncoderThread(this);
 }
 
 bool Playback::VideoRelease() {
@@ -63,8 +64,8 @@ void Playback::Play() {
     }
     prev_filter = FilterValue(0, 0, -1);
     alpha = 0;
-    start(LowPriority);
-    //start(HighPriority);
+    //start(LowPriority);
+    start(HighPriority);
 }
 
 void Playback::setPngPath(std::string path) {
@@ -534,8 +535,9 @@ void Playback::run() {
         }
         
         mutex.lock();
-        if(recording && use_ffmpeg && ffmpeg_pipe != nullptr) {
-            ffmpeg_write_frame(ffmpeg_pipe, frame);
+        if(recording && use_ffmpeg && encoder_thread && encoder_thread->isEncoding()) {
+            // Send frame to encoder thread (non-blocking)
+            encoder_thread->enqueueFrame(frame);
         }
         else if(recording && writer.isOpened()) {
             writer.write(frame);
@@ -574,6 +576,13 @@ void Playback::run() {
 
 
 Playback::~Playback() {
+    // Stop the encoder thread first
+    if (encoder_thread) {
+        encoder_thread->stopEncoding();
+        delete encoder_thread;
+        encoder_thread = nullptr;
+    }
+    
     mutex.lock();
     stop = true;
 #if defined(__linux__) || defined(__APPLE__)
@@ -635,7 +644,9 @@ void Playback::Release() {
     if(capture.isOpened() && mode == MODE_VIDEO) capture.release();
     if(writer.isOpened()) writer.release();
     mutex.unlock();
-    if(use_ffmpeg && ffmpeg_pipe != nullptr) {
+    
+    if(use_ffmpeg && encoder_thread && encoder_thread->isEncoding()) {
+        encoder_thread->stopEncoding();
         closeFFmpeg();
     }
 }
@@ -722,9 +733,11 @@ void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPat
     resStream << width << "x" << height;
     std::string resolution = resStream.str();
     
-    ffmpeg_pipe = ffmpeg_open(outputPath, codec, resolution, resolution, fps, crf);
-    if(!ffmpeg_pipe) {
-        std::cerr << "acidcam: Failed to open FFmpeg pipe for encoding\n";
+    // Start background encoding thread
+    if (encoder_thread && encoder_thread->startEncoding(outputPath, codec, resolution, resolution, fps, crf)) {
+        std::cout << "acidcam: Background FFmpeg encoder thread started\n";
+    } else {
+        std::cerr << "acidcam: Failed to start background FFmpeg encoder thread\n";
         use_ffmpeg = false;
         recording = false;
     }
@@ -780,9 +793,11 @@ bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device, i
     resStream << res_w << "x" << res_h;
     std::string resolution = resStream.str();
     
-    ffmpeg_pipe = ffmpeg_open(outputPath, codec, resolution, resolution, fps, crf);
-    if(!ffmpeg_pipe) {
-        std::cerr << "acidcam: Failed to open FFmpeg pipe for camera encoding\n";
+    // Start background encoding thread
+    if (encoder_thread && encoder_thread->startEncoding(outputPath, codec, resolution, resolution, fps, crf)) {
+        std::cout << "acidcam: Background FFmpeg encoder thread started (camera)\n";
+    } else {
+        std::cerr << "acidcam: Failed to start background FFmpeg encoder thread (camera)\n";
         use_ffmpeg = false;
         recording = false;
         mutex.unlock();
@@ -795,39 +810,43 @@ bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device, i
 
 void Playback::closeFFmpeg() {
     mutex.lock();
-    if(ffmpeg_pipe != nullptr) {
-        ffmpeg_close(ffmpeg_pipe);
-        ffmpeg_pipe = nullptr;
-        
-        // If we need to mux audio from source
-        if(ffmpeg_mux_audio && !ffmpeg_source_path.empty() && !ffmpeg_output_path.empty()) {
-            // Create final output path (replace temp_ prefix or add _final)
-            std::string finalPath = ffmpeg_output_path;
-            auto lastSlash = finalPath.rfind('/');
-            if(lastSlash == std::string::npos) lastSlash = finalPath.rfind('\\');
-            
-            std::string dir = (lastSlash != std::string::npos) ? finalPath.substr(0, lastSlash + 1) : "";
-            std::string filename = (lastSlash != std::string::npos) ? finalPath.substr(lastSlash + 1) : finalPath;
-            
-            // If filename starts with temp_, create non-temp version
-            if(filename.substr(0, 5) == "temp_") {
-                filename = filename.substr(5);
-            } else {
-                // Add _with_audio before extension
-                auto dotPos = filename.rfind('.');
-                if(dotPos != std::string::npos) {
-                    filename = filename.substr(0, dotPos) + "_with_audio" + filename.substr(dotPos);
-                }
-            }
-            finalPath = dir + filename;
-            
-            emit ffmpegFinished(QString::fromStdString(ffmpeg_output_path),
-                               QString::fromStdString(ffmpeg_source_path),
-                               QString::fromStdString(finalPath));
-        }
+    
+    // Stop the encoder thread
+    if(encoder_thread && encoder_thread->isEncoding()) {
+        encoder_thread->stopEncoding();
     }
+    
+    // If we need to mux audio from source
+    if(ffmpeg_mux_audio && !ffmpeg_source_path.empty() && !ffmpeg_output_path.empty()) {
+        // Create final output path (replace temp_ prefix or add _final)
+        std::string finalPath = ffmpeg_output_path;
+        auto lastSlash = finalPath.rfind('/');
+        if(lastSlash == std::string::npos) lastSlash = finalPath.rfind('\\');
+        
+        std::string dir = (lastSlash != std::string::npos) ? finalPath.substr(0, lastSlash + 1) : "";
+        std::string filename = (lastSlash != std::string::npos) ? finalPath.substr(lastSlash + 1) : finalPath;
+        
+        // If filename starts with temp_, create non-temp version
+        if(filename.substr(0, 5) == "temp_") {
+            filename = filename.substr(5);
+        } else {
+            // Add _with_audio before extension
+            auto dotPos = filename.rfind('.');
+            if(dotPos != std::string::npos) {
+                filename = filename.substr(0, dotPos) + "_with_audio" + filename.substr(dotPos);
+            }
+        }
+        finalPath = dir + filename;
+        
+        emit ffmpegFinished(QString::fromStdString(ffmpeg_output_path),
+                           QString::fromStdString(ffmpeg_source_path),
+                           QString::fromStdString(finalPath));
+    }
+    
     use_ffmpeg = false;
     recording = false;
     ffmpeg_mux_audio = false;
+    ffmpeg_pipe = nullptr;
+    
     mutex.unlock();
 }

@@ -22,6 +22,16 @@ int main(int argc, char **argv) {
 #endif
     
     QApplication app(argc, argv);
+    
+    // Load and apply professional stylesheet
+    QFile styleFile(":/stylesheet.qss");
+    if (styleFile.open(QFile::ReadOnly)) {
+        QString style = QLatin1String(styleFile.readAll());
+        app.setStyle("Fusion");
+        app.setStyleSheet(style);
+        styleFile.close();
+    }
+    
     AC_MainWindow window;
     window.show();
     return app.exec();
