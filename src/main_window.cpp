@@ -108,8 +108,8 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     playback = new Playback();
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
-    setGeometry(100, 100, 1280, 900);
-    setMinimumSize(1280, 900);
+    setGeometry(100, 100, 900, 900);
+    setMinimumSize(900, 900);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
@@ -405,6 +405,7 @@ void AC_MainWindow::createControls() {
     slide_r = new QSlider(Qt::Horizontal, this);
     slide_r->setRange(0, 255);
     slide_r->setMinimumWidth(120);
+    slide_r->setMaximumWidth(180);
     slide_r->setMaximumHeight(22);
     slide_r->setToolTip(tr("Adjust red channel intensity (0-255)"));
     
@@ -413,6 +414,7 @@ void AC_MainWindow::createControls() {
     slide_g = new QSlider(Qt::Horizontal, this);
     slide_g->setRange(0, 255);
     slide_g->setMinimumWidth(120);
+    slide_g->setMaximumWidth(180);
     slide_g->setMaximumHeight(22);
     slide_g->setToolTip(tr("Adjust green channel intensity (0-255)"));
     
@@ -421,6 +423,7 @@ void AC_MainWindow::createControls() {
     slide_b = new QSlider(Qt::Horizontal, this);
     slide_b->setRange(0, 255);
     slide_b->setMinimumWidth(120);
+    slide_b->setMaximumWidth(180);
     slide_b->setMaximumHeight(22);
     slide_b->setToolTip(tr("Adjust blue channel intensity (0-255)"));
     
@@ -437,6 +440,7 @@ void AC_MainWindow::createControls() {
     slide_bright = new QSlider(Qt::Horizontal, this);
     slide_bright->setRange(0, 255);
     slide_bright->setMinimumWidth(120);
+    slide_bright->setMaximumWidth(180);
     slide_bright->setMaximumHeight(22);
     slide_bright->setToolTip(tr("Adjust overall brightness (0-255)"));
     
@@ -445,6 +449,7 @@ void AC_MainWindow::createControls() {
     slide_gamma = new QSlider(Qt::Horizontal, this);
     slide_gamma->setRange(0, 255);
     slide_gamma->setMinimumWidth(120);
+    slide_gamma->setMaximumWidth(180);
     slide_gamma->setMaximumHeight(22);
     slide_gamma->setToolTip(tr("Adjust gamma correction (0-255)"));
     
@@ -453,6 +458,7 @@ void AC_MainWindow::createControls() {
     slide_saturation = new QSlider(Qt::Horizontal, this);
     slide_saturation->setRange(0, 255);
     slide_saturation->setMinimumWidth(120);
+    slide_saturation->setMaximumWidth(180);
     slide_saturation->setMaximumHeight(22);
     slide_saturation->setToolTip(tr("Adjust color saturation (0-255)"));
     
@@ -534,7 +540,7 @@ void AC_MainWindow::createControls() {
     progress_bar->hide();
     progress_bar->setToolTip(tr("Recording progress"));
 
-    // ===== Final Layout Assembly =====
+    
     QHBoxLayout *topRowLayout = new QHBoxLayout();
     topRowLayout->setSpacing(12);
     topRowLayout->addWidget(filterModeGroup);
