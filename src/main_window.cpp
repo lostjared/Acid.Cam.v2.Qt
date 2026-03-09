@@ -72,7 +72,6 @@ void generate_map() {
         ++index;
         ac::filter_menu_map["All Filters"].menu_list->push_back(filter_n);
     }
-    std::cout << "index: " << index << "\n";
     for(unsigned int j = 0; j < plugins.plugin_list.size(); ++j) {
         std::string name = "plugin " + plugins.plugin_list[j]->name();
         filter_map[name] = FilterValue(2, j, -1);
