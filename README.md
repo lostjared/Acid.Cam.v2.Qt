@@ -9,7 +9,7 @@ With over **2,200 filters** powered by the [libacidcam](https://github.com/lostj
 
 Acid Cam is ideal for:
 - Generating foundational glitch artwork for further manipulation in other software
-- Creating real-time visuals for live music performances and VJ sets
+- Creating video files
 - Producing source material for music videos and experimental film
 - Exploration and experimentation with pixel-level video processing
 
