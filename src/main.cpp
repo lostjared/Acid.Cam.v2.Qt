@@ -15,6 +15,7 @@
 
 #include"qtheaders.h"
 #include "main_window.h"
+#include <opencv2/core/ocl.hpp>
 #ifdef LINUX_RELEASE
 #include<unistd.h>
 #endif
@@ -56,6 +57,9 @@ int main(int argc, char **argv) {
 #endif
     
     QApplication app(argc, argv);
+
+    cv::ocl::setUseOpenCL(false);
+    std::cout << "acidcam: OpenCL disabled for Qt runtime\n";
     
     // Load and apply professional stylesheet
     QFile styleFile(":/stylesheet.qss");

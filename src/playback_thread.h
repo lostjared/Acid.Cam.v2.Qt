@@ -58,7 +58,6 @@ private:
     std::atomic<bool> _custom_cycle;
     std::atomic<int> _custom_cycle_index;
     std::atomic<int> fps_delay;
-    std::vector<std::string> draw_strings;
     std::unordered_map<std::string, FilterValue> filter_map_ex;
     std::atomic<bool> setFilterMap;
     std::unordered_map<std::string, FilterValue> filter_map_ex_set;

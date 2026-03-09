@@ -58,6 +58,9 @@ const char *menuNames[] = {"All Filters", "All Filters Sorted", "Blend", "Distor
 
 
 void generate_map() {
+    filter_map.clear();
+    filter_map_main.clear();
+    solo_filter.clear();
     ac::fill_filter_map();
     for(int i = 0; i < ac::draw_max; ++i )
         filter_map[ac::draw_strings[i]] = FilterValue(0, i, -1);
@@ -102,9 +105,9 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     init_plugins();
     ac::init_filter_menu_map();
+    ac::SortFilters();
     generate_map();
     draw_strings = ac::draw_strings;
-    ac::SortFilters();
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     playback = new Playback();
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
@@ -115,7 +118,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     createMenu();
     speed_index = 0;
     loading = false;
-    playback->setMaxAlloc(300);
+    playback->setMaxAlloc(1500);
     cap_camera = new CaptureCamera(this);
     cap_camera->setParent(this);
     

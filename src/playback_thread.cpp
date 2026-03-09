@@ -26,7 +26,6 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     _custom_cycle = false;
     _custom_cycle_index = 0;
     fps_delay = 60;
-    draw_strings = ac::draw_strings;
     filter_map_ex = filter_map;
     blend_image_copy_set = false;
     ffmpeg_pipe = nullptr;
@@ -340,9 +339,6 @@ void Playback::setDisplayed(bool shown) {
 
 void Playback::drawEffects(cv::Mat &frame) {
     if(ac::set_color_map > 0) ac::ApplyColorMap(frame);
-    ac::frames_released = false;
-    ac::reset_alpha = false;
-    ac::image_matrix_reset = false;
     if(bright_ > 0) {
         ac::setBrightness(frame, 1.0, bright_);
     }
@@ -362,23 +358,25 @@ void Playback::drawEffects(cv::Mat &frame) {
 
 void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
     if(f.index == 0) {
+        if(f.filter < 0 || f.filter >= static_cast<int>(ac::draw_strings.size()))
+            return;
+        const std::string &filter_name = ac::draw_strings[f.filter];
         if(single_mode == true &&
-           draw_strings[f.filter].find("SubFilter") != std::string::npos)
+           filter_name.find("SubFilter") != std::string::npos)
             return;
         
-        if(single_mode == false && draw_strings[f.filter].find("SubFilter") != std::string::npos && f.subfilter == -1)
+        if(single_mode == false && filter_name.find("SubFilter") != std::string::npos && f.subfilter == -1)
             return;
         
-        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("Intertwine") != std::string::npos)
+        if(ac::getMaxAllocated() < 1080 && filter_name.find("Intertwine") != std::string::npos)
             return;
-        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("InOrder") != std::string::npos)
+        if(ac::getMaxAllocated() < 1080 && filter_name.find("InOrder") != std::string::npos)
             return;
-        if(ac::getMaxAllocated() < 1080 && draw_strings[f.filter].find("Slit") != std::string::npos)
+        if(ac::getMaxAllocated() < 1080 && filter_name.find("Slit") != std::string::npos)
             return;
         
         ac::setSubFilter(f.subfilter);
-        //ac::draw_func[f.filter](frame);
-        ac::CallFilter(f.filter, frame);
+        ac::CallFilter(filter_name, frame);
         ac::setSubFilter(-1);
     } else if(current_filter.index == 1) {
         current_filterx = f.filter;
