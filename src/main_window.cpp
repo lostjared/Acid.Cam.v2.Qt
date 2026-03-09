@@ -90,6 +90,21 @@ void custom_filter(cv::Mat &) {
     
 }
 
+static int toAcColorOrder(const int uiIndex) {
+    switch(uiIndex) {
+        case 0: // RGB
+            return 0;
+        case 1: // BGR
+            return 1;
+        case 2: // BRG
+            return 4;
+        case 3: // GRB
+            return 3;
+        default:
+            return 0;
+    }
+}
+
 
 AC_MainWindow::~AC_MainWindow() {
     controls_Stop();
@@ -111,7 +126,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     playback = new Playback();
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
     setGeometry(100, 100, 900, 900);
-    setMinimumSize(900, 900);
+    setMinimumSize(900, 1080);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
@@ -296,6 +311,28 @@ void AC_MainWindow::createControls() {
     QVBoxLayout *customListLayout = new QVBoxLayout(customListGroup);
     customListLayout->setSpacing(12);
     customListLayout->setContentsMargins(14, 18, 14, 14);
+
+    QHBoxLayout *customSearchLayout = new QHBoxLayout();
+    customSearchLayout->setSpacing(8);
+    QLabel *customSearchLabel = new QLabel(tr("Search:"), this);
+    custom_search_text = new QLineEdit(this);
+    custom_search_text->setPlaceholderText(tr("Type filter name..."));
+    custom_search_text->setClearButtonEnabled(true);
+    custom_search_combo = new QComboBox(this);
+    custom_search_combo->setMinimumWidth(220);
+    custom_search_combo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    custom_search_combo->setMaxVisibleItems(20);
+    custom_search_add = new QPushButton(tr("Add Match"), this);
+    custom_search_add->setObjectName("btnPrimary");
+    custom_search_add->setMinimumWidth(78);
+    custom_search_add->setMaximumHeight(26);
+    custom_search_add->setToolTip(tr("Add selected match to custom filter list"));
+
+    customSearchLayout->addWidget(customSearchLabel);
+    customSearchLayout->addWidget(custom_search_text, 1);
+    customSearchLayout->addWidget(custom_search_combo, 1);
+    customSearchLayout->addWidget(custom_search_add);
+    customListLayout->addLayout(customSearchLayout);
     
     // Filter list widget
     custom_filters = new QListWidget(this);
@@ -393,6 +430,12 @@ void AC_MainWindow::createControls() {
     connect(btn_save, SIGNAL(clicked()), this, SLOT(save_CustomFile()));
     connect(chk_negate, SIGNAL(clicked()), this, SLOT(chk_Clicked()));
     connect(combo_rgb, SIGNAL(currentIndexChanged(int)), this, SLOT(cb_SetIndex(int)));
+    connect(custom_search_text, SIGNAL(textChanged(QString)), this, SLOT(customSearchChanged(QString)));
+    connect(custom_search_text, SIGNAL(returnPressed()), this, SLOT(addSearchResult()));
+    connect(custom_search_add, SIGNAL(clicked()), this, SLOT(addSearchResult()));
+    connect(custom_search_combo, SIGNAL(activated(int)), this, SLOT(addSearchResult()));
+
+    customSearchChanged(QString());
 
     // ===== Color Adjustments Section =====
     QGroupBox *colorGroup = new QGroupBox(tr("Color Adjustments"), this);
@@ -981,10 +1024,10 @@ void AC_MainWindow::movementOption3() {
 }
 
 void AC_MainWindow::chk_Clicked() {
-    playback->setOptions(chk_negate->isChecked(), combo_rgb->currentIndex());
+    playback->setOptions(chk_negate->isChecked(), toAcColorOrder(combo_rgb->currentIndex()));
 }
 void AC_MainWindow::cb_SetIndex(int index) {
-    playback->setOptions(chk_negate->isChecked(), index);
+    playback->setOptions(chk_negate->isChecked(), toAcColorOrder(index));
 }
 
 void AC_MainWindow::slideChanged(int) {
@@ -1057,6 +1100,51 @@ void AC_MainWindow::updateList() {
     std::vector<FilterValue> v;
     buildVector(v);
     playback->setVector(v);
+}
+
+void AC_MainWindow::customSearchChanged(const QString &text) {
+    if(custom_search_combo == nullptr)
+        return;
+
+    custom_search_combo->clear();
+    const QString search = text.trimmed();
+
+    for(int i = 0; i < ac::draw_max-6; ++i) {
+        const QString filter_name = QString::fromStdString(draw_strings[i]);
+        if(checkAdd(filter_name))
+            continue;
+        if(search.isEmpty() || filter_name.contains(search, Qt::CaseInsensitive)) {
+            custom_search_combo->addItem(filter_name);
+        }
+    }
+
+    for(unsigned int j = 0; j < plugins.plugin_list.size(); ++j) {
+        QString plugin_name = "plugin ";
+        plugin_name += plugins.plugin_list[j]->name().c_str();
+        if(search.isEmpty() || plugin_name.contains(search, Qt::CaseInsensitive)) {
+            custom_search_combo->addItem(plugin_name);
+        }
+    }
+}
+
+void AC_MainWindow::addSearchResult() {
+    if(custom_search_combo == nullptr || custom_search_combo->count() == 0)
+        return;
+
+    const QString selected = custom_search_combo->currentText();
+    if(selected.isEmpty())
+        return;
+
+    custom_filters->addItem(selected);
+    QString qs;
+    QTextStream stream(&qs);
+    stream << "Added Filter: " << selected << "\n";
+    Log(qs);
+    updateList();
+
+    // Clear search so next filter can be typed quickly
+    custom_search_text->clear();
+    custom_search_text->setFocus();
 }
 
 void AC_MainWindow::rmvClicked() {

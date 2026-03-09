@@ -153,6 +153,8 @@ public slots:
     void prev_filter();
     void showSlit();
     void onFFmpegFinished(QString tempFile, QString sourceFile, QString outputFile);
+    void customSearchChanged(const QString &text);
+    void addSearchResult();
      
 private:
     void createControls();
@@ -188,6 +190,9 @@ private:
 #endif
     QSettings *settings;
     std::vector<std::string> draw_strings;
+    QLineEdit *custom_search_text;
+    QComboBox *custom_search_combo;
+    QPushButton *custom_search_add;
     
 };
 

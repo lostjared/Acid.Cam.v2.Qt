@@ -8,6 +8,28 @@
 #include"playback_thread.h"
 #include<chrono>
 
+namespace {
+void ApplyNegateSwapOnce(cv::Mat &frame, bool negate_enabled) {
+    const bool do_swap = (ac::color_order != 0) || (ac::swapColor_r != 0) || (ac::swapColor_g != 0) || (ac::swapColor_b != 0);
+    if(!do_swap && !negate_enabled)
+        return;
+
+    for(int z = 0; z < frame.rows; ++z) {
+        for(int i = 0; i < frame.cols; ++i) {
+            if(do_swap) {
+                ac::swapColors_(frame, z, i);
+            }
+            if(negate_enabled) {
+                cv::Vec3b &pixel = frame.at<cv::Vec3b>(z, i);
+                pixel[0] = ~pixel[0];
+                pixel[1] = ~pixel[1];
+                pixel[2] = ~pixel[2];
+            }
+        }
+    }
+}
+}
+
 Playback::Playback(QObject *parent) : QThread(parent) {
     stop = true;
     isStep = false;
@@ -233,7 +255,6 @@ void Playback::setOptions(bool n, int c) {
     negate = n;
     reverse = c;
     ac::color_order = c;
-    ac::in_custom = true;
     mutex.unlock();
 }
 
@@ -499,8 +520,6 @@ void Playback::run() {
             ac::in_custom = true;
             if(_custom_cycle == false) {
                 for(unsigned int i = 0; i < cur.size(); ++i) {
-                    if(i == cur.size()-1)
-                        ac::in_custom = false;
                     drawFilter(frame, cur[i]);
                     //msleep(duration);
                 }
@@ -514,6 +533,8 @@ void Playback::run() {
                 }
             }
             drawEffects(frame);
+            ApplyNegateSwapOnce(frame, ac::isNegative);
+            ac::in_custom = false;
             static int delay_counter = 0;
             ++delay_counter;
             if(delay_counter > (fps_delay * static_cast<int>(ac::fps))) {
