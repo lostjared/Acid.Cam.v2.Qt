@@ -1,4 +1,5 @@
-![screenshot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/screenshot.jpg "Acid Cam v2 Qt")
+
+<img width="1407" height="1018" alt="ss1" src="https://github.com/user-attachments/assets/4044594a-e235-47b7-8f21-bb69d576c5c0" />
 
 ## What is Acid Cam?
 
@@ -12,7 +13,8 @@ Acid Cam is ideal for:
 - Producing source material for music videos and experimental film
 - Exploration and experimentation with pixel-level video processing
 
-![screenshot](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acqt-ss.png?raw=true "Acid Cam Interface")
+<img width="1660" height="1025" alt="ss2" src="https://github.com/user-attachments/assets/8756c7b5-8968-46fc-a78d-550f83f65f15" />
+
 
 ## Recent Updates
 
@@ -210,10 +212,6 @@ See the `src/plugins/` directory for example plugin source code.
 - **Save your filter chains** — When you find a combination you like, save it as a `.filter` file so you can reload it later.
 - **Filters marked 720 or 1080** in their name are designed for those resolutions and may require significant RAM. Insufficient memory will cause the program to exit.
 - **Hardware encoding** — If you have an NVIDIA GPU, the application will auto-detect NVENC support and offer GPU-accelerated encoding at much faster speeds than CPU encoding.
-
-## Screenshots
-
-![Linux](https://github.com/lostjared/Acid.Cam.v2.Qt/blob/master/screens/acidcam.2.lin.jpg?raw=true "Acid Cam on Linux")
 
 ## License
 
