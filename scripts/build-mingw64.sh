@@ -37,13 +37,24 @@ cd "${SCRIPT_DIR}/libacidcam/build-mingw64"
 cmake .. \
     -DCMAKE_TOOLCHAIN_FILE="${TOOLCHAIN_FILE}" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_SHARED_LIBS=OFF \
     -DACIDCAM_STATIC_GNU_RUNTIME=ON \
     -DACIDCAM_ENABLE_TESTS=OFF \
     -DACIDCAM_ENABLE_EXAMPLES=OFF \
     -DCMAKE_INSTALL_PREFIX="${MINGW_SYSROOT}"
 
 cmake --build . -j "${JOBS}"
+
+# Remove old shared library artifacts from the sysroot.
+# A previous -DBUILD_SHARED_LIBS=ON build may have left a .dll and .dll.a
+# import library behind. If those remain, the linker and deploy script will
+# pick them up instead of the new static .a, causing a runtime "missing DLL" error.
+echo ""
+echo "=== Cleaning old libacidcam shared artifacts from sysroot ==="
+sudo rm -fv "${MINGW_SYSROOT}/bin/libacidcam"*.dll \
+            "${MINGW_SYSROOT}/bin/acidcam"*.dll \
+            "${MINGW_SYSROOT}/lib/libacidcam"*.dll.a \
+            "${MINGW_SYSROOT}/lib/acidcam"*.dll.a
 
 echo ""
 echo "=== Installing libacidcam to MinGW sysroot ==="

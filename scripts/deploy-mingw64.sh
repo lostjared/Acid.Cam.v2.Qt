@@ -76,6 +76,20 @@ SECUR32.dll secur32.dll
 BCRYPT.dll bcrypt.dll
 NCRYPT.dll ncrypt.dll
 SHLWAPI.dll shlwapi.dll
+WLDAP32.dll wldap32.dll
+ODBC32.dll odbc32.dll
+ODBCCP32.dll odbccp32.dll
+AUTHZ.dll authz.dll
+MPR.dll mpr.dll
+d3d9.dll D3D9.dll
+d3d11.dll D3D11.dll
+d3d12.dll D3D12.dll
+d2d1.dll D2D1.dll
+DWrite.dll dwrite.dll
+dxgi.dll DXGI.dll
+WINHTTP.dll winhttp.dll
+SHCORE.dll shcore.dll
+WTSAPI32.dll wtsapi32.dll
 api-ms-win-crt-runtime-l1-1-0.dll
 api-ms-win-crt-stdio-l1-1-0.dll
 api-ms-win-crt-heap-l1-1-0.dll
@@ -167,22 +181,51 @@ echo ""
 echo "Resolving DLL dependencies..."
 copy_dll_deps "${DEPLOY_DIR}/${EXE_NAME}"
 
-# Copy libacidcam DLL (may have been installed to the sysroot)
+# Check whether the exe actually needs libacidcam as a DLL.
+# If libacidcam was built with -DBUILD_SHARED_LIBS=OFF, it is statically
+# linked into the exe and no DLL is needed.  Only copy if the exe references it.
 echo ""
-echo "Checking for libacidcam DLL..."
-ACIDCAM_DLL=$(find "${MINGW_SYSROOT}/bin" -maxdepth 1 -name "libacidcam*.dll" -o -name "acidcam*.dll" 2>/dev/null | head -1)
-if [ -z "$ACIDCAM_DLL" ]; then
-    # Check the libacidcam build directory as fallback
-    ACIDCAM_DLL=$(find "${SCRIPT_DIR}/libacidcam/build-mingw64" -maxdepth 1 -name "libacidcam*.dll" -o -name "acidcam*.dll" 2>/dev/null | head -1)
-fi
-if [ -n "$ACIDCAM_DLL" ]; then
-    cp "$ACIDCAM_DLL" "${DEPLOY_DIR}/"
-    echo "  Copied: $(basename "$ACIDCAM_DLL")"
-    # Also resolve acidcam's own DLL dependencies
-    copy_dll_deps "$ACIDCAM_DLL"
+echo "Checking for libacidcam dependency..."
+if "${OBJDUMP}" -p "${DEPLOY_DIR}/${EXE_NAME}" 2>/dev/null | grep -qi "libacidcam\|acidcam.*\.dll"; then
+    echo "  Exe dynamically links libacidcam — looking for DLL..."
+    ACIDCAM_DLL=$(find "${MINGW_SYSROOT}/bin" -maxdepth 1 -name "libacidcam*.dll" -o -name "acidcam*.dll" 2>/dev/null | head -1)
+    if [ -z "$ACIDCAM_DLL" ]; then
+        ACIDCAM_DLL=$(find "${SCRIPT_DIR}/libacidcam/build-mingw64" -maxdepth 1 -name "libacidcam*.dll" -o -name "acidcam*.dll" 2>/dev/null | head -1)
+    fi
+    if [ -n "$ACIDCAM_DLL" ]; then
+        cp "$ACIDCAM_DLL" "${DEPLOY_DIR}/"
+        echo "  Copied: $(basename "$ACIDCAM_DLL")"
+        copy_dll_deps "$ACIDCAM_DLL"
+    else
+        echo "  WARNING: libacidcam DLL not found but exe requires it!"
+    fi
 else
-    echo "  WARNING: libacidcam DLL not found"
+    echo "  libacidcam is statically linked — no DLL needed."
+    # Remove any stale libacidcam DLL that may have been copied by the
+    # recursive dependency resolver from a previous shared build.
+    rm -f "${DEPLOY_DIR}/libacidcam"*.dll "${DEPLOY_DIR}/acidcam"*.dll
 fi
+
+# Ensure critical MinGW runtime DLLs are always present.
+# These are needed by pre-built OpenCV/Qt DLLs from the sysroot even when
+# the main exe statically links them.  A missing or wrong version of these
+# is the #1 cause of "entry point not found" errors on Windows.
+echo ""
+echo "Ensuring MinGW runtime DLLs are present..."
+MINGW_RUNTIME_DLLS="libstdc++-6.dll libgcc_s_seh-1.dll libwinpthread-1.dll"
+for rtdll in ${MINGW_RUNTIME_DLLS}; do
+    if [ ! -f "${DEPLOY_DIR}/${rtdll}" ]; then
+        rtdll_path=$(find "${MINGW_SYSROOT}/bin" -maxdepth 1 -name "${rtdll}" 2>/dev/null | head -1)
+        if [ -n "$rtdll_path" ]; then
+            cp "$rtdll_path" "${DEPLOY_DIR}/"
+            echo "  Force-copied: ${rtdll}"
+        else
+            echo "  WARNING: ${rtdll} not found in sysroot!"
+        fi
+    else
+        echo "  Present: ${rtdll}"
+    fi
+done
 
 # Copy Qt plugins
 echo ""
@@ -251,6 +294,28 @@ cat > "${DEPLOY_DIR}/qt.conf" << 'EOF'
 [Paths]
 Plugins = .
 EOF
+
+# Verify DLL consistency: check that every DLL dependency is either
+# a Windows system DLL or present in the deploy directory.
+echo ""
+echo "Verifying DLL dependencies..."
+MISSING_COUNT=0
+ALL_NEEDED=$("${OBJDUMP}" -p "${DEPLOY_DIR}/"*.dll "${DEPLOY_DIR}/${EXE_NAME}" 2>/dev/null \
+    | grep "DLL Name:" | awk '{print $3}' | sort -u)
+for needed_dll in ${ALL_NEEDED}; do
+    if is_system_dll "$needed_dll"; then
+        continue
+    fi
+    if [ ! -f "${DEPLOY_DIR}/${needed_dll}" ]; then
+        echo "  MISSING: ${needed_dll}"
+        MISSING_COUNT=$((MISSING_COUNT + 1))
+    fi
+done
+if [ "$MISSING_COUNT" -eq 0 ]; then
+    echo "  All DLL dependencies satisfied."
+else
+    echo "  WARNING: ${MISSING_COUNT} DLL(s) missing! App may fail with 'entry point not found'."
+fi
 
 # Create a plugins/ directory note
 echo ""
