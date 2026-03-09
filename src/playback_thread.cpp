@@ -92,14 +92,15 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     mutex.lock();
     mode = MODE_CAMERA;
     device_num = device;
-
 //#if defined(__linux__) || defined(__APPLE__)
 #ifdef _WIN32
     capture.open(device, cv::CAP_DSHOW);
-    //capture.open(0, cv::CAP_MSMF);
+#elif __linux__
+    capture.open(device, cv::CAP_V4L2);
 #else
     capture.open(device);
 #endif
+    capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
     if(!capture.isOpened()) {
         mutex.unlock();
         return false;
