@@ -100,11 +100,11 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
 #else
     capture.open(device);
 #endif
-    capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
     if(!capture.isOpened()) {
         mutex.unlock();
         return false;
     }
+    capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
     recording = record;
     writer = wr;
     int res_w = 640, res_h = 480;
