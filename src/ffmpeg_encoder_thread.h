@@ -26,6 +26,11 @@ private:
     std::atomic<bool> stop_encoding;
     std::atomic<bool> is_encoding;
     FILE *ffmpeg_pipe;
+    QString diagnostic_log_path;
+    qint64 diagnostic_log_position;
+    bool timestamped_input;
+
+    void drainDiagnosticLog();
     
 public:
     FFmpegEncoderThread(QObject *parent = nullptr);
@@ -34,7 +39,7 @@ public:
     // Start encoding to output file
     bool startEncoding(const std::string &output, FFmpegCodec codec,
                       const std::string &src_res, const std::string &dst_res,
-                      double fps, int crf);
+                      double fps, const FFmpegEncodeOptions &options);
     
     // Queue a frame for encoding
     void enqueueFrame(const cv::Mat &frame);
@@ -56,6 +61,7 @@ signals:
     void encodingStopped();
     void encodingError(const QString &error);
     void framesProcessed(int count);
+    void ffmpegOutput(const QString &text);
 };
 
 #endif

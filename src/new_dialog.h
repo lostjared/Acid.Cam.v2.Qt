@@ -20,7 +20,7 @@ public:
     void createControls();
     void setParent(AC_MainWindow *p);
     
-    QComboBox *combo_res, *combo_device;
+    QComboBox *combo_res, *combo_device, *combo_fps;
     QLineEdit *output_dir;
     QCheckBox *chk_record;
     QPushButton *btn_start, *btn_select;
@@ -28,14 +28,19 @@ public:
     QCheckBox *chk_use_ffmpeg;
     QComboBox *ffmpeg_codec;
     QSpinBox *spin_crf;
+    QComboBox *ffmpeg_preset, *ffmpeg_tune;
+    QCheckBox *chk_realtime, *chk_timestamp_frames;
+    QCheckBox *chk_sync_fps;
     
 public slots:
     void btn_Select();
     void btn_Start();
     void onUseFFmpegChanged(int state);
+    void onCodecChanged(int index);
     
 private:
     AC_MainWindow *win_parent;
+    QSettings *settings;
 };
 
 class CaptureVideo : public QDialog {
@@ -53,13 +58,17 @@ public:
     QCheckBox *chk_use_ffmpeg;
     QComboBox *ffmpeg_codec;
     QSpinBox *spin_crf;
+    QComboBox *ffmpeg_preset, *ffmpeg_tune;
+    QCheckBox *chk_realtime;
     QCheckBox *chk_mux_audio;
+    QCheckBox *chk_sync_fps;
     
 public slots:
     void btn_SetSourceFile();
     void btn_SetOutputDir();
     void btn_Start();
     void onUseFFmpegChanged(int state);
+    void onCodecChanged(int index);
     
 private:
     AC_MainWindow *win_parent;

@@ -58,6 +58,7 @@ private:
     std::atomic<bool> _custom_cycle;
     std::atomic<int> _custom_cycle_index;
     std::atomic<int> fps_delay;
+    std::atomic<bool> sync_to_input_fps;
     std::unordered_map<std::string, FilterValue> filter_map_ex;
     std::atomic<bool> setFilterMap;
     std::unordered_map<std::string, FilterValue> filter_map_ex_set;
@@ -95,7 +96,8 @@ public:
     bool VideoRelease();
     void SetFlip(bool f1, bool f2);
     void setVideo(cv::VideoCapture cap, cv::VideoWriter writer, bool record, bool record_png);
-    bool setVideoCamera(std::string name, int type, int device, int res, cv::VideoWriter writer, bool record);
+    bool setVideoCamera(std::string name, int type, int device, int res,
+                        int requestedFps, cv::VideoWriter writer, bool record);
     bool openVideo(std::string video);
     bool isStopped() const;
     void run();
@@ -120,12 +122,15 @@ public:
     unsigned long calcMem();
     void setCustomCycle(bool b);
     void setCustomCycleDelay(int delay);
+    void setSyncToInputFps(bool enabled);
     void setChromaImage(cv::Mat &frame);
     void setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPath,
-                        FFmpegCodec codec, int crf, double fps, int width, int height,
+                        FFmpegCodec codec, const FFmpegEncodeOptions &options,
+                        double fps, int width, int height,
                         bool muxAudio, const std::string &sourcePath);
     bool setVideoCameraFFmpeg(const std::string &outputPath, int device, int res,
-                              FFmpegCodec codec, int crf);
+                              int requestedFps, FFmpegCodec codec,
+                              const FFmpegEncodeOptions &options);
     void closeFFmpeg();
     
 signals:
@@ -134,6 +139,7 @@ signals:
     void frameIncrement();
     void resetIndex();
     void ffmpegFinished(QString tempFile, QString sourceFile, QString outputFile);
+    void ffmpegOutput(const QString &text);
 };
 
 #endif

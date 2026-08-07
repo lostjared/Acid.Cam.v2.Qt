@@ -5,12 +5,78 @@
  */
 
 #include "ffmpeg_write.h"
+#include <algorithm>
+#include <cctype>
 
 #ifndef _WIN32
 #include <unistd.h>
 #endif
 
 static const std::string ffmpeg_path = "ffmpeg";
+
+namespace {
+std::string lowercase(std::string value) {
+    std::transform(value.begin(), value.end(), value.begin(),
+                   [](unsigned char ch) {
+                       return static_cast<char>(std::tolower(ch));
+                   });
+    return value;
+}
+
+bool isSoftwarePreset(const std::string &preset) {
+    static const char *presets[] = {"ultrafast", "superfast", "veryfast",
+                                    "faster",    "fast",      "medium",
+                                    "slow",      "slower",    "veryslow"};
+    return std::find(std::begin(presets), std::end(presets), preset) !=
+           std::end(presets);
+}
+
+std::string softwarePreset(std::string preset) {
+    preset = lowercase(preset);
+    if(preset == "p1") return "ultrafast";
+    if(preset == "p2") return "superfast";
+    if(preset == "p3") return "veryfast";
+    if(preset == "p4") return "fast";
+    if(preset == "p5") return "medium";
+    if(preset == "p6") return "slow";
+    if(preset == "p7") return "veryslow";
+    return isSoftwarePreset(preset) ? preset : "medium";
+}
+
+std::string nvencPreset(std::string preset) {
+    preset = lowercase(preset);
+    if(preset.size() == 2 && preset[0] == 'p' && preset[1] >= '1' &&
+       preset[1] <= '7')
+        return preset;
+    if(preset == "ultrafast") return "p1";
+    if(preset == "superfast") return "p2";
+    if(preset == "veryfast" || preset == "faster") return "p3";
+    if(preset == "fast") return "p4";
+    if(preset == "slow" || preset == "slower") return "p6";
+    if(preset == "veryslow") return "p7";
+    return "p5";
+}
+
+bool isSoftwareTune(const std::string &tune) {
+    static const char *tunes[] = {"film",       "animation", "grain",
+                                  "stillimage", "psnr",      "ssim",
+                                  "fastdecode", "zerolatency"};
+    return std::find(std::begin(tunes), std::end(tunes), tune) !=
+           std::end(tunes);
+}
+
+bool isNvencTune(const std::string &tune) {
+    return tune == "hq" || tune == "uhq" || tune == "ll" ||
+           tune == "ull" || tune == "lossless";
+}
+
+std::string softwareTune(std::string tune, bool realtime) {
+    if(realtime) return "zerolatency";
+    tune = lowercase(tune);
+    if(tune == "ll" || tune == "ull") return "zerolatency";
+    return isSoftwareTune(tune) ? tune : "";
+}
+}
 
 const char* getCodecName(FFmpegCodec codec) {
     switch (codec) {
@@ -38,9 +104,12 @@ const char* getCodecDescription(FFmpegCodec codec) {
 
 FILE* ffmpeg_open(const std::string &output, FFmpegCodec codec,
                   const std::string &src_res, const std::string &dst_res,
-                  double fps, int crf) {
+                  double fps, const FFmpegEncodeOptions &options,
+                  const std::string &diagnosticLogPath) {
     
     const char* codec_name = getCodecName(codec);
+    const int quality = std::max(0, std::min(options.quality, 51));
+    const std::string requested_tune = lowercase(options.tune);
     
     std::ostringstream cmd;
     cmd << ffmpeg_path 
@@ -48,16 +117,30 @@ FILE* ffmpeg_open(const std::string &output, FFmpegCodec codec,
         << " -s " << src_res
         << " -pixel_format bgr24"
         << " -f rawvideo"
-        << " -r " << fps
-        << " -i pipe:"
-        << " -vsync cfr"  // Force constant frame rate - prevents stuttering with hardware encoders
+        << " -r " << fps;
+    cmd << " -i pipe:"
+        << (options.timestampInput
+                ? " -vf \"setpts=(RTCTIME-RTCSTART)/(TB*1000000)\" -fps_mode vfr"
+                : " -fps_mode cfr")
         << " -vcodec " << codec_name
         << " -pix_fmt yuv420p";
     
     switch (codec) {
         case FFmpegCodec::LIBX264:
         case FFmpegCodec::LIBX265:
-            cmd << " -crf " << crf;
+            cmd << " -preset " << softwarePreset(options.preset);
+            if(requested_tune == "lossless") {
+                if(codec == FFmpegCodec::LIBX265)
+                    cmd << " -x265-params lossless=1";
+                else
+                    cmd << " -qp 0";
+            } else {
+                const std::string tune =
+                    softwareTune(requested_tune, options.realtime);
+                if(!tune.empty()) cmd << " -tune " << tune;
+                cmd << " -crf " << quality;
+            }
+            if(options.realtime) cmd << " -bf 0";
             if (codec == FFmpegCodec::LIBX265) {
                 cmd << " -tag:v hvc1";
             }
@@ -65,9 +148,16 @@ FILE* ffmpeg_open(const std::string &output, FFmpegCodec codec,
             
         case FFmpegCodec::H264_NVENC:
         case FFmpegCodec::HEVC_NVENC:
-            cmd << " -preset p5";
-            cmd << " -cq " << crf;
-            cmd << " -b:v 0";
+            cmd << " -preset " << nvencPreset(options.preset);
+            if(requested_tune == "lossless") {
+                cmd << " -tune lossless";
+            } else if(options.realtime) {
+                cmd << " -tune ll -bf 0";
+            } else if(isNvencTune(requested_tune)) {
+                cmd << " -tune " << requested_tune;
+            }
+            if(requested_tune != "lossless")
+                cmd << " -cq " << quality << " -b:v 0";
             if (codec == FFmpegCodec::HEVC_NVENC) {
                 cmd << " -tag:v hvc1";
             }
@@ -76,14 +166,15 @@ FILE* ffmpeg_open(const std::string &output, FFmpegCodec codec,
         case FFmpegCodec::H264_VAAPI:
         case FFmpegCodec::HEVC_VAAPI:
             cmd << " -vaapi_device /dev/dri/renderD128";
-            cmd << " -qp " << crf;
+            cmd << " -qp " << quality;
+            if(options.realtime) cmd << " -bf 0";
             if (codec == FFmpegCodec::HEVC_VAAPI) {
                 cmd << " -tag:v hvc1";
             }
             break;
             
         default:
-            cmd << " -crf " << crf;
+            cmd << " -crf " << quality;
             break;
     }
     
@@ -93,6 +184,8 @@ FILE* ffmpeg_open(const std::string &output, FFmpegCodec codec,
     
     // Output file
     cmd << " \"" << output << "\"";
+    if(!diagnosticLogPath.empty())
+        cmd << " > \"" << diagnosticLogPath << "\" 2>&1";
     
     std::cout << "acidcam: Starting FFmpeg: " << cmd.str() << "\n";
     
@@ -112,6 +205,7 @@ FILE* ffmpeg_open(const std::string &output, FFmpegCodec codec,
 void ffmpeg_write_frame(FILE *fptr, const cv::Mat &frame) {
     if (fptr && !frame.empty()) {
         fwrite(frame.ptr(), sizeof(char), frame.total() * frame.elemSize(), fptr);
+        fflush(fptr);
     }
 }
 
@@ -126,7 +220,8 @@ void ffmpeg_close(FILE *fptr) {
 }
 
 bool ffmpeg_mux_audio(const std::string &temp_video, const std::string &source,
-                      const std::string &output) {
+                      const std::string &output,
+                      const FFmpegLogCallback &logCallback) {
     std::ostringstream cmd;
     cmd << ffmpeg_path
         << " -y -i \"" << temp_video << "\""
@@ -135,7 +230,8 @@ bool ffmpeg_mux_audio(const std::string &temp_video, const std::string &source,
         << " -map 0:v:0"
         << " -map 1:a:0?"  // Optional audio track
         << " -shortest"
-        << " \"" << output << "\"";
+        << " \"" << output << "\""
+        << " 2>&1";
     
     std::cout << "acidcam: Muxing audio: " << cmd.str() << "\n";
     
@@ -150,13 +246,18 @@ bool ffmpeg_mux_audio(const std::string &temp_video, const std::string &source,
         return false;
     }
     
-    // Wait for completion
+    char buffer[4096];
+    while(fgets(buffer, sizeof(buffer), fptr) != nullptr) {
+        std::cerr << buffer;
+        if(logCallback)
+            logCallback(buffer);
+    }
+
 #ifndef _WIN32
     int status = pclose(fptr);
-    return WEXITSTATUS(status) == 0;
+    return status != -1 && WIFEXITED(status) && WEXITSTATUS(status) == 0;
 #else
-    _pclose(fptr);
-    return true;
+    return _pclose(fptr) == 0;
 #endif
 }
 

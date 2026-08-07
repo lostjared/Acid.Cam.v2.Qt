@@ -33,6 +33,7 @@ protected:
 
 signals:
     void muxFinished(bool success, QString tempFile, QString outputFile);
+    void ffmpegOutput(const QString &text);
 };
 
 #endif

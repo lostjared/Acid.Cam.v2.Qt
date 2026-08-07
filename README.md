@@ -18,6 +18,35 @@ Acid Cam is ideal for:
 
 ## Recent Updates
 
+## Updates:
+
+  - Fixed Stop so it waits for the playback thread and releases the camera regardless of video/camera mode. This should turn off the webcam light immediately.
+  - Added camera FPS choices: 24, 30, and 60.
+  - The selection is saved between sessions.
+  - FPS is explicitly requested through CAP_PROP_FPS.
+  - Resolution and FPS are both verified after V4L2/DirectShow negotiation.
+  - Unsupported combinations now produce an error instead of silently falling back.
+  - Selected FPS is passed to OpenCV and FFmpeg recording.
+  - Added persisted “Sync processing to camera/video FPS” options.
+  - Playback now uses the source-reported FPS instead of the global processing FPS when enabled.
+  - Added camera-only “Timestamp frames using capture time.”
+      - Uses wall-clock PTS with variable-frame-rate FFmpeg output.
+      - Keeps the timestamped encoder queue short to discard stale frames and reduce drift.
+
+  - FFmpeg encoder and audio-mux stdout/stderr now appear in both the terminal and Log textbox.
+  - Log textbox now retains at most 2,000 lines, automatically removing the oldest entries.
+  - Log appending no longer rebuilds the entire textbox each time.
+  - Corrected unsafe FFmpeg child-process exit-status handling.
+
+  Validation:
+
+  - Full CMake build passed.
+  - Encoder and mux logging tests passed.
+  - Delayed-frame test confirmed timestamps preserve elapsed time.
+  - Audio mux remained responsive with 43 GUI heartbeat ticks.
+  - Updated dialogs passed headless UI checks.
+
+
 
 ## Bug Fixes:
 

@@ -7,8 +7,64 @@
 
 #include"playback_thread.h"
 #include<chrono>
+#include<cmath>
 
 namespace {
+void requestedCameraResolution(int selection, int &width, int &height) {
+    width = 640;
+    height = 480;
+    if(selection == 1) {
+        width = 1280;
+        height = 720;
+    } else if(selection == 2) {
+        width = 1920;
+        height = 1080;
+    }
+}
+
+bool openAndConfigureCamera(cv::VideoCapture &capture, int device,
+                            int resolution, int requestedFps, int &width,
+                            int &height, double &fps) {
+#if defined(_WIN32)
+    capture.open(device, cv::CAP_DSHOW);
+#elif defined(__linux__)
+    capture.open(device, cv::CAP_V4L2);
+#else
+    capture.open(device);
+#endif
+    if(!capture.isOpened())
+        return false;
+
+    requestedCameraResolution(resolution, width, height);
+    capture.set(cv::CAP_PROP_FOURCC,
+                cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+    capture.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    capture.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    capture.set(cv::CAP_PROP_FPS, requestedFps);
+
+    const int actualWidth =
+        static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH));
+    const int actualHeight =
+        static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    fps = capture.get(cv::CAP_PROP_FPS);
+    const bool fpsRejected = fps <= 0.0 || std::abs(fps - requestedFps) > 0.5;
+    if(actualWidth != width || actualHeight != height || fpsRejected) {
+        std::cerr << "acidcam: Camera rejected " << width << "x" << height
+                  << " @ " << requestedFps << " FPS; negotiated "
+                  << actualWidth << "x" << actualHeight << " @ " << fps
+                  << " FPS instead\n";
+        capture.release();
+        return false;
+    }
+
+    width = actualWidth;
+    height = actualHeight;
+    std::cout << "acidcam: Camera opened with backend "
+              << capture.getBackendName() << " at " << width << "x" << height
+              << " @ " << fps << " FPS\n";
+    return true;
+}
+
 void ApplyNegateSwapOnce(cv::Mat &frame, bool negate_enabled) {
     const bool do_swap = (ac::color_order != 0) || (ac::swapColor_r != 0) || (ac::swapColor_g != 0) || (ac::swapColor_b != 0);
     if(!do_swap && !negate_enabled)
@@ -59,6 +115,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     _custom_cycle = false;
     _custom_cycle_index = 0;
     fps_delay = 60;
+    sync_to_input_fps = true;
     setFilterMap = false;
     filter_map_ex = filter_map;
     blend_image_copy_set = false;
@@ -66,6 +123,12 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     use_ffmpeg = false;
     ffmpeg_mux_audio = false;
     encoder_thread = new FFmpegEncoderThread(this);
+    connect(encoder_thread, &FFmpegEncoderThread::ffmpegOutput,
+            this, &Playback::ffmpegOutput);
+}
+
+void Playback::setSyncToInputFps(bool enabled) {
+    sync_to_input_fps = enabled;
 }
 
 bool Playback::VideoRelease() {
@@ -123,46 +186,22 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record, b
     mutex.unlock();
 }
 
-bool Playback::setVideoCamera(std::string name, int type, int device, int res, cv::VideoWriter wr, bool record) {
+bool Playback::setVideoCamera(std::string name, int type, int device, int res,
+                              int requestedFps, cv::VideoWriter wr,
+                              bool record) {
     mutex.lock();
     mode = MODE_CAMERA;
     device_num = device;
-//#if defined(__linux__) || defined(__APPLE__)
-#ifdef _WIN32
-    capture.open(device, cv::CAP_DSHOW);
-#elif __linux__
-    capture.open(device, cv::CAP_V4L2);
-#else
-    capture.open(device);
-#endif
-    if(!capture.isOpened()) {
+    int res_w = 0, res_h = 0;
+    double fps = 0.0;
+    if(!openAndConfigureCamera(capture, device, res, requestedFps, res_w,
+                               res_h, fps)) {
         mutex.unlock();
         return false;
     }
-    capture.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
     recording = record;
     writer = wr;
-    int res_w = 640, res_h = 480;
-    switch(res) {
-        case 0:
-            res_w = 640;
-            res_h = 480;
-            break;
-        case 1:
-            res_w = 1280;
-            res_h = 720;
-            break;
-        case 2:
-            res_w = 1920;
-            res_h = 1080;
-            break;
-    }
-
-   capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
-   capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
-   double fps = capture.get(cv::CAP_PROP_FPS);
-   res_w = capture.get(cv::CAP_PROP_FRAME_WIDTH);
-   res_h = capture.get(cv::CAP_PROP_FRAME_HEIGHT);
+    frame_rate = fps;
     if(record == true && name.size()>0) {
         writer = cv::VideoWriter(name, type, fps, cv::Size(res_w, res_h), true);
         if(!writer.isOpened()) {
@@ -620,10 +659,15 @@ void Playback::run() {
         std::chrono::time_point<std::chrono::system_clock> nowx =
         std::chrono::system_clock::now();
         auto m = std::chrono::duration_cast<std::chrono::milliseconds>(nowx - now).count();
-        if (ac::fps > 0) {
-            int fps_mil = 1000 / ac::fps;
-            if (m < fps_mil)
-                std::this_thread::sleep_for(std::chrono::milliseconds(fps_mil - m - 1));
+        const double target_fps = sync_to_input_fps
+                                      ? frame_rate.load()
+                                      : static_cast<double>(ac::fps);
+        if(target_fps > 0.0) {
+            const auto frame_time = std::chrono::duration<double, std::milli>(
+                1000.0 / target_fps);
+            const auto elapsed = nowx - now;
+            if(elapsed < frame_time)
+                std::this_thread::sleep_for(frame_time - elapsed);
         }
         
     }
@@ -696,9 +740,13 @@ void Playback::Stop() {
 }
 
 void Playback::Release() {
-    mutex.lock();
     stop = true;
-    if(capture.isOpened() && mode == MODE_VIDEO) capture.release();
+    condition.wakeOne();
+    if(isRunning())
+        wait();
+
+    mutex.lock();
+    if(capture.isOpened()) capture.release();
     if(writer.isOpened()) writer.release();
     mutex.unlock();
     
@@ -770,7 +818,9 @@ void Playback::filterFade(cv::Mat &frame, FilterValue &filter1, FilterValue &fil
 }
 
 void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPath,
-                              FFmpegCodec codec, int crf, double fps, int width, int height,
+                              FFmpegCodec codec,
+                              const FFmpegEncodeOptions &options, double fps,
+                              int width, int height,
                               bool muxAudio, const std::string &sourcePath) {
     mutex.lock();
     mode = MODE_VIDEO;
@@ -791,7 +841,9 @@ void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPat
     std::string resolution = resStream.str();
     
     // Start background encoding thread
-    if (encoder_thread && encoder_thread->startEncoding(outputPath, codec, resolution, resolution, fps, crf)) {
+    if (encoder_thread && encoder_thread->startEncoding(
+                              outputPath, codec, resolution, resolution, fps,
+                              options)) {
         std::cout << "acidcam: Background FFmpeg encoder thread started\n";
     } else {
         std::cerr << "acidcam: Failed to start background FFmpeg encoder thread\n";
@@ -802,56 +854,37 @@ void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPat
     mutex.unlock();
 }
 
-bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device, int res,
-                                    FFmpegCodec codec, int crf) {
+bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device,
+                                    int res, int requestedFps,
+                                    FFmpegCodec codec,
+                                    const FFmpegEncodeOptions &options) {
     mutex.lock();
     mode = MODE_CAMERA;
     device_num = device;
 
-#ifdef _WIN32
-    capture.open(device, cv::CAP_DSHOW);
-#else
-    capture.open(device);
-#endif
-    
-    if(!capture.isOpened()) {
-        mutex.unlock();
-        return false;
-    }
-    
     recording = true;
     use_ffmpeg = true;
     ffmpeg_output_path = outputPath;
-    
-    int res_w = 640, res_h = 480;
-    switch(res) {
-        case 0:
-            res_w = 640;
-            res_h = 480;
-            break;
-        case 1:
-            res_w = 1280;
-            res_h = 720;
-            break;
-        case 2:
-            res_w = 1920;
-            res_h = 1080;
-            break;
-    }
 
-    capture.set(cv::CAP_PROP_FRAME_WIDTH, res_w);
-    capture.set(cv::CAP_PROP_FRAME_HEIGHT, res_h);
-    double fps = capture.get(cv::CAP_PROP_FPS);
-    if(fps <= 0) fps = 30;
-    res_w = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_WIDTH));
-    res_h = static_cast<int>(capture.get(cv::CAP_PROP_FRAME_HEIGHT));
+    int res_w = 0, res_h = 0;
+    double fps = 0.0;
+    if(!openAndConfigureCamera(capture, device, res, requestedFps, res_w,
+                               res_h, fps)) {
+        recording = false;
+        use_ffmpeg = false;
+        mutex.unlock();
+        return false;
+    }
+    frame_rate = fps;
     
     std::ostringstream resStream;
     resStream << res_w << "x" << res_h;
     std::string resolution = resStream.str();
     
     // Start background encoding thread
-    if (encoder_thread && encoder_thread->startEncoding(outputPath, codec, resolution, resolution, fps, crf)) {
+    if (encoder_thread && encoder_thread->startEncoding(
+                              outputPath, codec, resolution, resolution, fps,
+                              options)) {
         std::cout << "acidcam: Background FFmpeg encoder thread started (camera)\n";
     } else {
         std::cerr << "acidcam: Failed to start background FFmpeg encoder thread (camera)\n";

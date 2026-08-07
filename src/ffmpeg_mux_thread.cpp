@@ -34,7 +34,10 @@ void FFmpegMuxThread::run() {
     const QString outputFile = output_file;
     const bool success =
         ffmpeg_mux_audio(tempFile.toStdString(), sourceFile.toStdString(),
-                         outputFile.toStdString());
+                         outputFile.toStdString(), [this](const std::string &text) {
+                             emit ffmpegOutput(QString::fromLocal8Bit(
+                                 text.data(), static_cast<int>(text.size())));
+                         });
     muxing = false;
     emit muxFinished(success, tempFile, outputFile);
 }

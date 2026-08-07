@@ -176,9 +176,13 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     QObject::connect(playback, SIGNAL(resetIndex()), this, SLOT(resetIndex()));
     QObject::connect(playback, SIGNAL(ffmpegFinished(QString, QString, QString)), 
                      this, SLOT(onFFmpegFinished(QString, QString, QString)));
+    QObject::connect(playback, &Playback::ffmpegOutput,
+                     this, &AC_MainWindow::Log);
     QObject::connect(mux_thread,
                      SIGNAL(muxFinished(bool, QString, QString)), this,
                      SLOT(onAudioMuxFinished(bool, QString, QString)));
+    QObject::connect(mux_thread, &FFmpegMuxThread::ffmpegOutput,
+                     this, &AC_MainWindow::Log);
     
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
         QString text;
@@ -561,6 +565,7 @@ void AC_MainWindow::createControls() {
     
     log_text = new QTextEdit(this);
     log_text->setReadOnly(true);
+    log_text->document()->setMaximumBlockCount(2000);
     log_text->setMinimumHeight(100);
     log_text->setToolTip(tr("Application log and status messages"));
     
@@ -1226,18 +1231,19 @@ void AC_MainWindow::setSub() {
     }
 }
 void AC_MainWindow::Log(const QString &s) {
-    QString text;
-    text = log_text->toPlainText();
-    text += s;
-    log_text->setText(text);
-    QTextCursor tmpCursor = log_text->textCursor();
+    if(!log_text || s.isEmpty())
+        return;
+    QTextCursor tmpCursor(log_text->document());
     tmpCursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+    tmpCursor.insertText(s);
     log_text->setTextCursor(tmpCursor);
     log_text->ensureCursorVisible();
 }
 
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record, int type,
-                                bool useFFmpeg, FFmpegCodec ffmpegCodec, int crf) {
+                                bool useFFmpeg, FFmpegCodec ffmpegCodec,
+                                const FFmpegEncodeOptions &ffmpegOptions,
+                                bool syncToInputFps, int cameraFps) {
     programMode = MODE_CAMERA;
     progress_bar->hide();
     controls_showvideo->setEnabled(false);
@@ -1252,7 +1258,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     frame_index = 0;
 
     video_frames = 0;
-    video_fps = 24;
+    video_fps = cameraFps;
     
     int res_w = 0;
     int res_h = 0;
@@ -1261,6 +1267,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     frame_index = 0;
     paused = false;
     recording = record;
+    playback->setSyncToInputFps(syncToInputFps);
     QString output_name;
     QTextStream stream_(&output_name);
     static unsigned int index = 0;
@@ -1319,10 +1326,21 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         QString out_s;
         QTextStream out_stream(&out_s);
         out_stream << "Now recording with FFmpeg (" << getCodecDescription(ffmpegCodec) << ") to: " << output_name 
-                   << "\nResolution: " << res_w << "x" << res_h << " CRF: " << crf << "\n";
+                   << "\nResolution: " << res_w << "x" << res_h
+                   << " FPS: " << cameraFps
+                   << " Quality: " << ffmpegOptions.quality
+                   << " Preset: " << ffmpegOptions.preset.c_str()
+                   << " Tune: " << ffmpegOptions.tune.c_str()
+                   << " Realtime: " << (ffmpegOptions.realtime ? "yes" : "no")
+                   << " Timestamp frames: "
+                   << (ffmpegOptions.timestampInput ? "yes" : "no")
+                   << " Sync FPS: " << (syncToInputFps ? "yes" : "no")
+                   << "\n";
         Log(out_s);
         
-        rt_val = playback->setVideoCameraFFmpeg(output_name.toStdString(), dev, res, ffmpegCodec, crf);
+        rt_val = playback->setVideoCameraFFmpeg(
+            output_name.toStdString(), dev, res, cameraFps, ffmpegCodec,
+            ffmpegOptions);
     } else {
         int c_type = 0;
         if(recording) {
@@ -1346,7 +1364,9 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         } else {
             output_name = "";
         }
-        rt_val = playback->setVideoCamera(output_name.toStdString(), c_type, dev, res, writer, recording);
+        rt_val = playback->setVideoCamera(output_name.toStdString(), c_type,
+                                          dev, res, cameraFps, writer,
+                                          recording);
     }
     
     // if successful
@@ -1355,7 +1375,13 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     controls_stop->setEnabled(true);
     
     if(rt_val == false) {
-        QMessageBox::information(this, tr("Error Could not create output file"), tr("Output file"));
+        Log(tr("Could not open the camera at the selected resolution or create "
+               "the output encoder. Check the terminal for the negotiated "
+               "camera mode.\n"));
+        QMessageBox::information(
+            this, tr("Camera Configuration Failed"),
+            tr("The camera could not use the selected resolution. Confirm that "
+               "the device supports this mode and that it is not in use."));
         return false;
     }
     
@@ -1376,7 +1402,9 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 }
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record, bool png_record, int type,
-                               bool useFFmpeg, FFmpegCodec ffmpegCodec, int crf, bool muxAudio) {
+                               bool useFFmpeg, FFmpegCodec ffmpegCodec,
+                               const FFmpegEncodeOptions &ffmpegOptions,
+                               bool muxAudio, bool syncToInputFps) {
     programMode = MODE_VIDEO;
     controls_stop->setEnabled(true);
     controls_pause->setEnabled(true);
@@ -1413,6 +1441,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     controls_stop->setEnabled(true);
     paused = false;
     recording = record;
+    playback->setSyncToInputFps(syncToInputFps);
     QString output_name;
     QTextStream stream_(&output_name);
     static unsigned int index = 0;
@@ -1456,14 +1485,21 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         QString out_s;
         QTextStream out_stream(&out_s);
         out_stream << "Now recording with FFmpeg (" << getCodecDescription(ffmpegCodec) << ") to: " << output_name 
-                   << "\nResolution: " << res_w << "x" << res_h << " CRF: " << crf << "\n";
+                   << "\nResolution: " << res_w << "x" << res_h
+                   << " Quality: " << ffmpegOptions.quality
+                   << " Preset: " << ffmpegOptions.preset.c_str()
+                   << " Tune: " << ffmpegOptions.tune.c_str()
+                   << " Realtime: " << (ffmpegOptions.realtime ? "yes" : "no")
+                   << " Sync FPS: " << (syncToInputFps ? "yes" : "no")
+                   << "\n";
         if(muxAudio) {
             out_stream << "Audio will be copied from source video.\n";
         }
         Log(out_s);
         
         playback->setVideoFFmpeg(capture_video, output_name.toStdString(),
-                                 ffmpegCodec, crf, video_fps, res_w, res_h,
+                                 ffmpegCodec, ffmpegOptions, video_fps, res_w,
+                                 res_h,
                                  muxAudio, filename.toStdString());
     } else if(recording) {
         video_file_name = output_name;
