@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.lostjared.AcidCam</id>
+  <name>Acid Cam</name>
+  <summary>Create real-time glitch art from cameras and videos</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <developer id="io.github.lostjared">
+    <name>Jared Bruni</name>
+  </developer>
+  <description>
+    <p>
+      Acid Cam applies real-time visual distortion filters to webcam feeds,
+      video files, and images. Build custom filter chains, preview the result,
+      and record processed video with FFmpeg.
+    </p>
+    <p>
+      The libacidcam filter engine provides thousands of effects for glitch
+      art, experimental video, live visuals, and source-material generation.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.lostjared.AcidCam.desktop</launchable>
+  <url type="homepage">https://github.com/lostjared/Acid.Cam.v2.Qt</url>
+  <url type="bugtracker">https://github.com/lostjared/Acid.Cam.v2.Qt/issues</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://github.com/user-attachments/assets/4044594a-e235-47b7-8f21-bb69d576c5c0</image>
+      <caption>Acid Cam filter and recording interface</caption>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="1.80.0" date="2026-08-07">
+      <description>
+        <p>Improves capture stability, FFmpeg encoding, camera timing, and recording controls.</p>
+      </description>
+    </release>
+  </releases>
+</component>

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Acid Cam
+Comment=Create real-time glitch art from cameras and videos
+Exec=acidcam-qt
+Icon=io.github.lostjared.AcidCam
+Terminal=false
+Categories=AudioVideo;Video;
+Keywords=video;camera;glitch;effects;filters;FFmpeg;

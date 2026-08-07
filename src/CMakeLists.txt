@@ -9,7 +9,40 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-option(ACIDCAM_STATIC_GNU_RUNTIME "Link libgcc and libstdc++ statically" ON)
+set(_acidcam_static_gnu_runtime_default ON)
+if(APPLE)
+    # AppleClang uses libc++ and the Darwin runtime. It does not provide the
+    # GNU-only -static-libgcc or -static-libstdc++ linker options.
+    set(_acidcam_static_gnu_runtime_default OFF)
+endif()
+option(ACIDCAM_STATIC_GNU_RUNTIME "Link libgcc and libstdc++ statically"
+    ${_acidcam_static_gnu_runtime_default})
+unset(_acidcam_static_gnu_runtime_default)
+
+# Make native Homebrew dependencies discoverable on both Apple Silicon
+# (/opt/homebrew) and Intel (/usr/local) without replacing user search paths.
+if(APPLE)
+    find_program(HOMEBREW_EXECUTABLE brew
+        HINTS /opt/homebrew/bin /usr/local/bin)
+    if(HOMEBREW_EXECUTABLE)
+        execute_process(
+            COMMAND "${HOMEBREW_EXECUTABLE}" --prefix
+            OUTPUT_VARIABLE HOMEBREW_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE HOMEBREW_PREFIX_RESULT
+        )
+        if(HOMEBREW_PREFIX_RESULT EQUAL 0 AND HOMEBREW_PREFIX)
+            list(PREPEND CMAKE_PREFIX_PATH
+                "${HOMEBREW_PREFIX}"
+                "${HOMEBREW_PREFIX}/opt/qt"
+                "${HOMEBREW_PREFIX}/opt/qt@6"
+                "${HOMEBREW_PREFIX}/opt/opencv"
+                "${HOMEBREW_PREFIX}/opt/sdl2"
+            )
+            message(STATUS "Homebrew prefix: ${HOMEBREW_PREFIX}")
+        endif()
+    endif()
+endif()
 
 # When cross-compiling with MinGW, help CMake find packages
 if(MINGW)
@@ -36,7 +69,20 @@ endif()
 
 find_package(PkgConfig REQUIRED)
 if(NOT CMAKE_CROSSCOMPILING)
-    set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig")
+    set(_acidcam_pkg_config_paths "/usr/local/lib/pkgconfig")
+    if(APPLE AND HOMEBREW_PREFIX)
+        list(PREPEND _acidcam_pkg_config_paths
+            "${HOMEBREW_PREFIX}/lib/pkgconfig"
+            "${HOMEBREW_PREFIX}/share/pkgconfig"
+        )
+    endif()
+    list(JOIN _acidcam_pkg_config_paths ":" _acidcam_pkg_config_path)
+    if(DEFINED ENV{PKG_CONFIG_PATH} AND NOT "$ENV{PKG_CONFIG_PATH}" STREQUAL "")
+        string(APPEND _acidcam_pkg_config_path ":$ENV{PKG_CONFIG_PATH}")
+    endif()
+    set(ENV{PKG_CONFIG_PATH} "${_acidcam_pkg_config_path}")
+    unset(_acidcam_pkg_config_path)
+    unset(_acidcam_pkg_config_paths)
 endif()
 
 pkg_check_modules(ACIDCAM REQUIRED acidcam)
@@ -176,7 +222,8 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
 
 # Static linking of GNU runtime libraries
-if(ACIDCAM_STATIC_GNU_RUNTIME AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+if(ACIDCAM_STATIC_GNU_RUNTIME AND NOT APPLE
+   AND CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)$")
     target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
     if(MINGW)
         target_link_options(${PROJECT_NAME} PRIVATE -Wl,-Bstatic -lpthread -Wl,-Bdynamic)

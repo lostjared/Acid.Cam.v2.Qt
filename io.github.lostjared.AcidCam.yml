@@ -1,0 +1,74 @@
+app-id: io.github.lostjared.AcidCam
+runtime: org.kde.Platform
+runtime-version: '6.10'
+sdk: org.kde.Sdk
+command: acidcam-qt
+
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=all
+  - --filesystem=xdg-videos
+  - --filesystem=xdg-pictures
+
+modules:
+  - name: opencv
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_LIST=core,geometry,imgproc,imgcodecs,videoio,highgui,video,photo,objdetect
+      - -DBUILD_SHARED_LIBS=ON
+      - -DBUILD_TESTS=OFF
+      - -DBUILD_PERF_TESTS=OFF
+      - -DBUILD_EXAMPLES=OFF
+      - -DBUILD_opencv_apps=OFF
+      - -DBUILD_JAVA=OFF
+      - -DBUILD_opencv_python3=OFF
+      - -DWITH_QT=OFF
+      - -DWITH_GTK=OFF
+      - -DWITH_OPENCL=OFF
+      - -DWITH_FFMPEG=ON
+      - -DOPENCV_GENERATE_PKGCONFIG=ON
+    cleanup:
+      - /bin
+      - /share/licenses/opencv4
+    sources:
+      - type: git
+        url: https://github.com/opencv/opencv.git
+        tag: 5.0.0
+        commit: 40738fb16ceddb5fb3fea747585f7ce6abb0605b
+
+  - name: libacidcam
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_SHARED_LIBS=ON
+      - -DACIDCAM_ENABLE_TESTS=OFF
+      - -DACIDCAM_ENABLE_EXAMPLES=OFF
+      - -DACIDCAM_STATIC_GNU_RUNTIME=OFF
+    sources:
+      - type: git
+        url: https://github.com/lostjared/libacidcam.git
+        commit: 5a57602ce55a1d61cb4bd6b90e5e7c4d9a3113d3
+
+  - name: acidcam
+    buildsystem: cmake-ninja
+    builddir: true
+    subdir: src
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DACIDCAM_STATIC_GNU_RUNTIME=OFF
+    sources:
+      - type: dir
+        path: .
+        skip:
+          - .git
+          - .flatpak-builder
+          - flatpak-build
+          - flatpak-repo
+          - '*.flatpak'
+          - src/build

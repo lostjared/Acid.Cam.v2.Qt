@@ -180,8 +180,27 @@ make -j$(nproc)
 
 ```bash
 brew install cmake opencv qt@6 sdl2 ffmpeg pkg-config
-# Then follow the same cmake build steps as Linux
+
+# Build and install libacidcam first.
+cd ../libacidcam
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="$HOME/.local"
+cmake --build build --parallel
+cmake --install build
+
+# Build Acid Cam with the same local prefix available to CMake/pkg-config.
+cd ../Acid.Cam.v2.Qt
+PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" \
+    cmake -S src -B build -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_PREFIX_PATH="$HOME/.local"
+cmake --build build --parallel
 ```
+
+Both projects discover `/opt/homebrew` automatically on Apple Silicon.
+`ACIDCAM_STATIC_GNU_RUNTIME` defaults to `OFF` on macOS because AppleClang
+uses libc++ and does not support the GNU static-runtime linker flags. Native
+builds select `arm64` automatically; pass `-DCMAKE_OSX_ARCHITECTURES=arm64`
+only when an explicit architecture is required.
 
 ### Windows (MinGW Cross-Compilation)
 
@@ -286,5 +305,4 @@ This project is released under the **BSD 2-Clause License**. See [LICENSE](LICEN
 ## Links
 
 - [libacidcam — Core Filter Library](https://github.com/lostjared/libacidcam)
-
 
