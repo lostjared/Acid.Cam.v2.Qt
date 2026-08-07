@@ -300,7 +300,7 @@ See the `src/plugins/` directory for example plugin source code.
 
 ## License
 
-This project is released under the **BSD 2-Clause License**. See [LICENSE](LICENSE) for details.
+This project is released under the **GPLv3 License**. See [LICENSE](LICENSE) for details.
 
 ## Links
 
