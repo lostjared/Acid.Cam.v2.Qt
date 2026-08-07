@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(Acid_Cam_v2_Qt VERSION 1.0 LANGUAGES CXX)
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
@@ -144,6 +146,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME acidcam-qt
 )
 
+add_library(acidcam-basic-plugin MODULE plugins/basic/basic.cpp)
+set_target_properties(acidcam-basic-plugin PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "basic"
+)
+
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -213,5 +221,21 @@ if(WIN32)
 endif()
 
 install(TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION bin
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(TARGETS acidcam-basic-plugin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/acidcam/plugins/basic
+)
+
+install(FILES ../flatpak/io.github.lostjared.AcidCam.desktop
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+)
+
+install(FILES ../flatpak/io.github.lostjared.AcidCam.metainfo.xml
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo
+)
+
+install(FILES ../flatpak/io.github.lostjared.AcidCam.png
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps
 )

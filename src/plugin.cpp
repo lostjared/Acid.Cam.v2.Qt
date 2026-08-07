@@ -6,6 +6,8 @@
  */
 
 #include "plugin.h"
+#include <QCoreApplication>
+#include <QStandardPaths>
 
 PluginList plugins;
 
@@ -39,8 +41,17 @@ void add_directory(QDir &cdir, std::vector<std::string> &files) {
 
 void init_plugins() {
     std::vector<std::string> files;
-    QDir d("plugins");
-    add_directory(d, files);
+    const QStringList pluginDirectories = {
+        QDir::cleanPath(QCoreApplication::applicationDirPath() +
+                        "/../lib/acidcam/plugins"),
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+            "/plugins",
+        QDir::current().filePath("plugins")};
+    for(const QString &path : pluginDirectories) {
+        QDir directory(path);
+        if(directory.exists())
+            add_directory(directory, files);
+    }
     if(files.size()>0) {
         for(unsigned int i = 0; i < files.size(); ++i) {
             Plugin *p = new Plugin();
@@ -124,5 +135,4 @@ PluginList::~PluginList() {
     for(auto i = plugin_list.begin(); i != plugin_list.end(); ++i)
         delete *i;
 }
-
 

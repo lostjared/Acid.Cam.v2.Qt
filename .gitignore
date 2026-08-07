@@ -1,1 +1,5 @@
 *DS_Store
+.flatpak-builder/
+flatpak-build/
+flatpak-repo/
+*.flatpak
