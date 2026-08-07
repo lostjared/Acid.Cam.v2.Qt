@@ -53,7 +53,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/lostjared/libacidcam.git
-        commit: 5a57602ce55a1d61cb4bd6b90e5e7c4d9a3113d3
+        commit: 85f0cb5fe884257412f8539465610f544853f486
 
   - name: acidcam
     buildsystem: cmake-ninja
