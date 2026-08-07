@@ -108,6 +108,9 @@ static int toAcColorOrder(const int uiIndex) {
 
 AC_MainWindow::~AC_MainWindow() {
     controls_Stop();
+    if(mux_thread && mux_thread->isRunning()) {
+        mux_thread->wait();
+    }
 #ifndef _WIN32
     delete playback;
 #endif
@@ -124,6 +127,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     draw_strings = ac::draw_strings;
     ac::filter_menu_map["User"].menu_list->push_back("No Filter");
     playback = new Playback();
+    mux_thread = new FFmpegMuxThread(this);
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
     setGeometry(100, 100, 900, 900);
     setMinimumSize(900, 1080);
@@ -172,6 +176,9 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     QObject::connect(playback, SIGNAL(resetIndex()), this, SLOT(resetIndex()));
     QObject::connect(playback, SIGNAL(ffmpegFinished(QString, QString, QString)), 
                      this, SLOT(onFFmpegFinished(QString, QString, QString)));
+    QObject::connect(mux_thread,
+                     SIGNAL(muxFinished(bool, QString, QString)), this,
+                     SLOT(onAudioMuxFinished(bool, QString, QString)));
     
     for(unsigned int i = 0; i < plugins.plugin_list.size(); ++i) {
         QString text;
@@ -1797,13 +1804,24 @@ void AC_MainWindow::stopRecording() {
 
 void AC_MainWindow::onFFmpegFinished(QString tempFile, QString sourceFile, QString outputFile) {
     Log(tr("FFmpeg encoding finished. Muxing audio...\n"));
-    bool success = ffmpeg_mux_audio(tempFile.toStdString(), sourceFile.toStdString(), outputFile.toStdString());
+    statusBar()->showMessage(tr("Muxing audio..."));
+    if(!mux_thread->startMux(tempFile, sourceFile, outputFile)) {
+        Log(tr("Could not start audio mux worker. The video without audio was preserved.\n"));
+        QMessageBox::warning(
+            this, tr("Audio Muxing Failed"),
+            tr("Could not start audio muxing. Video file saved without audio."));
+    }
+}
+
+void AC_MainWindow::onAudioMuxFinished(bool success, QString tempFile,
+                                       QString outputFile) {
     if(success) {
         QFile::remove(tempFile);
         QString msg;
         QTextStream stream(&msg);
         stream << "Video with audio saved to: " << outputFile << "\n";
         Log(msg);
+        statusBar()->showMessage(tr("Video encoding complete"));
         QMessageBox::information(this, tr("Encoding Complete"), 
             tr("Video encoding complete with audio from source."));
     } else {
@@ -1811,6 +1829,7 @@ void AC_MainWindow::onFFmpegFinished(QString tempFile, QString sourceFile, QStri
         QTextStream stream(&msg);
         stream << "Audio muxing failed. Video saved to: " << tempFile << "\n";
         Log(msg);
+        statusBar()->showMessage(tr("Audio muxing failed"));
         QMessageBox::warning(this, tr("Audio Muxing Failed"), 
             tr("Could not copy audio from source. Video file saved without audio."));
     }

@@ -24,6 +24,17 @@ bool FFmpegEncoderThread::startEncoding(const std::string &output, FFmpegCodec c
         emit encodingError(QString::fromStdString("Encoding already in progress"));
         return false;
     }
+
+    // A previous run may have cleared is_encoding immediately before returning.
+    if (isRunning()) {
+        wait();
+    }
+
+    {
+        QMutexLocker locker(&queue_mutex);
+        std::queue<cv::Mat> empty_queue;
+        frame_queue.swap(empty_queue);
+    }
     
     // Open FFmpeg pipe
     ffmpeg_pipe = ffmpeg_open(output, codec, src_res, dst_res, fps, crf);
@@ -43,15 +54,20 @@ bool FFmpegEncoderThread::startEncoding(const std::string &output, FFmpegCodec c
 }
 
 void FFmpegEncoderThread::enqueueFrame(const cv::Mat &frame) {
-    if (!is_encoding) {
+    if (frame.empty()) {
         return;
     }
-    
-    // Make a copy to avoid issues with frame reuse
-    cv::Mat frame_copy = frame.clone();
-    
+
     QMutexLocker locker(&queue_mutex);
-    frame_queue.push(frame_copy);
+    if (!is_encoding || stop_encoding) {
+        return;
+    }
+
+    // Bound memory use if the selected encoder cannot keep up with playback.
+    if (frame_queue.size() >= max_queued_frames) {
+        frame_queue.pop();
+    }
+    frame_queue.push(frame.clone());
     queue_condition.wakeOne();  // Signal that a frame is available
 }
 
@@ -67,9 +83,8 @@ void FFmpegEncoderThread::stopEncoding() {
     }
     
     // Wait for thread to process remaining frames and exit
-    if (!wait(5000)) {  // 5 second timeout
+    if (!wait(5000)) {  // Report slow shutdown, but never kill a C++ thread asynchronously.
         std::cerr << "acidcam: FFmpeg encoder thread did not stop gracefully\n";
-        terminate();
         wait();
     }
 }

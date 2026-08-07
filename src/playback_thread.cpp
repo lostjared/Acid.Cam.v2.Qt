@@ -32,8 +32,19 @@ void ApplyNegateSwapOnce(cv::Mat &frame, bool negate_enabled) {
 
 Playback::Playback(QObject *parent) : QThread(parent) {
     stop = true;
+    video_shown = false;
+    video_is_set = false;
+    chroma_image_set = false;
+    frame_rate = 0.0;
+    recording = false;
     isStep = false;
     isPaused = false;
+    record_png = false;
+    png_index = 0;
+    mode = MODE_VIDEO;
+    device_num = 0;
+    frame_index = nullptr;
+    red = green = blue = 0;
     bright_ = gamma_ = saturation_ = 0;
     single_mode = true;
     alpha = 0;
@@ -48,6 +59,7 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     _custom_cycle = false;
     _custom_cycle_index = 0;
     fps_delay = 60;
+    setFilterMap = false;
     filter_map_ex = filter_map;
     blend_image_copy_set = false;
     ffmpeg_pipe = nullptr;
@@ -78,10 +90,11 @@ void Playback::setCustomCycleDelay(int delay) {
 }
 
 void Playback::Play() {
-    if(!isRunning()) {
-        if(isStopped()) {
-            stop = false;
-        }
+    if(isRunning()) {
+        return;
+    }
+    if(isStopped()) {
+        stop = false;
     }
     prev_filter = FilterValue(0, 0, -1);
     alpha = 0;
@@ -153,6 +166,7 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res, c
     if(record == true && name.size()>0) {
         writer = cv::VideoWriter(name, type, fps, cv::Size(res_w, res_h), true);
         if(!writer.isOpened()) {
+            mutex.unlock();
             return false;
         }
     }
@@ -260,22 +274,30 @@ void Playback::setOptions(bool n, int c) {
 
 void Playback::setCycle(int type, int frame_skip, std::vector<std::string> &v) {
     mutex.lock();
-    cycle_on = type;
-    if(!cycle_values.empty())
-        cycle_values.erase(cycle_values.begin(), cycle_values.end());
+    cycle_on = 0;
+    cycle_values.clear();
     if(v.size() > 1) {
         for(auto &i : v) {
             cv::Mat value = cv::imread(i);
-            cycle_values.push_back(value);
+            if(!value.empty()) {
+                cycle_values.push_back(std::move(value));
+            }
         }
-        cycle_index = 0;
-        frame_num = frame_skip;
-        blend_image_copy = cv::imread(v[0]);
-        blend_image_copy_set = true;
-        blend_set = true;
-        static std::random_device r;
-        static auto rng = std::default_random_engine(r());
-        std::shuffle(cycle_values.begin(), cycle_values.end(), rng);
+        if(!cycle_values.empty()) {
+            cycle_on = type;
+            cycle_index = 0;
+            frame_num = std::max(0, frame_skip);
+            blend_image_copy = cycle_values.front().clone();
+            blend_image_copy_set = true;
+            blend_set = true;
+            static std::random_device r;
+            static auto rng = std::default_random_engine(r());
+            std::shuffle(cycle_values.begin(), cycle_values.end(), rng);
+        } else {
+            blend_image_copy.release();
+            blend_image_copy_set = false;
+            blend_set = false;
+        }
     }
     mutex.unlock();
 }
@@ -411,7 +433,10 @@ void Playback::drawFilter(cv::Mat &frame, FilterValue &f) {
 void Playback::run() {
 
 #ifdef _WIN32
-    int duration = (1000/ac::fps)/4;
+    const double configured_fps = ac::fps;
+    int duration = configured_fps > 0.0
+                       ? static_cast<int>((1000.0 / configured_fps) / 4.0)
+                       : 10;
 #else
     int duration = 10;
 #endif
@@ -476,29 +501,36 @@ void Playback::run() {
             if(frame_count > frame_num) {
                 mutex.lock();
                 frame_count = 0;
-                switch(cycle_on) {
-                    case 0:
-                        break;
-                    case 1:
-                        cycle_image = &cycle_values[rand()%cycle_values.size()];
-                        break;
-                    case 2:
-                        cycle_image = &cycle_values[cycle_index];
-                        ++cycle_index;
-                        if(cycle_index > static_cast<int>(cycle_values.size()-1))
-                            cycle_index = 0;
+                if(cycle_values.empty()) {
+                    cycle_on = 0;
+                } else {
+                    cycle_index = std::clamp(
+                        cycle_index.load(), 0,
+                        static_cast<int>(cycle_values.size()) - 1);
+                    switch(cycle_on) {
+                        case 0:
+                            break;
+                        case 1:
+                            cycle_image = &cycle_values[rand()%cycle_values.size()];
+                            break;
+                        case 2:
+                            cycle_image = &cycle_values[cycle_index];
+                            ++cycle_index;
+                            if(cycle_index > static_cast<int>(cycle_values.size()-1))
+                                cycle_index = 0;
 
-                        break;
-                    case 3:
-                        cycle_image = &cycle_values[cycle_index];
-                        ++cycle_index;
-                        if(cycle_index > static_cast<int>(cycle_values.size()-1)) {
-                            cycle_index = 0;
-                            static std::random_device r;
-                            static auto rng = std::default_random_engine(r());
-                            std::shuffle(cycle_values.begin(), cycle_values.end(), rng);
-                        }
-                        break;
+                            break;
+                        case 3:
+                            cycle_image = &cycle_values[cycle_index];
+                            ++cycle_index;
+                            if(cycle_index > static_cast<int>(cycle_values.size()-1)) {
+                                cycle_index = 0;
+                                static std::random_device r;
+                                static auto rng = std::default_random_engine(r());
+                                std::shuffle(cycle_values.begin(), cycle_values.end(), rng);
+                            }
+                            break;
+                    }
                 }
                 if(blend_set == true && cycle_image != 0)
                     blend_image = cycle_image->clone();
@@ -566,9 +598,15 @@ void Playback::run() {
         if(video_shown == true) {
             if(frame.channels()==3) {
                 cv::cvtColor(frame, rgb_frame, cv::COLOR_BGR2RGB);
-                img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
+                img = QImage((const unsigned char *)(rgb_frame.data), rgb_frame.cols,
+                             rgb_frame.rows, static_cast<int>(rgb_frame.step),
+                             QImage::Format_RGB888)
+                          .copy();
             } else {
-                img = QImage((const unsigned char*)(frame.data), frame.cols, frame.rows, QImage::Format_Indexed8);
+                img = QImage((const unsigned char *)(frame.data), frame.cols,
+                             frame.rows, static_cast<int>(frame.step),
+                             QImage::Format_Grayscale8)
+                          .copy();
             }
             emit procImage(img);
             if(isStep == true) {
@@ -596,22 +634,18 @@ void Playback::run() {
 
 
 Playback::~Playback() {
-    // Stop the encoder thread first
+    // Playback can enqueue frames, so it must finish before the encoder is freed.
+    stop = true;
+    condition.wakeOne();
+    if(isRunning()) {
+        wait();
+    }
+
     if (encoder_thread) {
         encoder_thread->stopEncoding();
         delete encoder_thread;
         encoder_thread = nullptr;
     }
-    
-    mutex.lock();
-    stop = true;
-#if defined(__linux__) || defined(__APPLE__)
-    condition.wakeOne();
-#endif
-    mutex.unlock();
-#if defined(__linux__) || defined(__APPLE__)
-    wait();
-#endif
 }
 
 void Playback::setFrameIndex(const long &index) {
@@ -627,7 +661,10 @@ bool Playback::getFrame(QImage &img, const int &index) {
     cv::Mat frame;
     if(mode == MODE_VIDEO && capture.read(frame)) {
         cv::cvtColor(frame, rgb_frame, cv::COLOR_BGR2RGB);
-        img = QImage((const unsigned char*)(rgb_frame.data), rgb_frame.cols, rgb_frame.rows, QImage::Format_RGB888);
+        img = QImage((const unsigned char *)(rgb_frame.data), rgb_frame.cols,
+                     rgb_frame.rows, static_cast<int>(rgb_frame.step),
+                     QImage::Format_RGB888)
+                  .copy();
         mutex.unlock();
         setFrameIndex(index);
         return true;

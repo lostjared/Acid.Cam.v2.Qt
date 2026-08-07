@@ -23,6 +23,7 @@
 #include "color_range.h"
 #include "slitscan_win.h"
 #include "ffmpeg_write.h"
+#include "ffmpeg_mux_thread.h"
 
 class SearchWindow;
 class ChromaWindow;
@@ -153,6 +154,7 @@ public slots:
     void prev_filter();
     void showSlit();
     void onFFmpegFinished(QString tempFile, QString sourceFile, QString outputFile);
+    void onAudioMuxFinished(bool success, QString tempFile, QString outputFile);
     void customSearchChanged(const QString &text);
     void addSearchResult();
      
@@ -189,6 +191,7 @@ private:
     Controller controller;
 #endif
     QSettings *settings;
+    FFmpegMuxThread *mux_thread;
     std::vector<std::string> draw_strings;
     QLineEdit *custom_search_text;
     QComboBox *custom_search_combo;

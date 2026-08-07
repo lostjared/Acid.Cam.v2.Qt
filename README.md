@@ -18,6 +18,43 @@ Acid Cam is ideal for:
 
 ## Recent Updates
 
+
+## Bug Fixes:
+
+• Corrected 18 native-safety defects across six files.
+
+  Key fixes include:
+
+  1. Initialized previously undefined playback state.
+  2. Prevented restarting an active playback thread.
+  3. Fixed a locked mutex on camera-writer failure.
+  4. Guarded zero FPS division.
+  5. Rejected failed cycle-image loads.
+  6. Prevented empty-vector modulo/indexing.
+  7. Clamped cycle indices and delays.
+  8. Deep-copied preview QImage buffers.
+  9. Deep-copied seek-preview buffers.
+  10. Stopped playback before deleting its encoder.
+  11. Removed unsafe asynchronous thread termination.
+  12. Waited for prior encoder runs before restarting.
+  13. Closed stop/enqueue races and cleared stale frames.
+  14. Bounded the encoder queue to prevent memory exhaustion.
+  15. Rejected empty or incorrectly typed filter frames.
+  16. Fixed unknown-filter map insertion.
+  17. Validated sub-filter indices.
+  18. Hardened worker counts and row partitioning.
+
+  Primary changes are in Acid.Cam.v2.Qt/src/playback_thread.cpp:33, Acid.Cam.v2.Qt/src/ffmpeg_encoder_thread.cpp:20, libacidcam/source/ac.h:2952, and libacidcam/source/ac-filter1.cpp:179.
+
+  Validation completed:
+
+  - libacidcam Debug build: passed.
+  - Acid.Cam.v2.Qt Debug build against the updated library: passed.
+  - Focused invalid-input/threading regression checks: passed.
+  - Headless Qt startup smoke test: no immediate crash; stopped by the test timeout.
+
+  Interactive camera, recording, and filter-cycling tests still require a graphical session and capture device.
+
 ### New Interface (v1.80)
 
 The application has been redesigned with a new interface layout featuring organized sections for filter selection, custom filter chain management, and color adjustments — all accessible from the main window. The new interface includes:

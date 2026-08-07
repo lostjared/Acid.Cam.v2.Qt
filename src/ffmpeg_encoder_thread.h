@@ -19,6 +19,7 @@ class FFmpegEncoderThread : public QThread {
     Q_OBJECT
     
 private:
+    static constexpr size_t max_queued_frames = 120;
     std::queue<cv::Mat> frame_queue;
     QMutex queue_mutex;
     QWaitCondition queue_condition;

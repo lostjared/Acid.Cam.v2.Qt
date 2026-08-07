@@ -88,6 +88,7 @@ set(SOURCES
     slitscan_win.cpp
     ffmpeg_write.cpp
     ffmpeg_encoder_thread.cpp
+    ffmpeg_mux_thread.cpp
 )
 
 set(HEADERS
@@ -110,6 +111,7 @@ set(HEADERS
     slitscan_win.h
     ffmpeg_write.h
     ffmpeg_encoder_thread.h
+    ffmpeg_mux_thread.h
 )
 
 
