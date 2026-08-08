@@ -130,7 +130,7 @@ AC_MainWindow::AC_MainWindow(QWidget *parent) : QMainWindow(parent) {
     mux_thread = new FFmpegMuxThread(this);
     settings = new QSettings("LostSideDead", "Acid Cam Qt");
     setGeometry(100, 100, 900, 900);
-    setMinimumSize(900, 1080);
+    setMinimumSize(900, 900);
     setWindowTitle(tr("Acid Cam v2 - Qt"));
     createControls();
     createMenu();
