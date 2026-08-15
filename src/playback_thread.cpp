@@ -119,9 +119,9 @@ Playback::Playback(QObject *parent) : QThread(parent) {
     setFilterMap = false;
     filter_map_ex = filter_map;
     blend_image_copy_set = false;
-    ffmpeg_pipe = nullptr;
     use_ffmpeg = false;
     ffmpeg_mux_audio = false;
+    no_drop_recording = false;
     encoder_thread = new FFmpegEncoderThread(this);
     connect(encoder_thread, &FFmpegEncoderThread::ffmpegOutput,
             this, &Playback::ffmpegOutput);
@@ -179,6 +179,7 @@ void Playback::setVideo(cv::VideoCapture cap, cv::VideoWriter wr, bool record, b
     capture = cap;
     writer = wr;
     recording = record;
+    no_drop_recording = false;
     if(capture.isOpened()) {
         frame_rate =  capture.get(cv::CAP_PROP_FPS);
         if(frame_rate <= 0) frame_rate = 24;
@@ -200,6 +201,7 @@ bool Playback::setVideoCamera(std::string name, int type, int device, int res,
         return false;
     }
     recording = record;
+    no_drop_recording = false;
     writer = wr;
     frame_rate = fps;
     if(record == true && name.size()>0) {
@@ -627,7 +629,8 @@ void Playback::run() {
         
         mutex.lock();
         if(recording && use_ffmpeg && encoder_thread && encoder_thread->isEncoding()) {
-            // Send frame to encoder thread (non-blocking)
+            // No-drop mode blocks here until MXWrite has room; normal/live
+            // recording remains asynchronous and may discard stale frames.
             encoder_thread->enqueueFrame(frame);
         }
         else if(recording && writer.isOpened()) {
@@ -662,7 +665,7 @@ void Playback::run() {
         const double target_fps = sync_to_input_fps
                                       ? frame_rate.load()
                                       : static_cast<double>(ac::fps);
-        if(target_fps > 0.0) {
+        if(target_fps > 0.0 && !no_drop_recording) {
             const auto frame_time = std::chrono::duration<double, std::milli>(
                 1000.0 / target_fps);
             const auto elapsed = nowx - now;
@@ -818,7 +821,6 @@ void Playback::filterFade(cv::Mat &frame, FilterValue &filter1, FilterValue &fil
 }
 
 void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPath,
-                              FFmpegCodec codec,
                               const FFmpegEncodeOptions &options, double fps,
                               int width, int height,
                               bool muxAudio, const std::string &sourcePath) {
@@ -828,6 +830,7 @@ void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPat
     recording = true;
     use_ffmpeg = true;
     ffmpeg_mux_audio = muxAudio;
+    no_drop_recording = options.blockWhenFull;
     ffmpeg_source_path = sourcePath;
     ffmpeg_output_path = outputPath;
     
@@ -842,11 +845,11 @@ void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPat
     
     // Start background encoding thread
     if (encoder_thread && encoder_thread->startEncoding(
-                              outputPath, codec, resolution, resolution, fps,
+                              outputPath, resolution, resolution, fps,
                               options)) {
-        std::cout << "acidcam: Background FFmpeg encoder thread started\n";
+        std::cout << "acidcam: Background MXWrite encoder thread started\n";
     } else {
-        std::cerr << "acidcam: Failed to start background FFmpeg encoder thread\n";
+        std::cerr << "acidcam: Failed to start background MXWrite encoder thread\n";
         use_ffmpeg = false;
         recording = false;
     }
@@ -856,7 +859,6 @@ void Playback::setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPat
 
 bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device,
                                     int res, int requestedFps,
-                                    FFmpegCodec codec,
                                     const FFmpegEncodeOptions &options) {
     mutex.lock();
     mode = MODE_CAMERA;
@@ -865,6 +867,7 @@ bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device,
     recording = true;
     use_ffmpeg = true;
     ffmpeg_output_path = outputPath;
+    no_drop_recording = false;
 
     int res_w = 0, res_h = 0;
     double fps = 0.0;
@@ -883,11 +886,11 @@ bool Playback::setVideoCameraFFmpeg(const std::string &outputPath, int device,
     
     // Start background encoding thread
     if (encoder_thread && encoder_thread->startEncoding(
-                              outputPath, codec, resolution, resolution, fps,
+                              outputPath, resolution, resolution, fps,
                               options)) {
-        std::cout << "acidcam: Background FFmpeg encoder thread started (camera)\n";
+        std::cout << "acidcam: Background MXWrite encoder thread started (camera)\n";
     } else {
-        std::cerr << "acidcam: Failed to start background FFmpeg encoder thread (camera)\n";
+        std::cerr << "acidcam: Failed to start background MXWrite encoder thread (camera)\n";
         use_ffmpeg = false;
         recording = false;
         mutex.unlock();
@@ -936,7 +939,7 @@ void Playback::closeFFmpeg() {
     use_ffmpeg = false;
     recording = false;
     ffmpeg_mux_audio = false;
-    ffmpeg_pipe = nullptr;
+    no_drop_recording = false;
     
     mutex.unlock();
 }

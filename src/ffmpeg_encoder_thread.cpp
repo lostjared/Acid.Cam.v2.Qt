@@ -6,15 +6,28 @@
  */
 
 #include "ffmpeg_encoder_thread.h"
-#include <QDir>
-#include <QFile>
-#include <QTemporaryFile>
+#include <algorithm>
 #include <iostream>
+
+namespace {
+bool parseResolution(const std::string &resolution, int &width, int &height) {
+    const auto separator = resolution.find('x');
+    if(separator == std::string::npos)
+        return false;
+    try {
+        width = std::stoi(resolution.substr(0, separator));
+        height = std::stoi(resolution.substr(separator + 1));
+    } catch(const std::exception &) {
+        return false;
+    }
+    return width > 0 && height > 0;
+}
+}
 
 FFmpegEncoderThread::FFmpegEncoderThread(QObject *parent)
     : QThread(parent), stop_encoding(false), is_encoding(false),
-      ffmpeg_pipe(nullptr), diagnostic_log_position(0),
-      timestamped_input(false) {
+      output_width(0), output_height(0),
+      timestamped_input(false), block_when_full(false), frames_encoded(0) {
 }
 
 FFmpegEncoderThread::~FFmpegEncoderThread() {
@@ -22,9 +35,10 @@ FFmpegEncoderThread::~FFmpegEncoderThread() {
     wait();  // Wait for thread to finish
 }
 
-bool FFmpegEncoderThread::startEncoding(const std::string &output, FFmpegCodec codec,
+bool FFmpegEncoderThread::startEncoding(const std::string &output,
                                        const std::string &src_res, const std::string &dst_res,
                                        double fps, const FFmpegEncodeOptions &options) {
+    (void)src_res;
     if (is_encoding) {
         emit encodingError(QString::fromStdString("Encoding already in progress"));
         return false;
@@ -41,25 +55,31 @@ bool FFmpegEncoderThread::startEncoding(const std::string &output, FFmpegCodec c
         frame_queue.swap(empty_queue);
     }
     
-    QTemporaryFile diagnosticFile(
-        QDir::tempPath() + "/acidcam-ffmpeg-XXXXXX.log");
-    diagnosticFile.setAutoRemove(false);
-    if(!diagnosticFile.open()) {
-        emit encodingError(QString::fromStdString(
-            "Failed to create FFmpeg diagnostic log"));
+    if(!parseResolution(dst_res, output_width, output_height)) {
+        emit encodingError(QString::fromStdString("Invalid output resolution"));
         return false;
     }
-    diagnostic_log_path = diagnosticFile.fileName();
-    diagnosticFile.close();
-    diagnostic_log_position = 0;
-    timestamped_input = options.timestampInput;
 
-    ffmpeg_pipe = ffmpeg_open(output, codec, src_res, dst_res, fps, options,
-                              diagnostic_log_path.toStdString());
-    if (!ffmpeg_pipe) {
-        QFile::remove(diagnostic_log_path);
-        diagnostic_log_path.clear();
-        emit encodingError(QString::fromStdString("Failed to open FFmpeg pipe"));
+    mx::EncodeOptions mxOptions;
+    mxOptions.codec = options.codec;
+    mxOptions.crf = std::clamp(options.quality, 0, 51);
+    mxOptions.preset = options.preset;
+    mxOptions.tune = options.tune == "none" ? "" : options.tune;
+    mxOptions.ffmpeg_options = options.ffmpegOptions;
+    mxOptions.realtime = options.realtime;
+    mxOptions.block_when_full = options.blockWhenFull;
+    timestamped_input = options.timestampInput;
+    block_when_full = options.blockWhenFull;
+    frames_encoded = 0;
+
+    const bool opened = timestamped_input
+                            ? video_writer.open_ts(output, output_width,
+                                                   output_height, fps, mxOptions)
+                            : video_writer.open(output, output_width,
+                                                output_height, fps, mxOptions);
+    if(!opened) {
+        emit encodingError(QString::fromStdString(
+            "MXWrite failed to open the output video"));
         return false;
     }
     
@@ -78,14 +98,21 @@ void FFmpegEncoderThread::enqueueFrame(const cv::Mat &frame) {
         return;
     }
 
-    QMutexLocker locker(&queue_mutex);
-    if (!is_encoding || stop_encoding) {
+    if(block_when_full) {
+        // MXWrite's no-drop queue has exactly one pending slot. Submit from
+        // the playback/processing thread so its write() call provides the
+        // backpressure directly; do not build a second Qt-side frame queue.
+        if(is_encoding && !stop_encoding)
+            writeFrame(frame);
         return;
     }
 
+    QMutexLocker locker(&queue_mutex);
+    if(!is_encoding || stop_encoding)
+        return;
     // Bound memory use if the selected encoder cannot keep up with playback.
     const size_t queueLimit = timestamped_input ? 2 : max_queued_frames;
-    if (frame_queue.size() >= queueLimit) {
+    if(frame_queue.size() >= queueLimit) {
         frame_queue.pop();
     }
     frame_queue.push(frame.clone());
@@ -105,7 +132,7 @@ void FFmpegEncoderThread::stopEncoding() {
     
     // Wait for thread to process remaining frames and exit
     if (!wait(5000)) {  // Report slow shutdown, but never kill a C++ thread asynchronously.
-        std::cerr << "acidcam: FFmpeg encoder thread did not stop gracefully\n";
+        std::cerr << "acidcam: MXWrite encoder thread did not stop gracefully\n";
         wait();
     }
 }
@@ -116,8 +143,6 @@ size_t FFmpegEncoderThread::getQueueSize() {
 }
 
 void FFmpegEncoderThread::run() {
-    int frames_encoded = 0;
-    
     while (true) {
         cv::Mat frame;
         
@@ -139,51 +164,44 @@ void FFmpegEncoderThread::run() {
             if (!frame_queue.empty()) {
                 frame = frame_queue.front();
                 frame_queue.pop();
+                queue_condition.wakeAll();
             }
         }
 
-        drainDiagnosticLog();
-        
-        // Encode frame outside of mutex lock
-        if (!frame.empty() && ffmpeg_pipe) {
-            ffmpeg_write_frame(ffmpeg_pipe, frame);
-            ++frames_encoded;
-            
-            // Emit progress signal periodically (every 30 frames)
-            if (frames_encoded % 30 == 0) {
-                emit framesProcessed(frames_encoded);
-            }
-        }
+        writeFrame(frame);
     }
     
-    // Close the FFmpeg pipe
-    if (ffmpeg_pipe) {
-        ffmpeg_close(ffmpeg_pipe);
-        ffmpeg_pipe = nullptr;
-    }
-    drainDiagnosticLog();
-    QFile::remove(diagnostic_log_path);
-    diagnostic_log_path.clear();
+    if(video_writer.is_open())
+        video_writer.close();
     
     is_encoding = false;
     emit encodingStopped();
 }
 
-void FFmpegEncoderThread::drainDiagnosticLog() {
-    if(diagnostic_log_path.isEmpty())
+void FFmpegEncoderThread::writeFrame(const cv::Mat &frame) {
+    if(frame.empty() || !video_writer.is_open())
         return;
 
-    QFile file(diagnostic_log_path);
-    if(!file.open(QIODevice::ReadOnly) || !file.seek(diagnostic_log_position))
-        return;
+    cv::Mat sizedFrame;
+    if(frame.cols != output_width || frame.rows != output_height)
+        cv::resize(frame, sizedFrame, cv::Size(output_width, output_height));
+    else
+        sizedFrame = frame;
 
-    QByteArray output = file.readAll();
-    diagnostic_log_position = file.pos();
-    if(output.isEmpty())
-        return;
+    cv::Mat rgbaFrame;
+    if(sizedFrame.channels() == 4)
+        cv::cvtColor(sizedFrame, rgbaFrame, cv::COLOR_BGRA2RGBA);
+    else if(sizedFrame.channels() == 3)
+        cv::cvtColor(sizedFrame, rgbaFrame, cv::COLOR_BGR2RGBA);
+    else
+        cv::cvtColor(sizedFrame, rgbaFrame, cv::COLOR_GRAY2RGBA);
 
-    std::cerr.write(output.constData(), output.size());
-    std::cerr.flush();
-    output.replace('\r', '\n');
-    emit ffmpegOutput(QString::fromLocal8Bit(output));
+    if(timestamped_input)
+        video_writer.write_ts(rgbaFrame.data);
+    else
+        video_writer.write(rgbaFrame.data);
+
+    const int processed = ++frames_encoded;
+    if(processed % 30 == 0)
+        emit framesProcessed(processed);
 }

@@ -8,6 +8,10 @@
 
 #include "new_dialog.h"
 #include "main_window.h"
+#include "MXWrite/mxwrite.hpp"
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QTreeWidget>
 
 namespace {
 void populatePresetAndTuneControls(QComboBox *preset, QComboBox *tune) {
@@ -31,19 +35,159 @@ void populatePresetAndTuneControls(QComboBox *preset, QComboBox *tune) {
 FFmpegEncodeOptions selectedEncodeOptions(QSpinBox *quality,
                                           QComboBox *preset,
                                           QComboBox *tune,
+                                          QComboBox *codec,
+                                          QLineEdit *parameters,
                                           QCheckBox *realtime) {
     FFmpegEncodeOptions options;
     options.quality = quality->value();
     options.preset = preset->currentText().toStdString();
     options.tune = tune->currentText().toStdString();
+    options.codec = codec->currentData().toString().toStdString();
+    options.ffmpegOptions = parameters->text().trimmed().toStdString();
     options.realtime = realtime->isChecked();
     return options;
 }
 
-bool usesPresetAndTune(int codecIndex) {
-    const FFmpegCodec codec = static_cast<FFmpegCodec>(codecIndex);
-    return codec != FFmpegCodec::H264_VAAPI &&
-           codec != FFmpegCodec::HEVC_VAAPI;
+QString legacyCodecName(int index) {
+    static const QStringList names = {"libx264", "libx265", "h264_nvenc",
+                                      "hevc_nvenc", "h264_vaapi",
+                                      "hevc_vaapi"};
+    return index >= 0 && index < names.size() ? names.at(index) : "auto";
+}
+
+void populateVideoEncoders(QComboBox *combo, const QString &savedEncoder) {
+    combo->clear();
+    combo->addItem(QObject::tr("Automatic (NVENC, then software)"), "auto");
+    combo->addItem(QObject::tr("Automatic software H.264/H.265"), "software");
+    combo->addItem(QObject::tr("Automatic NVIDIA NVENC"), "nvenc");
+
+    for(const mx::EncoderInfo &encoder : mx::available_video_encoders()) {
+        const QString name = QString::fromStdString(encoder.name);
+        const QString longName = QString::fromStdString(encoder.long_name);
+        const QString backend = encoder.hardware ? QObject::tr("hardware")
+                                                 : QObject::tr("software");
+        combo->addItem(QString("%1 — %2 [%3]").arg(name, longName, backend),
+                       name);
+        const int index = combo->count() - 1;
+        combo->setItemData(index, longName, Qt::UserRole + 1);
+        combo->setItemData(index, QString::fromStdString(encoder.codec_name),
+                           Qt::UserRole + 2);
+        combo->setItemData(index, backend, Qt::UserRole + 3);
+        combo->setItemData(index,
+                           encoder.experimental ? QObject::tr("experimental")
+                                                : QObject::tr("stable"),
+                           Qt::UserRole + 4);
+        combo->setItemData(index,
+                           QString::fromStdString(encoder.pixel_formats),
+                           Qt::UserRole + 5);
+    }
+
+    int savedIndex = combo->findData(savedEncoder);
+    if(savedIndex < 0 && !savedEncoder.isEmpty()) {
+        combo->addItem(QObject::tr("%1 — unavailable in this FFmpeg build")
+                           .arg(savedEncoder),
+                       savedEncoder);
+        savedIndex = combo->count() - 1;
+    }
+    combo->setCurrentIndex(savedIndex >= 0 ? savedIndex : 0);
+}
+
+bool isExactEncoder(const QComboBox *combo) {
+    const QString name = combo->currentData().toString();
+    return name != "auto" && name != "software" && name != "nvenc";
+}
+
+void updateEncoderDetails(QComboBox *combo, QLabel *details,
+                          QPushButton *optionsButton) {
+    const bool exact = isExactEncoder(combo);
+    optionsButton->setEnabled(exact && combo->isEnabled());
+    const QString description = combo->currentData(Qt::UserRole + 1).toString();
+    if(description.isEmpty()) {
+        details->setText(exact
+                             ? QObject::tr("Exact FFmpeg encoder: %1")
+                                   .arg(combo->currentData().toString())
+                             : QObject::tr("MXWrite selects the concrete encoder at startup."));
+        return;
+    }
+    const QString codec = combo->currentData(Qt::UserRole + 2).toString();
+    const QString backend = combo->currentData(Qt::UserRole + 3).toString();
+    QString formats = combo->currentData(Qt::UserRole + 5).toString();
+    if(formats.isEmpty())
+        formats = QObject::tr("encoder-defined");
+    details->setText(QObject::tr("%1 | codec: %2 | %3 | pixel formats: %4")
+                         .arg(description, codec, backend, formats));
+}
+
+void showEncoderOptions(QWidget *parent, QComboBox *combo,
+                        QLineEdit *parameters) {
+    const QString encoderName = combo->currentData().toString();
+    if(!isExactEncoder(combo))
+        return;
+
+    QDialog dialog(parent);
+    dialog.setWindowTitle(QObject::tr("%1 Encoder Options").arg(encoderName));
+    dialog.resize(1000, 560);
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+    QLabel *summary = new QLabel(
+        QObject::tr("Double-click an option to append it to Extra FFmpeg parameters."),
+        &dialog);
+    layout->addWidget(summary);
+
+    QTreeWidget *tree = new QTreeWidget(&dialog);
+    tree->setColumnCount(6);
+    tree->setHeaderLabels({QObject::tr("Option"), QObject::tr("Type"),
+                           QObject::tr("Default"), QObject::tr("Range"),
+                           QObject::tr("Named values"),
+                           QObject::tr("Description")});
+    tree->setRootIsDecorated(false);
+    tree->setWordWrap(true);
+    const auto options =
+        mx::video_encoder_options(encoderName.toStdString());
+    for(const mx::EncoderOptionInfo &option : options) {
+        QString range;
+        if(!option.minimum.empty() || !option.maximum.empty()) {
+            range = QString("%1 … %2")
+                        .arg(QString::fromStdString(option.minimum),
+                             QString::fromStdString(option.maximum));
+        }
+        new QTreeWidgetItem(
+            tree, {"-" + QString::fromStdString(option.name),
+                   QString::fromStdString(option.type),
+                   QString::fromStdString(option.default_value), range,
+                   QString::fromStdString(option.choices),
+                   QString::fromStdString(option.help)});
+    }
+    if(tree->topLevelItemCount() == 0)
+        new QTreeWidgetItem(tree, {QObject::tr("(No private video AVOptions reported)")});
+    tree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    tree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    tree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    tree->header()->setSectionResizeMode(5, QHeaderView::Stretch);
+    layout->addWidget(tree);
+
+    QObject::connect(tree, &QTreeWidget::itemDoubleClicked, &dialog,
+                     [parameters, &dialog](QTreeWidgetItem *item, int) {
+        const QString optionName = item->text(0);
+        if(!optionName.startsWith('-'))
+            return;
+        bool accepted = false;
+        QString value = QInputDialog::getText(
+            &dialog, QObject::tr("Set Encoder Option"),
+            QObject::tr("%1 value:").arg(optionName), QLineEdit::Normal,
+            item->text(2), &accepted);
+        if(!accepted)
+            return;
+        if(value.contains(' ') || value.contains('\t') || value.contains('"')) {
+            value.replace('\\', "\\\\");
+            value.replace('"', "\\\"");
+            value = '"' + value + '"';
+        }
+        QString current = parameters->text().trimmed();
+        if(!current.isEmpty())
+            current += ' ';
+        parameters->setText(current + optionName + ' ' + value);
+    });
+    dialog.exec();
 }
 }
 
@@ -117,43 +261,58 @@ void CaptureCamera::createControls() {
     
     QLabel *codecLabel = new QLabel(tr("Codec:"), this);
     ffmpeg_codec = new QComboBox(this);
-    for (int i = 0; i < static_cast<int>(FFmpegCodec::CODEC_COUNT); ++i) {
-        ffmpeg_codec->addItem(getCodecDescription(static_cast<FFmpegCodec>(i)));
-    }
-    if (ffmpeg_check_nvenc()) {
-        ffmpeg_codec->setCurrentIndex(static_cast<int>(FFmpegCodec::H264_NVENC));
-    }
-    const int savedCodec = settings->value(
-        "camera/ffmpeg_codec", ffmpeg_codec->currentIndex()).toInt();
-    if(savedCodec >= 0 && savedCodec < ffmpeg_codec->count())
-        ffmpeg_codec->setCurrentIndex(savedCodec);
+    const QString savedCodec = settings->contains("camera/ffmpeg_codec_name")
+                                   ? settings->value("camera/ffmpeg_codec_name").toString()
+                               : settings->contains("camera/ffmpeg_codec")
+                                   ? legacyCodecName(settings->value(
+                                         "camera/ffmpeg_codec").toInt())
+                                   : QString("auto");
+    populateVideoEncoders(ffmpeg_codec, savedCodec);
     ffmpegGrid->addWidget(codecLabel, 0, 0);
     ffmpegGrid->addWidget(ffmpeg_codec, 0, 1);
+
+    encoder_details = new QLabel(this);
+    encoder_details->setWordWrap(true);
+    encoder_details->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    ffmpegGrid->addWidget(encoder_details, 1, 0, 1, 2);
+    encoder_options = new QPushButton(tr("Show Encoder Options..."), this);
+    ffmpegGrid->addWidget(encoder_options, 2, 1);
     
     QLabel *crfLabel = new QLabel(tr("Quality (CRF/CQ/QP):"), this);
     spin_crf = new QSpinBox(this);
     spin_crf->setRange(0, 51);
     spin_crf->setValue(settings->value("camera/ffmpeg_quality", 18).toInt());
     spin_crf->setToolTip(tr("Lower = better quality and a larger file. 18-23 is recommended."));
-    ffmpegGrid->addWidget(crfLabel, 1, 0);
-    ffmpegGrid->addWidget(spin_crf, 1, 1);
+    ffmpegGrid->addWidget(crfLabel, 3, 0);
+    ffmpegGrid->addWidget(spin_crf, 3, 1);
 
     ffmpeg_preset = new QComboBox(this);
     ffmpeg_tune = new QComboBox(this);
     populatePresetAndTuneControls(ffmpeg_preset, ffmpeg_tune);
     ffmpeg_preset->setCurrentText(settings->value("camera/ffmpeg_preset", "medium").toString());
     ffmpeg_tune->setCurrentText(settings->value("camera/ffmpeg_tune", "none").toString());
-    ffmpegGrid->addWidget(new QLabel(tr("Preset:"), this), 2, 0);
-    ffmpegGrid->addWidget(ffmpeg_preset, 2, 1);
-    ffmpegGrid->addWidget(new QLabel(tr("Tune:"), this), 3, 0);
-    ffmpegGrid->addWidget(ffmpeg_tune, 3, 1);
+    ffmpegGrid->addWidget(new QLabel(tr("Preset:"), this), 4, 0);
+    ffmpegGrid->addWidget(ffmpeg_preset, 4, 1);
+    ffmpegGrid->addWidget(new QLabel(tr("Tune:"), this), 5, 0);
+    ffmpegGrid->addWidget(ffmpeg_tune, 5, 1);
+
+    ffmpeg_parameters = new QLineEdit(
+        settings->value("camera/ffmpeg_parameters", "").toString(), this);
+    ffmpeg_parameters->setPlaceholderText(
+        tr("-profile:v high -level 4.1 -pix_fmt yuv420p"));
+    ffmpeg_parameters->setToolTip(
+        tr("Additional FFmpeg-style encoder options passed to MXWrite. "
+           "Do not include input or output filenames."));
+    ffmpegGrid->addWidget(new QLabel(tr("Extra FFmpeg parameters:"), this),
+                          6, 0);
+    ffmpegGrid->addWidget(ffmpeg_parameters, 6, 1);
 
     chk_realtime = new QCheckBox(tr("Realtime (low latency)"), this);
     chk_realtime->setChecked(settings->value("camera/ffmpeg_realtime", true).toBool());
     chk_realtime->setToolTip(
         tr("Reduces encoder buffering for live camera capture and overrides "
            "the selected tune with a low-latency tune."));
-    ffmpegGrid->addWidget(chk_realtime, 4, 0, 1, 2);
+    ffmpegGrid->addWidget(chk_realtime, 7, 0, 1, 2);
 
     chk_timestamp_frames = new QCheckBox(
         tr("Timestamp frames using capture time"), this);
@@ -162,7 +321,7 @@ void CaptureCamera::createControls() {
     chk_timestamp_frames->setToolTip(
         tr("Use wall-clock timestamps and variable frame timing to prevent "
            "camera recordings from drifting when processing slows down."));
-    ffmpegGrid->addWidget(chk_timestamp_frames, 5, 0, 1, 2);
+    ffmpegGrid->addWidget(chk_timestamp_frames, 8, 0, 1, 2);
     
     ffmpegLayout->addLayout(ffmpegGrid);
     mainLayout->addWidget(ffmpegGroup);
@@ -187,6 +346,9 @@ void CaptureCamera::createControls() {
     connect(btn_select, SIGNAL(clicked()), this, SLOT(btn_Select()));
     connect(chk_use_ffmpeg, SIGNAL(stateChanged(int)), this, SLOT(onUseFFmpegChanged(int)));
     connect(ffmpeg_codec, SIGNAL(currentIndexChanged(int)), this, SLOT(onCodecChanged(int)));
+    connect(encoder_options, &QPushButton::clicked, this, [this]() {
+        showEncoderOptions(this, ffmpeg_codec, ffmpeg_parameters);
+    });
     
     onUseFFmpegChanged(Qt::Checked);
     onCodecChanged(ffmpeg_codec->currentIndex());
@@ -196,17 +358,19 @@ void CaptureCamera::onUseFFmpegChanged(int state) {
     bool useFFmpeg = (state == Qt::Checked);
     ffmpeg_codec->setEnabled(useFFmpeg);
     spin_crf->setEnabled(useFFmpeg);
-    ffmpeg_preset->setEnabled(useFFmpeg && usesPresetAndTune(ffmpeg_codec->currentIndex()));
-    ffmpeg_tune->setEnabled(useFFmpeg && usesPresetAndTune(ffmpeg_codec->currentIndex()));
+    ffmpeg_preset->setEnabled(useFFmpeg);
+    ffmpeg_tune->setEnabled(useFFmpeg);
+    ffmpeg_parameters->setEnabled(useFFmpeg);
+    encoder_details->setEnabled(useFFmpeg);
+    updateEncoderDetails(ffmpeg_codec, encoder_details, encoder_options);
     chk_realtime->setEnabled(useFFmpeg);
     chk_timestamp_frames->setEnabled(useFFmpeg);
     video_type->setEnabled(!useFFmpeg);
 }
 
 void CaptureCamera::onCodecChanged(int index) {
-    const bool enabled = chk_use_ffmpeg->isChecked() && usesPresetAndTune(index);
-    ffmpeg_preset->setEnabled(enabled);
-    ffmpeg_tune->setEnabled(enabled);
+    (void)index;
+    updateEncoderDetails(ffmpeg_codec, encoder_details, encoder_options);
 }
 
 void CaptureCamera::setParent(AC_MainWindow *p) {
@@ -233,15 +397,16 @@ void CaptureCamera::btn_Select() {
 void CaptureCamera::btn_Start() {
     int vtype = video_type->currentIndex();
     bool useFFmpeg = chk_use_ffmpeg->isChecked();
-    FFmpegCodec codec = static_cast<FFmpegCodec>(ffmpeg_codec->currentIndex());
     const FFmpegEncodeOptions options = selectedEncodeOptions(
-        spin_crf, ffmpeg_preset, ffmpeg_tune, chk_realtime);
+        spin_crf, ffmpeg_preset, ffmpeg_tune, ffmpeg_codec,
+        ffmpeg_parameters, chk_realtime);
     FFmpegEncodeOptions cameraOptions = options;
     cameraOptions.timestampInput = chk_timestamp_frames->isChecked();
-    settings->setValue("camera/ffmpeg_codec", ffmpeg_codec->currentIndex());
+    settings->setValue("camera/ffmpeg_codec_name", ffmpeg_codec->currentData());
     settings->setValue("camera/ffmpeg_quality", options.quality);
     settings->setValue("camera/ffmpeg_preset", ffmpeg_preset->currentText());
     settings->setValue("camera/ffmpeg_tune", ffmpeg_tune->currentText());
+    settings->setValue("camera/ffmpeg_parameters", ffmpeg_parameters->text().trimmed());
     settings->setValue("camera/ffmpeg_realtime", options.realtime);
     settings->setValue("camera/ffmpeg_timestamp_frames",
                        cameraOptions.timestampInput);
@@ -251,7 +416,7 @@ void CaptureCamera::btn_Start() {
     if(output_dir->text().length() > 0) {
         if(win_parent->startCamera(combo_res->currentIndex(), combo_device->currentIndex(), 
                                    output_dir->text(), chk_record->isChecked(), vtype,
-                                   useFFmpeg, codec, cameraOptions,
+                                   useFFmpeg, cameraOptions,
                                    chk_sync_fps->isChecked(),
                                    combo_fps->currentText().toInt())) {
             hide();
@@ -317,43 +482,67 @@ void CaptureVideo::createControls() {
     
     QLabel *codecLabel = new QLabel(tr("Codec:"), this);
     ffmpeg_codec = new QComboBox(this);
-    for (int i = 0; i < static_cast<int>(FFmpegCodec::CODEC_COUNT); ++i) {
-        ffmpeg_codec->addItem(getCodecDescription(static_cast<FFmpegCodec>(i)));
-    }
-    if (ffmpeg_check_nvenc()) {
-        ffmpeg_codec->setCurrentIndex(static_cast<int>(FFmpegCodec::H264_NVENC));
-    }
-    const int savedCodec = settings->value(
-        "video/ffmpeg_codec", ffmpeg_codec->currentIndex()).toInt();
-    if(savedCodec >= 0 && savedCodec < ffmpeg_codec->count())
-        ffmpeg_codec->setCurrentIndex(savedCodec);
+    const QString savedCodec = settings->contains("video/ffmpeg_codec_name")
+                                   ? settings->value("video/ffmpeg_codec_name").toString()
+                               : settings->contains("video/ffmpeg_codec")
+                                   ? legacyCodecName(settings->value(
+                                         "video/ffmpeg_codec").toInt())
+                                   : QString("auto");
+    populateVideoEncoders(ffmpeg_codec, savedCodec);
     ffmpegGrid->addWidget(codecLabel, 0, 0);
     ffmpegGrid->addWidget(ffmpeg_codec, 0, 1);
+
+    encoder_details = new QLabel(this);
+    encoder_details->setWordWrap(true);
+    encoder_details->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    ffmpegGrid->addWidget(encoder_details, 1, 0, 1, 2);
+    encoder_options = new QPushButton(tr("Show Encoder Options..."), this);
+    ffmpegGrid->addWidget(encoder_options, 2, 1);
     
     QLabel *crfLabel = new QLabel(tr("Quality (CRF/CQ/QP):"), this);
     spin_crf = new QSpinBox(this);
     spin_crf->setRange(0, 51);
     spin_crf->setValue(settings->value("video/ffmpeg_quality", 18).toInt());
     spin_crf->setToolTip(tr("Lower = better quality, larger file. 18-23 recommended."));
-    ffmpegGrid->addWidget(crfLabel, 1, 0);
-    ffmpegGrid->addWidget(spin_crf, 1, 1);
+    ffmpegGrid->addWidget(crfLabel, 3, 0);
+    ffmpegGrid->addWidget(spin_crf, 3, 1);
 
     ffmpeg_preset = new QComboBox(this);
     ffmpeg_tune = new QComboBox(this);
     populatePresetAndTuneControls(ffmpeg_preset, ffmpeg_tune);
     ffmpeg_preset->setCurrentText(settings->value("video/ffmpeg_preset", "medium").toString());
     ffmpeg_tune->setCurrentText(settings->value("video/ffmpeg_tune", "none").toString());
-    ffmpegGrid->addWidget(new QLabel(tr("Preset:"), this), 2, 0);
-    ffmpegGrid->addWidget(ffmpeg_preset, 2, 1);
-    ffmpegGrid->addWidget(new QLabel(tr("Tune:"), this), 3, 0);
-    ffmpegGrid->addWidget(ffmpeg_tune, 3, 1);
+    ffmpegGrid->addWidget(new QLabel(tr("Preset:"), this), 4, 0);
+    ffmpegGrid->addWidget(ffmpeg_preset, 4, 1);
+    ffmpegGrid->addWidget(new QLabel(tr("Tune:"), this), 5, 0);
+    ffmpegGrid->addWidget(ffmpeg_tune, 5, 1);
+
+    ffmpeg_parameters = new QLineEdit(
+        settings->value("video/ffmpeg_parameters", "").toString(), this);
+    ffmpeg_parameters->setPlaceholderText(
+        tr("-profile:v high -level 4.1 -pix_fmt yuv420p"));
+    ffmpeg_parameters->setToolTip(
+        tr("Additional FFmpeg-style encoder options passed to MXWrite. "
+           "Do not include input or output filenames."));
+    ffmpegGrid->addWidget(new QLabel(tr("Extra FFmpeg parameters:"), this),
+                          6, 0);
+    ffmpegGrid->addWidget(ffmpeg_parameters, 6, 1);
 
     chk_realtime = new QCheckBox(tr("Realtime (low latency)"), this);
     chk_realtime->setChecked(settings->value("video/ffmpeg_realtime", false).toBool());
     chk_realtime->setToolTip(
         tr("Reduces buffering and overrides the selected tune with a "
            "low-latency tune; normally only needed for live input."));
-    ffmpegGrid->addWidget(chk_realtime, 4, 0, 1, 2);
+    ffmpegGrid->addWidget(chk_realtime, 7, 0, 1, 2);
+
+    chk_no_drop = new QCheckBox(tr("No Drop (pace processing to encoder)"),
+                                this);
+    chk_no_drop->setChecked(
+        settings->value("video/ffmpeg_no_drop", false).toBool());
+    chk_no_drop->setToolTip(
+        tr("Block file processing when the encoder is full so every processed "
+           "frame is written. This can make processing slower than realtime."));
+    ffmpegGrid->addWidget(chk_no_drop, 8, 0, 1, 2);
     
     ffmpegLayout->addLayout(ffmpegGrid);
     
@@ -386,6 +575,9 @@ void CaptureVideo::createControls() {
     connect(btn_start, SIGNAL(clicked()), this, SLOT(btn_Start()));
     connect(chk_use_ffmpeg, SIGNAL(stateChanged(int)), this, SLOT(onUseFFmpegChanged(int)));
     connect(ffmpeg_codec, SIGNAL(currentIndexChanged(int)), this, SLOT(onCodecChanged(int)));
+    connect(encoder_options, &QPushButton::clicked, this, [this]() {
+        showEncoderOptions(this, ffmpeg_codec, ffmpeg_parameters);
+    });
     
     onUseFFmpegChanged(Qt::Checked);
     onCodecChanged(ffmpeg_codec->currentIndex());
@@ -395,17 +587,20 @@ void CaptureVideo::onUseFFmpegChanged(int state) {
     bool useFFmpeg = (state == Qt::Checked);
     ffmpeg_codec->setEnabled(useFFmpeg);
     spin_crf->setEnabled(useFFmpeg);
-    ffmpeg_preset->setEnabled(useFFmpeg && usesPresetAndTune(ffmpeg_codec->currentIndex()));
-    ffmpeg_tune->setEnabled(useFFmpeg && usesPresetAndTune(ffmpeg_codec->currentIndex()));
+    ffmpeg_preset->setEnabled(useFFmpeg);
+    ffmpeg_tune->setEnabled(useFFmpeg);
+    ffmpeg_parameters->setEnabled(useFFmpeg);
+    encoder_details->setEnabled(useFFmpeg);
+    chk_no_drop->setEnabled(useFFmpeg);
+    updateEncoderDetails(ffmpeg_codec, encoder_details, encoder_options);
     chk_realtime->setEnabled(useFFmpeg);
     chk_mux_audio->setEnabled(useFFmpeg);
     video_type->setEnabled(!useFFmpeg);
 }
 
 void CaptureVideo::onCodecChanged(int index) {
-    const bool enabled = chk_use_ffmpeg->isChecked() && usesPresetAndTune(index);
-    ffmpeg_preset->setEnabled(enabled);
-    ffmpeg_tune->setEnabled(enabled);
+    (void)index;
+    updateEncoderDetails(ffmpeg_codec, encoder_details, encoder_options);
 }
 
 void CaptureVideo::setParent(AC_MainWindow *p) {
@@ -451,20 +646,23 @@ void CaptureVideo::btn_Start() {
     
     int num = video_type->currentIndex();
     bool useFFmpeg = chk_use_ffmpeg->isChecked();
-    FFmpegCodec codec = static_cast<FFmpegCodec>(ffmpeg_codec->currentIndex());
-    const FFmpegEncodeOptions options = selectedEncodeOptions(
-        spin_crf, ffmpeg_preset, ffmpeg_tune, chk_realtime);
+    FFmpegEncodeOptions options = selectedEncodeOptions(
+        spin_crf, ffmpeg_preset, ffmpeg_tune, ffmpeg_codec,
+        ffmpeg_parameters, chk_realtime);
+    options.blockWhenFull = chk_no_drop->isChecked();
     bool muxAudio = chk_mux_audio->isChecked();
-    settings->setValue("video/ffmpeg_codec", ffmpeg_codec->currentIndex());
+    settings->setValue("video/ffmpeg_codec_name", ffmpeg_codec->currentData());
     settings->setValue("video/ffmpeg_quality", options.quality);
     settings->setValue("video/ffmpeg_preset", ffmpeg_preset->currentText());
     settings->setValue("video/ffmpeg_tune", ffmpeg_tune->currentText());
+    settings->setValue("video/ffmpeg_parameters", ffmpeg_parameters->text().trimmed());
     settings->setValue("video/ffmpeg_realtime", options.realtime);
+    settings->setValue("video/ffmpeg_no_drop", options.blockWhenFull);
     settings->setValue("video/sync_processing_fps", chk_sync_fps->isChecked());
     
     if(win_parent->startVideo(edit_src->text(), edit_outdir->text(), 
                               chk_record->isChecked(), chk_png->isChecked(), num,
-                              useFFmpeg, codec, options, muxAudio,
+                              useFFmpeg, options, muxAudio,
                               chk_sync_fps->isChecked())) {
         hide();
     } else {

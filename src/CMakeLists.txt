@@ -3,7 +3,7 @@ project(Acid_Cam_v2_Qt VERSION 1.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -95,6 +95,10 @@ list(FILTER SDL2_LDFLAGS EXCLUDE REGEX "SDL2main")
 
 # Use find_package for OpenCV (pkg-config opencv4.pc not always available, e.g. MinGW)
 find_package(OpenCV REQUIRED)
+
+# MXWrite links directly to the FFmpeg libraries. No ffmpeg executable is
+# launched at runtime.
+add_subdirectory(MXWrite)
 # Fix empty OpenCV_INCLUDE_DIRS during MinGW cross-compilation
 if(MINGW AND (NOT OpenCV_INCLUDE_DIRS OR OpenCV_INCLUDE_DIRS STREQUAL ""))
     set(_mingw_sysroot "/usr/x86_64-w64-mingw32/sys-root/mingw")
@@ -241,6 +245,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
         ${ACIDCAM_LIBRARIES}
         ${OpenCV_LIBS}
         ${SDL2_LIBRARIES}
+        mxwrite
     )
 else()
     target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -253,6 +258,7 @@ else()
         ${ACIDCAM_LIBRARIES}
         ${OpenCV_LIBS}
         ${SDL2_LIBRARIES}
+        mxwrite
     )
 endif()
 

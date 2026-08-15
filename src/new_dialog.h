@@ -29,6 +29,9 @@ public:
     QComboBox *ffmpeg_codec;
     QSpinBox *spin_crf;
     QComboBox *ffmpeg_preset, *ffmpeg_tune;
+    QLineEdit *ffmpeg_parameters;
+    QLabel *encoder_details;
+    QPushButton *encoder_options;
     QCheckBox *chk_realtime, *chk_timestamp_frames;
     QCheckBox *chk_sync_fps;
     
@@ -59,7 +62,11 @@ public:
     QComboBox *ffmpeg_codec;
     QSpinBox *spin_crf;
     QComboBox *ffmpeg_preset, *ffmpeg_tune;
+    QLineEdit *ffmpeg_parameters;
+    QLabel *encoder_details;
+    QPushButton *encoder_options;
     QCheckBox *chk_realtime;
+    QCheckBox *chk_no_drop;
     QCheckBox *chk_mux_audio;
     QCheckBox *chk_sync_fps;
     

@@ -36,12 +36,10 @@ public:
     void Log(const QString &s);
     bool startCamera(int res, int dev, const QString &outdir, bool record, int type,
                      bool useFFmpeg = false,
-                     FFmpegCodec codec = FFmpegCodec::LIBX264,
                      const FFmpegEncodeOptions &options = FFmpegEncodeOptions(),
                      bool syncToInputFps = true, int cameraFps = 30);
     bool startVideo(const QString &filename, const QString &outdir, bool record, bool png_record, int type,
                     bool useFFmpeg = false,
-                    FFmpegCodec codec = FFmpegCodec::LIBX264,
                     const FFmpegEncodeOptions &options = FFmpegEncodeOptions(),
                     bool muxAudio = true, bool syncToInputFps = true);
     QListWidget /**filters,*/ *custom_filters;

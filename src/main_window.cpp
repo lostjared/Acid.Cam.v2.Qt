@@ -6,6 +6,7 @@
 
 
 #include "main_window.h"
+#include <QFileInfo>
 #include<mutex>
 #include"plugin.h"
 #include<sys/stat.h>
@@ -1241,7 +1242,7 @@ void AC_MainWindow::Log(const QString &s) {
 }
 
 bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool record, int type,
-                                bool useFFmpeg, FFmpegCodec ffmpegCodec,
+                                bool useFFmpeg,
                                 const FFmpegEncodeOptions &ffmpegOptions,
                                 bool syncToInputFps, int cameraFps) {
     programMode = MODE_CAMERA;
@@ -1296,7 +1297,8 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
     QString out_type;
     if(useFFmpeg) {
         ext = ".mp4";
-        out_type = QString("FFmpeg.%1").arg(getCodecName(ffmpegCodec));
+        out_type = QString("FFmpeg.%1").arg(
+            QString::fromStdString(ffmpegOptions.codec));
     } else {
         switch(type) {
             case 0:
@@ -1325,12 +1327,14 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         video_file_name = output_name;
         QString out_s;
         QTextStream out_stream(&out_s);
-        out_stream << "Now recording with FFmpeg (" << getCodecDescription(ffmpegCodec) << ") to: " << output_name 
+        out_stream << "Now recording with FFmpeg (" << ffmpegOptions.codec.c_str()
+                   << ") to: " << output_name
                    << "\nResolution: " << res_w << "x" << res_h
                    << " FPS: " << cameraFps
                    << " Quality: " << ffmpegOptions.quality
                    << " Preset: " << ffmpegOptions.preset.c_str()
                    << " Tune: " << ffmpegOptions.tune.c_str()
+                   << " Extra options: " << ffmpegOptions.ffmpegOptions.c_str()
                    << " Realtime: " << (ffmpegOptions.realtime ? "yes" : "no")
                    << " Timestamp frames: "
                    << (ffmpegOptions.timestampInput ? "yes" : "no")
@@ -1339,7 +1343,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
         Log(out_s);
         
         rt_val = playback->setVideoCameraFFmpeg(
-            output_name.toStdString(), dev, res, cameraFps, ffmpegCodec,
+            output_name.toStdString(), dev, res, cameraFps,
             ffmpegOptions);
     } else {
         int c_type = 0;
@@ -1402,7 +1406,7 @@ bool AC_MainWindow::startCamera(int res, int dev, const QString &outdir, bool re
 }
 
 bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, bool record, bool png_record, int type,
-                               bool useFFmpeg, FFmpegCodec ffmpegCodec,
+                               bool useFFmpeg,
                                const FFmpegEncodeOptions &ffmpegOptions,
                                bool muxAudio, bool syncToInputFps) {
     programMode = MODE_VIDEO;
@@ -1454,7 +1458,8 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
     
     if(useFFmpeg) {
         ext = ".mp4";
-        out_type = QString("FFmpeg.%1").arg(getCodecName(ffmpegCodec));
+        out_type = QString("FFmpeg.%1").arg(
+            QString::fromStdString(ffmpegOptions.codec));
     } else {
         switch(type) {
             case 0:
@@ -1484,12 +1489,15 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         video_file_name = output_name;
         QString out_s;
         QTextStream out_stream(&out_s);
-        out_stream << "Now recording with FFmpeg (" << getCodecDescription(ffmpegCodec) << ") to: " << output_name 
+        out_stream << "Now recording with FFmpeg (" << ffmpegOptions.codec.c_str()
+                   << ") to: " << output_name
                    << "\nResolution: " << res_w << "x" << res_h
                    << " Quality: " << ffmpegOptions.quality
                    << " Preset: " << ffmpegOptions.preset.c_str()
                    << " Tune: " << ffmpegOptions.tune.c_str()
+                   << " Extra options: " << ffmpegOptions.ffmpegOptions.c_str()
                    << " Realtime: " << (ffmpegOptions.realtime ? "yes" : "no")
+                   << " No drop: " << (ffmpegOptions.blockWhenFull ? "yes" : "no")
                    << " Sync FPS: " << (syncToInputFps ? "yes" : "no")
                    << "\n";
         if(muxAudio) {
@@ -1498,7 +1506,7 @@ bool AC_MainWindow::startVideo(const QString &filename, const QString &outdir, b
         Log(out_s);
         
         playback->setVideoFFmpeg(capture_video, output_name.toStdString(),
-                                 ffmpegCodec, ffmpegOptions, video_fps, res_w,
+                                 ffmpegOptions, video_fps, res_w,
                                  res_h,
                                  muxAudio, filename.toStdString());
     } else if(recording) {
@@ -1861,13 +1869,35 @@ void AC_MainWindow::onAudioMuxFinished(bool success, QString tempFile,
         QMessageBox::information(this, tr("Encoding Complete"), 
             tr("Video encoding complete with audio from source."));
     } else {
+        const QFileInfo tempInfo(tempFile);
+        const QFileInfo outputInfo(outputFile);
+        const bool finalCopyIsValid = tempInfo.exists() && outputInfo.exists() &&
+                                      tempInfo.size() > 0 &&
+                                      tempInfo.size() == outputInfo.size();
+        const bool removed = finalCopyIsValid && QFile::remove(tempFile);
         QString msg;
         QTextStream stream(&msg);
-        stream << "Audio muxing failed. Video saved to: " << tempFile << "\n";
+        if(finalCopyIsValid) {
+            stream << "Audio muxing failed. Video without audio saved to: "
+                   << outputFile << "\n";
+        } else {
+            stream << "Audio muxing failed before a valid final copy was "
+                      "created. Video preserved at: "
+                   << tempFile << "\n";
+        }
+        if(finalCopyIsValid && !removed)
+            stream << "Could not remove temporary video: " << tempFile << "\n";
         Log(msg);
         statusBar()->showMessage(tr("Audio muxing failed"));
         QMessageBox::warning(this, tr("Audio Muxing Failed"), 
-            tr("Could not copy audio from source. Video file saved without audio."));
+            removed
+                ? tr("Could not copy audio from source. The final video was "
+                     "saved without audio and the temporary file was removed.")
+            : finalCopyIsValid
+                ? tr("Could not copy audio from source or remove the temporary "
+                     "file. The final video was saved without audio.")
+                : tr("Could not copy audio from source or create the final "
+                     "copy. The temporary video was preserved."));
     }
 }
 

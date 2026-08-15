@@ -5,7 +5,7 @@
 
 Acid Cam is a **real-time glitch art application** for processing live webcam feeds and video files through a massive library of visual distortion filters. It is built for artists, VJs, musicians, and anyone interested in creating unique, one-of-a-kind visual effects commonly referred to as **Acid Glitches**. The application takes video input — either from a webcam or a video file — and runs each frame through one or more pixel-manipulation filters in real time, producing output that ranges from subtle color shifts to extreme psychedelic distortions.
 
-With over **2,200 filters** powered by the [libacidcam](https://github.com/lostjared/libacidcam) filter engine, Acid Cam can generate an essentially limitless variety of visual effects. Filters can be applied individually or chained together in a custom sequence. Many filters support **sub-filters**, allowing you to compose complex multi-layered effects. The results can be recorded directly to video files using the integrated FFmpeg encoder or exported as individual PNG frames.
+With over **2,200 filters** powered by the [libacidcam](https://github.com/lostjared/libacidcam) filter engine, Acid Cam can generate an essentially limitless variety of visual effects. Filters can be applied individually or chained together in a custom sequence. Many filters support **sub-filters**, allowing you to compose complex multi-layered effects. The results can be recorded directly to video files using the integrated MXWrite encoder or exported as individual PNG frames.
 
 Acid Cam is ideal for:
 - Generating foundational glitch artwork for further manipulation in other software
@@ -133,7 +133,7 @@ Open **Controls → Options** and set the **Max Frames** value to control how ma
 
 - **OS:** Linux, macOS, or Windows
 - **RAM:** 8 GB minimum (16 GB recommended for 1080p workflows)
-- **FFmpeg:** Must be installed and available on PATH for video encoding
+- **FFmpeg development libraries:** Required when building MXWrite; the `ffmpeg` executable is not used at runtime
 - **GPU (optional):** OpenCL-capable GPU for accelerated filter processing; NVIDIA or VAAPI-capable GPU for hardware video encoding
 
 ## Dependencies
@@ -144,10 +144,10 @@ Open **Controls → Options** and set the **Max Frames** value to control how ma
 | OpenCV 3.0+ | Video capture, image processing, matrix operations |
 | Qt6 (or Qt5 5.15+) | GUI framework (Widgets, OpenGL, Network) |
 | SDL2 | Audio/display support |
-| FFmpeg | Video encoding and audio muxing |
+| MXWrite + FFmpeg libraries | In-process video encoding and audio muxing |
 | pkg-config | Build dependency resolution |
 | CMake 3.16+ | Build system |
-| C++17 compiler | GCC, Clang, or MSVC with C++17 support |
+| C++20 compiler | GCC, Clang, or MSVC with C++20 support |
 
 ## Building from Source
 
@@ -156,7 +156,8 @@ Open **Controls → Options** and set the **Max Frames** value to control how ma
 ```bash
 # Install dependencies
 sudo apt-get install build-essential cmake pkg-config \
-    qt6-base-dev libopencv-dev libsdl2-dev ffmpeg \
+    qt6-base-dev libopencv-dev libsdl2-dev libavcodec-dev libavformat-dev \
+    libavutil-dev libswscale-dev \
     git autoconf automake libtool
 
 # Build and install libacidcam first
@@ -232,7 +233,8 @@ A MinGW toolchain file and build scripts are provided. See the `scripts/` direct
 
 ### Recording & Export
 
-- **FFmpeg encoding** with codec selection (libx264 recommended), CRF quality control, and optional audio muxing from the source video
+- **MXWrite encoding** with codec selection (libx264 recommended), CRF quality control, and optional in-process audio muxing from the source video
+- **No Drop mode** for video files — keeps one pending encoder frame and paces frame processing to encoder capacity instead of building a large queue
 - **PNG frame export** — Save every processed frame as an individual PNG
 - **Snapshots** (Ctrl+A) — Save the current frame as a PNG at any time
 - **Legacy OpenCV encoding** — MPEG-4, AVC, XviD (produces larger files)
@@ -305,4 +307,3 @@ This project is released under the **GPLv3 License**. See [LICENSE](LICENSE) for
 ## Links
 
 - [libacidcam — Core Filter Library](https://github.com/lostjared/libacidcam)
-

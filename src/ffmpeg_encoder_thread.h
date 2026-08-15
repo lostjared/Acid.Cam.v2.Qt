@@ -10,6 +10,7 @@
 
 #include "qtheaders.h"
 #include "ffmpeg_write.h"
+#include "MXWrite/mxwrite.hpp"
 #include <opencv2/opencv.hpp>
 #include <queue>
 #include <atomic>
@@ -25,26 +26,28 @@ private:
     QWaitCondition queue_condition;
     std::atomic<bool> stop_encoding;
     std::atomic<bool> is_encoding;
-    FILE *ffmpeg_pipe;
-    QString diagnostic_log_path;
-    qint64 diagnostic_log_position;
+    mx::Writer video_writer;
+    int output_width;
+    int output_height;
     bool timestamped_input;
+    bool block_when_full;
+    std::atomic<int> frames_encoded;
 
-    void drainDiagnosticLog();
+    void writeFrame(const cv::Mat &frame);
     
 public:
     FFmpegEncoderThread(QObject *parent = nullptr);
     ~FFmpegEncoderThread();
     
     // Start encoding to output file
-    bool startEncoding(const std::string &output, FFmpegCodec codec,
+    bool startEncoding(const std::string &output,
                       const std::string &src_res, const std::string &dst_res,
                       double fps, const FFmpegEncodeOptions &options);
     
     // Queue a frame for encoding
     void enqueueFrame(const cv::Mat &frame);
     
-    // Stop encoding and close pipe
+    // Stop encoding and finalize the MXWrite stream.
     void stopEncoding();
     
     // Check if currently encoding

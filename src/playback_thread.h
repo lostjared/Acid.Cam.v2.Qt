@@ -62,11 +62,11 @@ private:
     std::unordered_map<std::string, FilterValue> filter_map_ex;
     std::atomic<bool> setFilterMap;
     std::unordered_map<std::string, FilterValue> filter_map_ex_set;
-    FILE *ffmpeg_pipe;
     std::atomic<bool> use_ffmpeg;
     std::string ffmpeg_output_path;
     std::string ffmpeg_source_path;
     std::atomic<bool> ffmpeg_mux_audio;
+    std::atomic<bool> no_drop_recording;
     FFmpegEncoderThread *encoder_thread;
     
 public:
@@ -125,11 +125,11 @@ public:
     void setSyncToInputFps(bool enabled);
     void setChromaImage(cv::Mat &frame);
     void setVideoFFmpeg(cv::VideoCapture cap, const std::string &outputPath,
-                        FFmpegCodec codec, const FFmpegEncodeOptions &options,
+                        const FFmpegEncodeOptions &options,
                         double fps, int width, int height,
                         bool muxAudio, const std::string &sourcePath);
     bool setVideoCameraFFmpeg(const std::string &outputPath, int device, int res,
-                              int requestedFps, FFmpegCodec codec,
+                              int requestedFps,
                               const FFmpegEncodeOptions &options);
     void closeFFmpeg();
     
