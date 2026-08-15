@@ -3,6 +3,6 @@ Architecture: amd64
 Maintainer: Jared Bruni
 Depends: libopencv-dev, qt5-default,libsdl2-2.0-0,libacidcam
 Priority: optional
-Version: 1.76.11
+Version: 2.0.3
 Description: Acid.Cam
 	Turns Webcam or Video files into interactive work of art

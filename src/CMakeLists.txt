@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(Acid_Cam_v2_Qt VERSION 1.0 LANGUAGES CXX)
+project(Acid_Cam_v2_Qt VERSION 2.0.3 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
