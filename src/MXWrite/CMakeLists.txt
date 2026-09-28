@@ -13,7 +13,7 @@ if(APPLE)
     else()
         set(HOMEBREW_PREFIX "/usr/local" CACHE PATH "Homebrew prefix for Intel")
     endif()
-    
+
     # If not explicitly set, try to detect
     if(NOT DEFINED HOMEBREW_PREFIX OR HOMEBREW_PREFIX STREQUAL "")
         execute_process(
@@ -23,7 +23,7 @@ if(APPLE)
             ERROR_QUIET
         )
     endif()
-    
+
     if(HOMEBREW_PREFIX)
         message(STATUS "Using Homebrew prefix: ${HOMEBREW_PREFIX}")
         list(APPEND CMAKE_PREFIX_PATH "${HOMEBREW_PREFIX}")
@@ -32,59 +32,67 @@ if(APPLE)
     endif()
 endif()
 
-find_package(PkgConfig REQUIRED)
 find_package(CUDAToolkit QUIET)
 
-pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
-    libavcodec>=58.0.0
-    libavformat>=58.0.0
-    libavutil>=56.0.0
-    libswscale>=5.0.0
-)
+if(MSVC)
+    # vcpkg supplies FindFFMPEG with configuration-specific libraries and
+    # their transitive dependencies. A custom FindFFMPEG module also works.
+    find_package(FFMPEG REQUIRED)
+    set(MXWRITE_FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES})
+else()
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
+        libavcodec>=58.0.0
+        libavformat>=58.0.0
+        libavutil>=56.0.0
+        libswscale>=5.0.0
+    )
 
 
-if(NOT FFMPEG_FOUND)
-    message(STATUS "FFmpeg not found via pkg-config, attempting manual search...")
-    
-    if(APPLE AND HOMEBREW_PREFIX)
-        # Search in Homebrew directories
-        find_path(FFMPEG_INCLUDE_DIR libavcodec/avcodec.h
-            HINTS "${HOMEBREW_PREFIX}/include"
-            NO_DEFAULT_PATH
-        )
-        find_library(AVCODEC_LIBRARY avcodec
-            HINTS "${HOMEBREW_PREFIX}/lib"
-            NO_DEFAULT_PATH
-        )
-        find_library(AVFORMAT_LIBRARY avformat
-            HINTS "${HOMEBREW_PREFIX}/lib"
-            NO_DEFAULT_PATH
-        )
-        find_library(AVUTIL_LIBRARY avutil
-            HINTS "${HOMEBREW_PREFIX}/lib"
-            NO_DEFAULT_PATH
-        )
-        find_library(SWSCALE_LIBRARY swscale
-            HINTS "${HOMEBREW_PREFIX}/lib"
-            NO_DEFAULT_PATH
-        )
-        
-        if(FFMPEG_INCLUDE_DIR AND AVCODEC_LIBRARY AND AVFORMAT_LIBRARY AND AVUTIL_LIBRARY AND SWSCALE_LIBRARY)
-            set(FFMPEG_FOUND TRUE)
-            set(FFMPEG_INCLUDE_DIRS "${FFMPEG_INCLUDE_DIR}")
-            set(FFMPEG_LIBRARIES ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY})
-            message(STATUS "Found FFmpeg in Homebrew: ${HOMEBREW_PREFIX}")
+    if(NOT FFMPEG_FOUND)
+        message(STATUS "FFmpeg not found via pkg-config, attempting manual search...")
+
+        if(APPLE AND HOMEBREW_PREFIX)
+            # Search in Homebrew directories
+            find_path(FFMPEG_INCLUDE_DIR libavcodec/avcodec.h
+                HINTS "${HOMEBREW_PREFIX}/include"
+                NO_DEFAULT_PATH
+            )
+            find_library(AVCODEC_LIBRARY avcodec
+                HINTS "${HOMEBREW_PREFIX}/lib"
+                NO_DEFAULT_PATH
+            )
+            find_library(AVFORMAT_LIBRARY avformat
+                HINTS "${HOMEBREW_PREFIX}/lib"
+                NO_DEFAULT_PATH
+            )
+            find_library(AVUTIL_LIBRARY avutil
+                HINTS "${HOMEBREW_PREFIX}/lib"
+                NO_DEFAULT_PATH
+            )
+            find_library(SWSCALE_LIBRARY swscale
+                HINTS "${HOMEBREW_PREFIX}/lib"
+                NO_DEFAULT_PATH
+            )
+
+            if(FFMPEG_INCLUDE_DIR AND AVCODEC_LIBRARY AND AVFORMAT_LIBRARY AND AVUTIL_LIBRARY AND SWSCALE_LIBRARY)
+                set(FFMPEG_FOUND TRUE)
+                set(FFMPEG_INCLUDE_DIRS "${FFMPEG_INCLUDE_DIR}")
+                set(FFMPEG_LIBRARIES ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY})
+                message(STATUS "Found FFmpeg in Homebrew: ${HOMEBREW_PREFIX}")
+            endif()
+        endif()
+
+        if(NOT FFMPEG_FOUND)
+            message(FATAL_ERROR "FFmpeg libraries not found. Please install FFmpeg: brew install ffmpeg")
+        endif()
+    else()
+        message(STATUS "Found FFmpeg via pkg-config")
+        if(NOT FFMPEG_LIBRARIES AND FFMPEG_LINK_LIBRARIES)
+            set(FFMPEG_LIBRARIES ${FFMPEG_LINK_LIBRARIES})
         endif()
     endif()
-    
-    if(NOT FFMPEG_FOUND)
-        message(FATAL_ERROR "FFmpeg libraries not found. Please install FFmpeg: brew install ffmpeg")
-    endif()
-else()
-    message(STATUS "Found FFmpeg via pkg-config")
-    if(NOT FFMPEG_LIBRARIES AND FFMPEG_LINK_LIBRARIES)
-        set(FFMPEG_LIBRARIES ${FFMPEG_LINK_LIBRARIES})
-    endif()
+    set(MXWRITE_FFMPEG_LIBRARIES PkgConfig::FFMPEG)
 endif()
 
 set(CMAKE_REQUIRED_INCLUDES ${FFMPEG_INCLUDE_DIRS})
@@ -164,7 +172,7 @@ if(FFMPEG_LIBRARY_DIRS)
     target_link_directories(mxwrite PUBLIC ${FFMPEG_LIBRARY_DIRS})
 endif()
 
-target_link_libraries(mxwrite PUBLIC PkgConfig::FFMPEG Threads::Threads)
+target_link_libraries(mxwrite PUBLIC ${MXWRITE_FFMPEG_LIBRARIES} Threads::Threads)
 
 if(CUDAToolkit_FOUND)
     # PUBLIC: this define changes the layout of class mx::Writer (adds the
@@ -180,7 +188,13 @@ else()
     message(STATUS "MXWrite: CUDA runtime not found, device-frame ingestion disabled")
 endif()
 
-target_compile_options(mxwrite PRIVATE -O3 -Wall -Wextra -pedantic)
+if(MSVC)
+    target_compile_options(mxwrite PRIVATE /W4 /utf-8 /Zc:__cplusplus)
+    # CUDA/Windows headers must not define min/max macros in consumers either.
+    target_compile_definitions(mxwrite PUBLIC NOMINMAX)
+else()
+    target_compile_options(mxwrite PRIVATE -O3 -Wall -Wextra -pedantic)
+endif()
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(

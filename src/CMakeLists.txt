@@ -10,9 +10,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 set(_acidcam_static_gnu_runtime_default ON)
-if(APPLE)
-    # AppleClang uses libc++ and the Darwin runtime. It does not provide the
-    # GNU-only -static-libgcc or -static-libstdc++ linker options.
+if(APPLE OR MSVC)
+    # AppleClang and MSVC do not use the GNU runtime libraries.
     set(_acidcam_static_gnu_runtime_default OFF)
 endif()
 option(ACIDCAM_STATIC_GNU_RUNTIME "Link libgcc and libstdc++ statically"
@@ -67,31 +66,41 @@ elseif(NOT OPENGL_FOUND)
     message(FATAL_ERROR "OpenGL not found")
 endif()
 
-find_package(PkgConfig REQUIRED)
-if(NOT CMAKE_CROSSCOMPILING)
-    set(_acidcam_pkg_config_paths "/usr/local/lib/pkgconfig")
-    if(APPLE AND HOMEBREW_PREFIX)
-        list(PREPEND _acidcam_pkg_config_paths
-            "${HOMEBREW_PREFIX}/lib/pkgconfig"
-            "${HOMEBREW_PREFIX}/share/pkgconfig"
-        )
+if(MSVC)
+    # Native packages preserve Debug/Release library selection and do not
+    # require a Unix pkg-config installation. Supply their install prefixes
+    # through CMAKE_PREFIX_PATH, or use the vcpkg CMake toolchain.
+    find_package(acidcam CONFIG REQUIRED)
+    set(ACIDCAM_LIBRARIES acidcam::acidcam)
+    find_package(SDL2 CONFIG REQUIRED)
+    set(SDL2_LIBRARIES SDL2::SDL2)
+else()
+    find_package(PkgConfig REQUIRED)
+    if(NOT CMAKE_CROSSCOMPILING AND NOT WIN32)
+        set(_acidcam_pkg_config_paths "/usr/local/lib/pkgconfig")
+        if(APPLE AND HOMEBREW_PREFIX)
+            list(PREPEND _acidcam_pkg_config_paths
+                "${HOMEBREW_PREFIX}/lib/pkgconfig"
+                "${HOMEBREW_PREFIX}/share/pkgconfig"
+            )
+        endif()
+        list(JOIN _acidcam_pkg_config_paths ":" _acidcam_pkg_config_path)
+        if(DEFINED ENV{PKG_CONFIG_PATH} AND NOT "$ENV{PKG_CONFIG_PATH}" STREQUAL "")
+            string(APPEND _acidcam_pkg_config_path ":$ENV{PKG_CONFIG_PATH}")
+        endif()
+        set(ENV{PKG_CONFIG_PATH} "${_acidcam_pkg_config_path}")
+        unset(_acidcam_pkg_config_path)
+        unset(_acidcam_pkg_config_paths)
     endif()
-    list(JOIN _acidcam_pkg_config_paths ":" _acidcam_pkg_config_path)
-    if(DEFINED ENV{PKG_CONFIG_PATH} AND NOT "$ENV{PKG_CONFIG_PATH}" STREQUAL "")
-        string(APPEND _acidcam_pkg_config_path ":$ENV{PKG_CONFIG_PATH}")
-    endif()
-    set(ENV{PKG_CONFIG_PATH} "${_acidcam_pkg_config_path}")
-    unset(_acidcam_pkg_config_path)
-    unset(_acidcam_pkg_config_paths)
+
+    pkg_check_modules(ACIDCAM REQUIRED acidcam)
+    pkg_check_modules(SDL2 REQUIRED sdl2)
+
+    # Remove SDL2main from link libraries - this Qt app has its own main(),
+    # and SDL2main provides a conflicting main() wrapper.
+    list(REMOVE_ITEM SDL2_LIBRARIES SDL2main -lSDL2main)
+    list(FILTER SDL2_LDFLAGS EXCLUDE REGEX "SDL2main")
 endif()
-
-pkg_check_modules(ACIDCAM REQUIRED acidcam)
-pkg_check_modules(SDL2 REQUIRED sdl2)
-
-# Remove SDL2main from link libraries - this Qt app has its own main(),
-# and SDL2main provides a conflicting main() wrapper.
-list(REMOVE_ITEM SDL2_LIBRARIES SDL2main -lSDL2main)
-list(FILTER SDL2_LDFLAGS EXCLUDE REGEX "SDL2main")
 
 # Use find_package for OpenCV (pkg-config opencv4.pc not always available, e.g. MinGW)
 find_package(OpenCV REQUIRED)
@@ -225,8 +234,13 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # Prevent SDL from hijacking main() - we manage our own entry point
 target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
 
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /utf-8 /Zc:__cplusplus)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX _USE_MATH_DEFINES)
+endif()
+
 # Static linking of GNU runtime libraries
-if(ACIDCAM_STATIC_GNU_RUNTIME AND NOT APPLE
+if(ACIDCAM_STATIC_GNU_RUNTIME AND NOT APPLE AND NOT MSVC
    AND CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)$")
     target_link_options(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
     if(MINGW)
@@ -271,6 +285,13 @@ if(WIN32)
         dwmapi
         uxtheme
     )
+endif()
+
+option(ACIDCAM_DEPLOY_RUNTIME "Copy Windows runtime DLLs and Qt plugins after linking" ${MSVC})
+set(ACIDCAM_RUNTIME_DIRS "" CACHE STRING "Additional directories to search for Windows runtime DLLs")
+if(ACIDCAM_DEPLOY_RUNTIME AND WIN32 AND NOT CMAKE_CROSSCOMPILING)
+    include(cmake/WindowsDeployment.cmake)
+    acidcam_enable_windows_deployment(${PROJECT_NAME})
 endif()
 
 install(TARGETS ${PROJECT_NAME}
